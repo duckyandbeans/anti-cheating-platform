@@ -93,6 +93,11 @@
         #exam-section { display: none; }
         #status-msg { text-align: center; margin-top: 1rem; font-weight: 600; }
         .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; padding: 10px; background: #fee2e2; border-radius: 4px; }
+        
+        .teacher-link {
+            text-align: center; margin-top: 15px; font-size: 0.85rem; color: #9ca3af; cursor: pointer; text-decoration: underline;
+        }
+        .teacher-link:hover { color: #4b5563; }
     </style>
     
     <!-- LOAD FIREBASE (COMPAT VERSION) -->
@@ -128,6 +133,9 @@
         </div>
         <button class="btn" id="startBtn" onclick="startExam()">Start Exam</button>
         <p class="error-msg" id="login-error"></p>
+        
+        <!-- TEACHER LOGIN LINK -->
+        <div class="teacher-link" onclick="teacherLogin()">Teacher's Login</div>
     </div>
 
     <!-- 2. EXAM SCREEN -->
@@ -144,7 +152,7 @@
 
 <script>
     // ============================================
-    // YOUR CONFIG IS ALREADY PASTED HERE
+    // FIREBASE CONFIGURATION
     // ============================================
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
@@ -275,7 +283,7 @@
             if (--timer < 0) {
                 clearInterval(timerInterval);
                 alert("⏰ TIME IS UP! Submitting your answers automatically.");
-                submitExam(true); // Force auto-submit
+                submitExam(true); 
             }
         }, 1000);
     }
@@ -299,8 +307,23 @@
         }
     });
 
-    // 5. ONE-TIME ENTRY LOGIC (Anti-Reset)
-    async function startExam() {
+    // 5. TEACHER LOGIN LOGIC
+    function teacherLogin() {
+        const pass = prompt("Enter Teacher Password:");
+        if (pass === "030") {
+            // Auto-fill dummy data to pass validation
+            document.getElementById('studentClass').value = "XII H"; // Default
+            document.getElementById('studentNo').value = "0";
+            document.getElementById('studentName').value = "TEACHER_TEST";
+            // Start in Bypass Mode
+            startExam(true);
+        } else {
+            alert("Incorrect Password");
+        }
+    }
+
+    // 6. START EXAM (TIME LOCK + ANTI-RESET + TEACHER MODE)
+    async function startExam(isTeacher = false) {
         const btn = document.getElementById('startBtn');
         const errorMsg = document.getElementById('login-error');
         
@@ -310,6 +333,16 @@
         
         if(!cls || !no || !name) { alert("Please fill in all details."); return; }
 
+        // --- TIME LOCK (8 PM WIB on Dec 4, 2025) ---
+        const EXAM_START_DATE = new Date("2025-12-04T20:00:00+07:00");
+        const now = new Date();
+
+        // IF NOT TEACHER -> Check Time
+        if (!isTeacher && now < EXAM_START_DATE) {
+            alert("⏳ The exam has not started yet.\nPlease come back at 8:00 PM (20:00 WIB).");
+            return;
+        }
+
         btn.disabled = true;
         btn.innerText = "Checking access...";
         errorMsg.style.display = 'none';
@@ -317,24 +350,28 @@
         const uniqueID = `${cls}_${no}`;
 
         try {
-            const docRef = db.collection("exam_starts").doc(uniqueID);
-            const docSnap = await docRef.get();
+            // IF NOT TEACHER -> Check Database for existing user
+            if (!isTeacher) {
+                const docRef = db.collection("exam_starts").doc(uniqueID);
+                const docSnap = await docRef.get();
 
-            if (docSnap.exists) {
-                const data = docSnap.data();
-                btn.innerText = "Access Denied";
-                errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed. Contact teacher if this is an error.`;
-                errorMsg.style.display = 'block';
-                return; 
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    btn.innerText = "Access Denied";
+                    errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed. Contact teacher if this is an error.`;
+                    errorMsg.style.display = 'block';
+                    return; 
+                }
+
+                // Log start time to prevent reset
+                await docRef.set({
+                    class: cls,
+                    number: no,
+                    name: name,
+                    startTime: new Date().toLocaleTimeString(),
+                    timestamp: new Date().toString()
+                });
             }
-
-            await docRef.set({
-                class: cls,
-                number: no,
-                name: name,
-                startTime: new Date().toLocaleTimeString(),
-                timestamp: new Date().toString()
-            });
 
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('exam-section').style.display = 'block';
@@ -354,7 +391,6 @@
     async function submitExam(isAuto = false) {
         if(!isAuto && !confirm("Are you sure you want to finish?")) return;
         
-        // Stop the timer
         clearInterval(timerInterval);
 
         const btn = document.getElementById('submitBtn');
@@ -406,11 +442,9 @@
             status.style.color = "green";
             status.innerText = "✅ Submitted! You can close this tab.";
             
-            // Show alert unless it was auto-submitted (to avoid popup spam)
             if(!isAuto) {
                 alert(`Exam Submitted!\nYour Score: ${finalPercentage}%`);
             } else {
-                // If auto-submitted, replace the screen content so they know
                 document.body.innerHTML = `<div class="container" style="text-align:center"><h1>⏰ Time's Up!</h1><p>Your exam was automatically submitted.</p><h2>Score: ${finalPercentage}%</h2></div>`;
             }
 
