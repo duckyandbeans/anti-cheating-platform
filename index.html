@@ -256,7 +256,11 @@
 
         } catch (e) {
             console.error(e);
-            alert("Connection error. Please refresh and try again.");
+            if (e.code === 'permission-denied') {
+                alert("⛔ ERROR: Database is LOCKED. Teacher needs to change Firebase Rules to 'allow read, write: if true;'");
+            } else {
+                alert("Connection error: " + e.message);
+            }
             btn.disabled = false;
             btn.innerText = "Start Exam";
         }
@@ -294,8 +298,7 @@
             
             if (isCorrect) score++;
             
-            // --- DETAILED LOGGING (Answers & 1/0) ---
-            answerSheet.push(`Q${q.id}:${userAns.replace(/\|/g, "-")}`); // Prevent pipe conflict
+            answerSheet.push(`Q${q.id}:${userAns.replace(/\|/g, "-")}`); 
             gradingSheet.push(isCorrect ? "1" : "0");
         });
 
