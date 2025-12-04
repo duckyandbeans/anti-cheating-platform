@@ -67,6 +67,23 @@
             animation: pulse 2s infinite;
         }
 
+        /* TIMER BOX */
+        #timer-box {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #111827;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: none; /* Hidden until exam starts */
+            z-index: 9999;
+            border: 2px solid var(--primary);
+        }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -75,10 +92,17 @@
 
         #exam-section { display: none; }
         #status-msg { text-align: center; margin-top: 1rem; font-weight: 600; }
-        .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; }
+        .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; padding: 10px; background: #fee2e2; border-radius: 4px; }
     </style>
+    
+    <!-- LOAD FIREBASE (COMPAT VERSION) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+<!-- TIMER DISPLAY -->
+<div id="timer-box">⏱️ 01:30:00</div>
 
 <div class="container">
     <div id="cheat-alert">⚠️ WARNING: You have left the exam screen! This event is being recorded.</div>
@@ -90,10 +114,8 @@
             <label>Class</label>
             <select id="studentClass">
                 <option value="">Select your class...</option>
-                <option value="10-A">10-A</option>
-                <option value="10-B">10-B</option>
-                <option value="11-A">11-A</option>
-                <option value="12-A">12-A</option>
+                <option value="XII H">XII H</option>
+                <option value="XII I">XII I</option>
             </select>
         </div>
         <div class="form-group">
@@ -120,303 +142,84 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
+<script>
     // ============================================
-    // ⚠️ PASTE YOUR FIREBASE CONFIG HERE
+    // YOUR CONFIG IS ALREADY PASTED HERE
     // ============================================
     const firebaseConfig = {
-      // ... PASTE YOUR KEYS HERE ...
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+      measurementId: "G-84YB5CYGM8"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // Initialize Firebase
+    let db;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        console.log("Firebase initialized successfully");
+    } catch (e) {
+        console.error("Firebase Error:", e);
+        alert("System Error: Could not connect to database.");
+    }
 
     // ============================================
     // EXAM QUESTIONS DATA
     // ============================================
     const EXAM_DATA = [
         // --- SECTION A: Tense and Conditionals ---
-        {
-            id: 1, type: "mcq", 
-            question: "By the time the final results were published, the lead scientist ____ the entire experimental procedure three times to ensure accuracy.",
-            options: ["verifies", "had verified", "was verifying", "has verified", "is verifying"],
-            answer: "had verified"
-        },
-        {
-            id: 2, type: "mcq", 
-            question: "While the team ____ the complex data, the supervisor walked around the office providing constructive criticism.",
-            options: ["analyzed", "was analyzing", "had analyzed", "analyzes", "has analyzed"],
-            answer: "was analyzing"
-        },
-        {
-            id: 3, type: "mcq", 
-            question: "Whenever the market ____ an unexpected shift, the investment firm immediately adjusts its portfolio risk assessment.",
-            options: ["detected", "has detected", "detects", "is detecting", "had detected"],
-            answer: "detects"
-        },
-        {
-            id: 4, type: "mcq", 
-            question: "They ____ the prototype design by Friday next week, so the engineering director asked them to prepare the final schematics this week.",
-            options: ["have finalized", "finalize", "will finalize", "will have finalized", "are finalizing"],
-            answer: "will have finalized"
-        },
-        {
-            id: 5, type: "mcq", 
-            question: "I ____ to accept the new position, but I received a better offer from my current employer at the last minute.",
-            options: ["intend", "was intending", "had intended", "have intended", "am intending"],
-            answer: "had intended"
-        },
-        {
-            id: 6, type: "mcq", 
-            question: "Had the committee foreseen the technical glitches, they ____ the product launch until the hardware was fully tested.",
-            options: ["would delay", "will delay", "had delayed", "would have delayed", "delayed"],
-            answer: "would have delayed"
-        },
-        {
-            id: 7, type: "mcq", 
-            question: "If you cool liquid nitrogen below its boiling point, it ____ and becomes a liquid again.",
-            options: ["condenses", "will condensate", "condensed", "is condensing", "condensates"],
-            answer: "condenses" 
-        },
-        {
-            id: 8, type: "mcq", 
-            question: "If the supply chain had not been disrupted last month, the company ____ its current production quotas now.",
-            options: ["meets", "would meet", "will meet", "would be meeting", "had met"],
-            answer: "would be meeting"
-        },
-        {
-            id: 9, type: "mcq", 
-            question: "If the CEO ____ the policy, the employees will stage a protest.",
-            options: ["ignores", "ignored", "had ignored", "would ignore", "would have ignored"],
-            answer: "ignores"
-        },
-        {
-            id: 10, type: "mcq", 
-            question: "Unless the temperature ____ above 37°C, the chemical reaction will not begin.",
-            options: ["raises", "raised", "will raise", "is raising", "rises"],
-            answer: "rises"
-        },
+        { id: 1, type: "mcq", question: "By the time the final results were published, the lead scientist ____ the entire experimental procedure three times to ensure accuracy.", options: ["verifies", "had verified", "was verifying", "has verified", "is verifying"], answer: "had verified" },
+        { id: 2, type: "mcq", question: "While the team ____ the complex data, the supervisor walked around the office providing constructive criticism.", options: ["analyzed", "was analyzing", "had analyzed", "analyzes", "has analyzed"], answer: "was analyzing" },
+        { id: 3, type: "mcq", question: "Whenever the market ____ an unexpected shift, the investment firm immediately adjusts its portfolio risk assessment.", options: ["detected", "has detected", "detects", "is detecting", "had detected"], answer: "detects" },
+        { id: 4, type: "mcq", question: "They ____ the prototype design by Friday next week, so the engineering director asked them to prepare the final schematics this week.", options: ["have finalized", "finalize", "will finalize", "will have finalized", "are finalizing"], answer: "will have finalized" },
+        { id: 5, type: "mcq", question: "I ____ to accept the new position, but I received a better offer from my current employer at the last minute.", options: ["intend", "was intending", "had intended", "have intended", "am intending"], answer: "had intended" },
+        { id: 6, type: "mcq", question: "Had the committee foreseen the technical glitches, they ____ the product launch until the hardware was fully tested.", options: ["would delay", "will delay", "had delayed", "would have delayed", "delayed"], answer: "would have delayed" },
+        { id: 7, type: "mcq", question: "If you cool liquid nitrogen below its boiling point, it ____ and becomes a liquid again.", options: ["condenses", "will condensate", "condensed", "is condensing", "condensates"], answer: "condenses" },
+        { id: 8, type: "mcq", question: "If the supply chain had not been disrupted last month, the company ____ its current production quotas now.", options: ["meets", "would meet", "will meet", "would be meeting", "had met"], answer: "would be meeting" },
+        { id: 9, type: "mcq", question: "If the CEO ____ the policy, the employees will stage a protest.", options: ["ignores", "ignored", "had ignored", "would ignore", "would have ignored"], answer: "ignores" },
+        { id: 10, type: "mcq", question: "Unless the temperature ____ above 37°C, the chemical reaction will not begin.", options: ["raises", "raised", "will raise", "is raising", "rises"], answer: "rises" },
 
         // --- SECTION B: Modals ---
-        {
-            id: 11, type: "mcq", 
-            question: "According to the university’s honor code, all students ____ cite their sources correctly when submitting academic work.",
-            options: ["should", "ought", "must", "need", "have"],
-            answer: "must"
-        },
-        {
-            id: 12, type: "mcq", 
-            question: "If you are serious about becoming fluent, you ____ practice speaking the language every day for at least 30 minutes.",
-            options: ["must", "have", "should", "need", "ought"],
-            answer: "should"
-        },
-        {
-            id: 13, type: "mcq", 
-            question: "All laboratory personnel ____ wear protective eyewear while handling corrosive substances, as mandated by federal safety standards.",
-            options: ["ought", "should", "must", "have", "need"],
-            answer: "must"
-        },
-        {
-            id: 14, type: "mcq", 
-            question: "The new recruits ____ pass a comprehensive background check before being granted access to classified documents.",
-            options: ["ought to", "should", "have to", "must", "need"],
-            answer: "must"
-        },
-        {
-            id: 15, type: "mcq", 
-            question: "To minimize risk in trading, investors ____ diversify their holdings across different markets and asset classes.",
-            options: ["ought to", "must", "have", "should", "need"],
-            answer: "should"
-        },
+        { id: 11, type: "mcq", question: "According to the university’s honor code, all students ____ cite their sources correctly when submitting academic work.", options: ["should", "ought", "must", "need", "have"], answer: "must" },
+        { id: 12, type: "mcq", question: "If you are serious about becoming fluent, you ____ practice speaking the language every day for at least 30 minutes.", options: ["must", "have", "should", "need", "ought"], answer: "should" },
+        { id: 13, type: "mcq", question: "All laboratory personnel ____ wear protective eyewear while handling corrosive substances, as mandated by federal safety standards.", options: ["ought", "should", "must", "have", "need"], answer: "must" },
+        { id: 14, type: "mcq", question: "The new recruits ____ pass a comprehensive background check before being granted access to classified documents.", options: ["ought to", "should", "have to", "must", "need"], answer: "must" },
+        { id: 15, type: "mcq", question: "To minimize risk in trading, investors ____ diversify their holdings across different markets and asset classes.", options: ["ought to", "must", "have", "should", "need"], answer: "should" },
 
         // --- SECTION C: Gerunds and Infinitives ---
-        {
-            id: 16, type: "mcq", 
-            question: "The government postponed ____ the new environmental taxes until the next fiscal quarter due to public resistance.",
-            options: ["to introduce", "introducing", "to have introduced", "introduce", "having introduced"],
-            answer: "introducing"
-        },
-        {
-            id: 17, type: "mcq", 
-            question: "Scientists hope ____ a cure for the rare genetic disorder within the next decade using emerging technology.",
-            options: ["discovering", "to discover", "discover", "having discovered", "to be discovered"],
-            answer: "to discover"
-        },
-        {
-            id: 18, type: "mcq", 
-            question: "The security guard admitted ____ the door unlocked when he left the building, which led to the theft of equipment.",
-            options: ["to leave", "leaving", "to have left", "leave", "left"],
-            answer: "leaving"
-        },
-        {
-            id: 19, type: "mcq", 
-            question: "We decided ____ the old servers instead of repairing them, as the cost of maintenance was proving prohibitive.",
-            options: ["replacing", "to replace", "replace", "to be replaced", "having replaced"],
-            answer: "to replace"
-        },
-        {
-            id: 20, type: "mcq", 
-            question: "The company avoids ____ raw materials from sources that lack certified ethical production standards.",
-            options: ["to purchase", "purchasing", "purchase", "to be purchasing", "having purchased"],
-            answer: "purchasing"
-        },
+        { id: 16, type: "mcq", question: "The government postponed ____ the new environmental taxes until the next fiscal quarter due to public resistance.", options: ["to introduce", "introducing", "to have introduced", "introduce", "having introduced"], answer: "introducing" },
+        { id: 17, type: "mcq", question: "Scientists hope ____ a cure for the rare genetic disorder within the next decade using emerging technology.", options: ["discovering", "to discover", "discover", "having discovered", "to be discovered"], answer: "to discover" },
+        { id: 18, type: "mcq", question: "The security guard admitted ____ the door unlocked when he left the building, which led to the theft of equipment.", options: ["to leave", "leaving", "to have left", "leave", "left"], answer: "leaving" },
+        { id: 19, type: "mcq", question: "We decided ____ the old servers instead of repairing them, as the cost of maintenance was proving prohibitive.", options: ["replacing", "to replace", "replace", "to be replaced", "having replaced"], answer: "to replace" },
+        { id: 20, type: "mcq", question: "The company avoids ____ raw materials from sources that lack certified ethical production standards.", options: ["to purchase", "purchasing", "purchase", "to be purchasing", "having purchased"], answer: "purchasing" },
 
         // --- SECTION D: Passive Voice ---
-        {
-            id: 21, type: "mcq", 
-            question: "The sensitive laboratory samples ____ in a cryogenic freezer until the lead researcher is ready to begin the analysis.",
-            options: ["are storing", "store", "are stored", "were stored", "have stored"],
-            answer: "are stored"
-        },
-        {
-            id: 22, type: "mcq", 
-            question: "The new compliance guidelines ____ by the legal department before they are officially implemented across the firm.",
-            options: ["are reviewing", "reviewed", "were reviewed", "will be reviewed", "have reviewing"],
-            answer: "will be reviewed"
-        },
-        {
-            id: 23, type: "mcq", 
-            question: "The faulty pressure sensor ____ before the equipment could be safely restarted for the next phase of testing.",
-            options: ["had repaired", "was repairing", "had been repaired", "repaired", "has repaired"],
-            answer: "had been repaired"
-        },
-        {
-            id: 24, type: "mcq", 
-            question: "The controversial memo ____ by the media as soon as it was leaked, causing immediate public outcry.",
-            options: ["was publishing", "published", "were published", "was published", "have published"],
-            answer: "was published"
-        },
-        {
-            id: 25, type: "mcq", 
-            question: "The architectural plans ____ and approved by the city planning commission last week.",
-            options: ["are reviewing", "reviewed", "were reviewed", "have reviewing", "had reviewing"],
-            answer: "were reviewed"
-        },
-        {
-            id: 26, type: "mcq", 
-            question: "Educators must consider ethical implications when using predictive analytics, and they have to ____ lesson plans based on algorithmic recommendations.",
-            options: ["adapting", "adapt", "to adapt", "adapts", "adaption"],
-            answer: "adapt"
-        },
-        {
-            id: 27, type: "mcq", 
-            question: "Authors submitting to peer-reviewed journals have to ____ that their data is reproducible, and they must include raw datasets.",
-            options: ["ensuring", "ensure", "ensures", "to ensuring", "ensured"],
-            answer: "ensure"
-        },
-        {
-            id: 28, type: "mcq", 
-            question: "During her first year, the resident struggled to get used to the overnight ____, especially since she was used to working standard hours.",
-            options: ["shift’s", "shifts", "shifting", "shift is", "shifted"],
-            answer: "shifts"
-        },
-        {
-            id: 29, type: "mcq", 
-            question: "The firm’s senior partner had trouble ____ to collaborative design platforms, as he used to draft everything manually on tracing paper.",
-            options: ["being used", "get used", "to get used", "getting used", "to be used"],
-            answer: "getting used"
-        },
-        {
-            id: 30, type: "mcq", 
-            question: "The lecturer emphasized the need to ____ fiscal policy through a long-term lens, especially when considering intergenerational equity.",
-            options: ["evaluating", "evaluate", "evaluates", "evaluated", "to evaluating"],
-            answer: "evaluate"
-        },
+        { id: 21, type: "mcq", question: "The sensitive laboratory samples ____ in a cryogenic freezer until the lead researcher is ready to begin the analysis.", options: ["are storing", "store", "are stored", "were stored", "have stored"], answer: "are stored" },
+        { id: 22, type: "mcq", question: "The new compliance guidelines ____ by the legal department before they are officially implemented across the firm.", options: ["are reviewing", "reviewed", "were reviewed", "will be reviewed", "have reviewing"], answer: "will be reviewed" },
+        { id: 23, type: "mcq", question: "The faulty pressure sensor ____ before the equipment could be safely restarted for the next phase of testing.", options: ["had repaired", "was repairing", "had been repaired", "repaired", "has repaired"], answer: "had been repaired" },
+        { id: 24, type: "mcq", question: "The controversial memo ____ by the media as soon as it was leaked, causing immediate public outcry.", options: ["was publishing", "published", "were published", "was published", "have published"], answer: "was published" },
+        { id: 25, type: "mcq", question: "The architectural plans ____ and approved by the city planning commission last week.", options: ["are reviewing", "reviewed", "were reviewed", "have reviewing", "had reviewing"], answer: "were reviewed" },
+        { id: 26, type: "mcq", question: "Educators must consider ethical implications when using predictive analytics, and they have to ____ lesson plans based on algorithmic recommendations.", options: ["adapting", "adapt", "to adapt", "adapts", "adaption"], answer: "adapt" },
+        { id: 27, type: "mcq", question: "Authors submitting to peer-reviewed journals have to ____ that their data is reproducible, and they must include raw datasets.", options: ["ensuring", "ensure", "ensures", "to ensuring", "ensured"], answer: "ensure" },
+        { id: 28, type: "mcq", question: "During her first year, the resident struggled to get used to the overnight ____, especially since she was used to working standard hours.", options: ["shift’s", "shifts", "shifting", "shift is", "shifted"], answer: "shifts" },
+        { id: 29, type: "mcq", question: "The firm’s senior partner had trouble ____ to collaborative design platforms, as he used to draft everything manually on tracing paper.", options: ["being used", "get used", "to get used", "getting used", "to be used"], answer: "getting used" },
+        { id: 30, type: "mcq", question: "The lecturer emphasized the need to ____ fiscal policy through a long-term lens, especially when considering intergenerational equity.", options: ["evaluating", "evaluate", "evaluates", "evaluated", "to evaluating"], answer: "evaluate" },
 
-        // --- SECTION E: Translations (Smart Grade) ---
-        {
-            id: 31, type: "text", 
-            question: "Translate: 'Saya sedang mencoba memahami instruksi yang diberikan oleh guru.'",
-            accepted_answers: [
-                "I am trying to understand the instructions given by the teacher",
-                "I'm trying to understand the instructions given by the teacher",
-                "I am trying to understand the instructions the teacher gave"
-            ]
-        },
-        {
-            id: 32, type: "text", 
-            question: "Translate: 'Mereka memutuskan untuk menunda perjalanan karena cuacanya buruk.'",
-            accepted_answers: [
-                "They decided to postpone the trip because the weather was bad",
-                "They decided to delay the trip because of bad weather",
-                "They decided to postpone the trip because of the bad weather"
-            ]
-        },
-        {
-            id: 33, type: "text", 
-            question: "Translate: 'Bisakah kamu menjelaskan alasan mengapa kamu datang terlambat hari ini?'",
-            accepted_answers: [
-                "Can you explain the reason why you came late today?",
-                "Can you explain why you are late today?",
-                "Could you explain the reason why you arrived late today?"
-            ]
-        },
-        {
-            id: 34, type: "text", 
-            question: "Translate: 'Kami sudah bekerja pada proyek ini selama lebih dari dua minggu.'",
-            accepted_answers: [
-                "We have been working on this project for more than two weeks",
-                "We've been working on this project for over two weeks",
-                "We have worked on this project for more than two weeks"
-            ]
-        },
-        {
-            id: 35, type: "text", 
-            question: "Translate: 'Walaupun dia lelah, dia tetap menyelesaikan pekerjaannya.'",
-            accepted_answers: [
-                "Even though he was tired, he still finished his work",
-                "Although he was tired, he finished his work",
-                "Even though he was tired he still completed his work"
-            ]
-        },
-        {
-            id: 36, type: "text", 
-            question: "Translate: 'Saya tertarik untuk belajar lebih banyak tentang budaya negara lain.'",
-            accepted_answers: [
-                "I am interested in learning more about the culture of other countries",
-                "I'm interested in learning more about other countries' cultures",
-                "I am interested to learn more about the culture of other countries"
-            ]
-        },
-        {
-            id: 37, type: "text", 
-            question: "Translate: 'Apakah kamu tahu siapa yang bertanggung jawab atas acara tersebut?'",
-            accepted_answers: [
-                "Do you know who is responsible for the event?",
-                "Do you know who is responsible for that event?",
-                "Do you know who is in charge of the event?"
-            ]
-        },
-        {
-            id: 38, type: "text", 
-            question: "Translate: 'Jika saya punya cukup waktu, saya akan membantu kamu menyelesaikan tugas itu.'",
-            accepted_answers: [
-                "If I had enough time, I would help you finish the task",
-                "If I had enough time I would help you finish that task",
-                "If I had enough time, I would help you complete the task"
-            ]
-        },
-        {
-            id: 39, type: "text", 
-            question: "Translate: 'Dia tidak menyangka bahwa hasil ujian akan sebaik itu.'",
-            accepted_answers: [
-                "He did not expect that the exam results would be that good",
-                "He didn't expect the exam results to be that good",
-                "She did not expect that the exam results would be that good"
-            ]
-        },
-        {
-            id: 40, type: "text", 
-            question: "Translate: 'Kami berharap dapat bertemu dengan Anda lagi di masa depan.'",
-            accepted_answers: [
-                "We hope to see you again in the future",
-                "We hope to meet you again in the future",
-                "We look forward to seeing you again in the future"
-            ]
-        }
+        // --- SECTION E: Translations ---
+        { id: 31, type: "text", question: "Translate: 'Saya sedang mencoba memahami instruksi yang diberikan oleh guru.'", accepted_answers: ["I am trying to understand the instructions given by the teacher", "I'm trying to understand the instructions given by the teacher", "I am trying to understand the instructions the teacher gave"] },
+        { id: 32, type: "text", question: "Translate: 'Mereka memutuskan untuk menunda perjalanan karena cuacanya buruk.'", accepted_answers: ["They decided to postpone the trip because the weather was bad", "They decided to delay the trip because of bad weather", "They decided to postpone the trip because of the bad weather"] },
+        { id: 33, type: "text", question: "Translate: 'Bisakah kamu menjelaskan alasan mengapa kamu datang terlambat hari ini?'", accepted_answers: ["Can you explain the reason why you came late today?", "Can you explain why you are late today?", "Could you explain the reason why you arrived late today?"] },
+        { id: 34, type: "text", question: "Translate: 'Kami sudah bekerja pada proyek ini selama lebih dari dua minggu.'", accepted_answers: ["We have been working on this project for more than two weeks", "We've been working on this project for over two weeks", "We have worked on this project for more than two weeks"] },
+        { id: 35, type: "text", question: "Translate: 'Walaupun dia lelah, dia tetap menyelesaikan pekerjaannya.'", accepted_answers: ["Even though he was tired, he still finished his work", "Although he was tired, he finished his work", "Even though he was tired he still completed his work"] },
+        { id: 36, type: "text", question: "Translate: 'Saya tertarik untuk belajar lebih banyak tentang budaya negara lain.'", accepted_answers: ["I am interested in learning more about the culture of other countries", "I'm interested in learning more about other countries' cultures", "I am interested to learn more about the culture of other countries"] },
+        { id: 37, type: "text", question: "Translate: 'Apakah kamu tahu siapa yang bertanggung jawab atas acara tersebut?'", accepted_answers: ["Do you know who is responsible for the event?", "Do you know who is responsible for that event?", "Do you know who is in charge of the event?"] },
+        { id: 38, type: "text", question: "Translate: 'Jika saya punya cukup waktu, saya akan membantu kamu menyelesaikan tugas itu.'", accepted_answers: ["If I had enough time, I would help you finish the task", "If I had enough time I would help you finish that task", "If I had enough time, I would help you complete the task"] },
+        { id: 39, type: "text", question: "Translate: 'Dia tidak menyangka bahwa hasil ujian akan sebaik itu.'", accepted_answers: ["He did not expect that the exam results would be that good", "He didn't expect the exam results to be that good", "She did not expect that the exam results would be that good"] },
+        { id: 40, type: "text", question: "Translate: 'Kami berharap dapat bertemu dengan Anda lagi di masa depan.'", accepted_answers: ["We hope to see you again in the future", "We hope to meet you again in the future", "We look forward to seeing you again in the future"] }
     ];
 
     // ============================================
@@ -426,11 +229,7 @@
     // 1. Punctuation & Case Normalizer
     function normalizeText(text) {
         if (!text) return "";
-        return text
-            .toLowerCase()                  // Lowercase
-            .replace(/[.,!?;:'"()]/g, "")     // Remove punctuation
-            .replace(/\s+/g, " ")           // Fix double spaces
-            .trim();                        // Trim edge
+        return text.toLowerCase().replace(/[.,!?;:'"()]/g, "").replace(/\s+/g, " ").trim();
     }
 
     // 2. Render Questions
@@ -455,7 +254,33 @@
         });
     }
 
-    // 3. Anti-Cheat & Logger
+    // 3. TIMER LOGIC (1h 30m = 90 mins = 5400 seconds)
+    let timerInterval;
+    function startTimer(duration) {
+        let timer = duration, hours, minutes, seconds;
+        const display = document.getElementById('timer-box');
+        display.style.display = 'block';
+
+        timerInterval = setInterval(function () {
+            hours = parseInt(timer / 3600, 10);
+            minutes = parseInt((timer % 3600) / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = `⏱️ ${hours}:${minutes}:${seconds}`;
+
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                alert("⏰ TIME IS UP! Submitting your answers automatically.");
+                submitExam(true); // Force auto-submit
+            }
+        }, 1000);
+    }
+
+    // 4. Anti-Cheat & Logger
     let switchCount = 0;
     let evidenceLogs = []; 
 
@@ -474,8 +299,8 @@
         }
     });
 
-    // 4. ONE-TIME ENTRY LOGIC (Anti-Reset)
-    window.startExam = async function() {
+    // 5. ONE-TIME ENTRY LOGIC (Anti-Reset)
+    async function startExam() {
         const btn = document.getElementById('startBtn');
         const errorMsg = document.getElementById('login-error');
         
@@ -489,25 +314,21 @@
         btn.innerText = "Checking access...";
         errorMsg.style.display = 'none';
 
-        // Unique ID for this student: "10-B_15"
         const uniqueID = `${cls}_${no}`;
 
         try {
-            // Check if this ID has started before
-            const docRef = doc(db, "exam_starts", uniqueID);
-            const docSnap = await getDoc(docRef);
+            const docRef = db.collection("exam_starts").doc(uniqueID);
+            const docSnap = await docRef.get();
 
-            if (docSnap.exists()) {
-                // THEY ARE CAUGHT!
+            if (docSnap.exists) {
                 const data = docSnap.data();
                 btn.innerText = "Access Denied";
                 errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed. Contact teacher if this is an error.`;
                 errorMsg.style.display = 'block';
-                return; // Stop here. Do not show questions.
+                return; 
             }
 
-            // FIRST TIME - Log them in DB
-            await setDoc(docRef, {
+            await docRef.set({
                 class: cls,
                 number: no,
                 name: name,
@@ -515,10 +336,12 @@
                 timestamp: new Date().toString()
             });
 
-            // Success: Open Exam
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('exam-section').style.display = 'block';
             renderQuestions();
+            
+            // START 90 MINUTE TIMER (5400 seconds)
+            startTimer(5400); 
 
         } catch (e) {
             console.error(e);
@@ -528,9 +351,12 @@
         }
     }
 
-    window.submitExam = async function() {
-        if(!confirm("Are you sure you want to finish?")) return;
+    async function submitExam(isAuto = false) {
+        if(!isAuto && !confirm("Are you sure you want to finish?")) return;
         
+        // Stop the timer
+        clearInterval(timerInterval);
+
         const btn = document.getElementById('submitBtn');
         const status = document.getElementById('status-msg');
         btn.disabled = true;
@@ -553,8 +379,6 @@
             } else {
                 const input = document.getElementById(`q${q.id}`);
                 userAns = input.value.trim();
-                
-                // Smart Check
                 const cleanUser = normalizeText(userAns);
                 if (q.accepted_answers.some(ans => normalizeText(ans) === cleanUser)) {
                     isCorrect = true;
@@ -568,7 +392,7 @@
         let finalPercentage = Math.round((score / totalQuestions) * 100);
 
         try {
-            await addDoc(collection(db, "exam_results"), {
+            await db.collection("exam_results").add({
                 class: document.getElementById('studentClass').value,
                 number: document.getElementById('studentNo').value,
                 name: document.getElementById('studentName').value,
@@ -581,7 +405,15 @@
             
             status.style.color = "green";
             status.innerText = "✅ Submitted! You can close this tab.";
-            alert(`Exam Submitted!\nYour Score: ${finalPercentage}%`);
+            
+            // Show alert unless it was auto-submitted (to avoid popup spam)
+            if(!isAuto) {
+                alert(`Exam Submitted!\nYour Score: ${finalPercentage}%`);
+            } else {
+                // If auto-submitted, replace the screen content so they know
+                document.body.innerHTML = `<div class="container" style="text-align:center"><h1>⏰ Time's Up!</h1><p>Your exam was automatically submitted.</p><h2>Score: ${finalPercentage}%</h2></div>`;
+            }
+
         } catch (e) {
             console.error(e);
             alert("Error submitting. Check your internet connection.");
