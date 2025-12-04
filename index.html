@@ -75,6 +75,7 @@
 
         #exam-section { display: none; }
         #status-msg { text-align: center; margin-top: 1rem; font-weight: 600; }
+        .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; }
     </style>
 </head>
 <body>
@@ -103,7 +104,8 @@
             <label>Full Name</label>
             <input type="text" id="studentName" placeholder="Enter your full name">
         </div>
-        <button class="btn" onclick="startExam()">Start Exam</button>
+        <button class="btn" id="startBtn" onclick="startExam()">Start Exam</button>
+        <p class="error-msg" id="login-error"></p>
     </div>
 
     <!-- 2. EXAM SCREEN -->
@@ -120,21 +122,14 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
     // ============================================
     // ⚠️ PASTE YOUR FIREBASE CONFIG HERE
     // ============================================
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
-  authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
-  projectId: "anti-cheating-remedial-quiz",
-  storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
-  messagingSenderId: "979294386230",
-  appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
-  measurementId: "G-84YB5CYGM8"
-};
+    const firebaseConfig = {
+      // ... PASTE YOUR KEYS HERE ...
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -432,10 +427,10 @@ const firebaseConfig = {
     function normalizeText(text) {
         if (!text) return "";
         return text
-            .toLowerCase()                  // 1. Lowercase everything
-            .replace(/[.,!?;:'"()]/g, "")     // 2. Remove all punctuation marks
-            .replace(/\s+/g, " ")           // 3. Fix double spaces
-            .trim();                        // 4. Trim edge whitespace
+            .toLowerCase()                  // Lowercase
+            .replace(/[.,!?;:'"()]/g, "")     // Remove punctuation
+            .replace(/\s+/g, " ")           // Fix double spaces
+            .trim();                        // Trim edge
     }
 
     // 2. Render Questions
@@ -479,17 +474,58 @@ const firebaseConfig = {
         }
     });
 
-    // 4. Global Functions
-    window.startExam = function() {
+    // 4. ONE-TIME ENTRY LOGIC (Anti-Reset)
+    window.startExam = async function() {
+        const btn = document.getElementById('startBtn');
+        const errorMsg = document.getElementById('login-error');
+        
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
         
         if(!cls || !no || !name) { alert("Please fill in all details."); return; }
-        
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('exam-section').style.display = 'block';
-        renderQuestions();
+
+        btn.disabled = true;
+        btn.innerText = "Checking access...";
+        errorMsg.style.display = 'none';
+
+        // Unique ID for this student: "10-B_15"
+        const uniqueID = `${cls}_${no}`;
+
+        try {
+            // Check if this ID has started before
+            const docRef = doc(db, "exam_starts", uniqueID);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                // THEY ARE CAUGHT!
+                const data = docSnap.data();
+                btn.innerText = "Access Denied";
+                errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed. Contact teacher if this is an error.`;
+                errorMsg.style.display = 'block';
+                return; // Stop here. Do not show questions.
+            }
+
+            // FIRST TIME - Log them in DB
+            await setDoc(docRef, {
+                class: cls,
+                number: no,
+                name: name,
+                startTime: new Date().toLocaleTimeString(),
+                timestamp: new Date().toString()
+            });
+
+            // Success: Open Exam
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('exam-section').style.display = 'block';
+            renderQuestions();
+
+        } catch (e) {
+            console.error(e);
+            alert("Connection error. Please refresh and try again.");
+            btn.disabled = false;
+            btn.innerText = "Start Exam";
+        }
     }
 
     window.submitExam = async function() {
