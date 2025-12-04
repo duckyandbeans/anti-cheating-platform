@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Admin Panel</title>
+    <style>
+        body { font-family: sans-serif; padding: 50px; text-align: center; background-color: #f4f4f9; }
+        .box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-block; }
+        h1 { color: #333; }
+        button { padding: 15px 30px; font-size: 18px; background: #007bff; color: white; border: none; cursor: pointer; border-radius: 5px; margin-top: 20px; transition: 0.3s; }
+        button:hover { background: #0056b3; transform: scale(1.05); }
+        #status { margin-top: 20px; font-weight: bold; }
+        .note { color: #666; font-size: 0.9em; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>📊 Exam Report Generator</h1>
+        <p>Click below to download class results and evidence logs.</p>
+        
+        <button id="downloadBtn">📥 Download Excel CSV</button>
+        
+        <p id="status"></p>
+        <p class="note">Open the downloaded file in Excel or Google Sheets.</p>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+    // ============================================
+    // PASTE YOUR FIREBASE CONFIG HERE
+    // ============================================
+    const firebaseConfig = {
+        // PASTE HERE
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('downloadBtn').addEventListener('click', async () => {
+        const status = document.getElementById('status');
+        status.innerText = "⏳ Fetching data from cloud...";
+        status.style.color = "blue";
+        
+        try {
+            const querySnapshot = await getDocs(collection(db, "exam_results"));
+            
+            // CSV Headers
+            // We use a specific order: Class, Number, Name, Score, Cheating Count, Time, EVIDENCE
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Class,No,Name,Total Score (%),Raw Score,Cheating Count,Time Submitted,Detailed Logs (Evidence)\n";
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                
+                // Safety: remove commas from names to keep columns straight
+                const cleanName = data.name ? data.name.replace(/,/g, " ") : "Unknown";
+                
+                // Get logs or default to "Clean"
+                const logs = data.evidence_logs ? `"${data.evidence_logs}"` : "None";
+                
+                const row = `${data.class},${data.number},${cleanName},${data.total_score},${data.raw_score},${data.cheat_count},${data.timestamp},${logs}`;
+                csvContent += row + "\r\n";
+            });
+
+            // Trigger Download
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            const dateStr = new Date().toISOString().slice(0,10);
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Exam_Results_${dateStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            
+            status.innerText = "✅ Download Complete!";
+            status.style.color = "green";
+            
+        } catch (e) {
+            console.error(e);
+            status.innerText = "❌ Error. Check Console (F12).";
+            status.style.color = "red";
+        }
+    });
+</script>
+</body>
+</html>
