@@ -13,106 +13,37 @@
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: #1f2937; line-height: 1.5; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        
         h1 { text-align: center; color: #111827; margin-bottom: 2rem; }
-        
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
         input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
         input:focus, select:focus { outline: 2px solid var(--primary); border-color: transparent; }
-
-        /* Question Cards */
-        .question-block { 
-            background: #f9fafb; 
-            border: 1px solid #e5e7eb; 
-            padding: 1.5rem; 
-            margin-bottom: 1.5rem; 
-            border-radius: 8px; 
-            border-left: 5px solid var(--primary);
-        }
+        .question-block { background: #f9fafb; border: 1px solid #e5e7eb; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 8px; border-left: 5px solid var(--primary); }
         .q-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; }
-        
-        /* MCQ Options */
         .mcq-option { display: flex; align-items: center; padding: 8px 0; cursor: pointer; }
         .mcq-option input { width: auto; margin-right: 10px; cursor: pointer; }
-        
-        /* Buttons */
-        .btn { 
-            display: block; 
-            width: 100%; 
-            padding: 1rem; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            font-size: 1.1rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-        }
+        .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #4338ca; }
         .btn:disabled { background: #9ca3af; cursor: not-allowed; }
-
-        /* Alerts */
-        #cheat-alert { 
-            background: #fee2e2; 
-            border: 1px solid #f87171; 
-            color: #991b1b; 
-            padding: 1rem; 
-            border-radius: 8px; 
-            margin-bottom: 2rem; 
-            display: none; 
-            text-align: center; 
-            font-weight: bold; 
-            animation: pulse 2s infinite;
-        }
-
-        /* TIMER BOX */
-        #timer-box {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: #111827;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: none; /* Hidden until exam starts */
-            z-index: 9999;
-            border: 2px solid var(--primary);
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
+        #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; animation: pulse 2s infinite; }
+        #timer-box { position: fixed; top: 15px; right: 15px; background: #111827; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: none; z-index: 9999; border: 2px solid var(--primary); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         #exam-section { display: none; }
         #status-msg { text-align: center; margin-top: 1rem; font-weight: 600; }
         .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; padding: 10px; background: #fee2e2; border-radius: 4px; }
-        
-        .teacher-link {
-            text-align: center; margin-top: 15px; font-size: 0.85rem; color: #9ca3af; cursor: pointer; text-decoration: underline;
-        }
+        .teacher-link { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #9ca3af; cursor: pointer; text-decoration: underline; }
         .teacher-link:hover { color: #4b5563; }
     </style>
-    
-    <!-- LOAD FIREBASE (COMPAT VERSION) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<!-- TIMER DISPLAY -->
 <div id="timer-box">⏱️ 01:30:00</div>
 
 <div class="container">
     <div id="cheat-alert">⚠️ WARNING: You have left the exam screen! This event is being recorded.</div>
 
-    <!-- 1. LOGIN SCREEN -->
     <div id="login-section">
         <h1>Student Login</h1>
         <div class="form-group">
@@ -133,17 +64,12 @@
         </div>
         <button class="btn" id="startBtn" onclick="startExam()">Start Exam</button>
         <p class="error-msg" id="login-error"></p>
-        
-        <!-- TEACHER LOGIN LINK -->
         <div class="teacher-link" onclick="teacherLogin()">Teacher's Login</div>
     </div>
 
-    <!-- 2. EXAM SCREEN -->
     <div id="exam-section">
         <h1>Final English Exam</h1>
-        <div style="text-align:center; margin-bottom:20px; color:#666;">
-            Answer carefully. Do not switch tabs.
-        </div>
+        <div style="text-align:center; margin-bottom:20px; color:#666;">Answer carefully. Do not switch tabs.</div>
         <div id="questions-container"></div>
         <button class="btn" id="submitBtn" onclick="submitExam()">Submit Answers</button>
         <p id="status-msg"></p>
@@ -151,9 +77,6 @@
 </div>
 
 <script>
-    // ============================================
-    // FIREBASE CONFIGURATION
-    // ============================================
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -164,22 +87,17 @@
       measurementId: "G-84YB5CYGM8"
     };
 
-    // Initialize Firebase
     let db;
     try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        console.log("Firebase initialized successfully");
+        console.log("Firebase initialized");
     } catch (e) {
         console.error("Firebase Error:", e);
         alert("System Error: Could not connect to database.");
     }
 
-    // ============================================
-    // EXAM QUESTIONS DATA
-    // ============================================
     const EXAM_DATA = [
-        // --- SECTION A: Tense and Conditionals ---
         { id: 1, type: "mcq", question: "By the time the final results were published, the lead scientist ____ the entire experimental procedure three times to ensure accuracy.", options: ["verifies", "had verified", "was verifying", "has verified", "is verifying"], answer: "had verified" },
         { id: 2, type: "mcq", question: "While the team ____ the complex data, the supervisor walked around the office providing constructive criticism.", options: ["analyzed", "was analyzing", "had analyzed", "analyzes", "has analyzed"], answer: "was analyzing" },
         { id: 3, type: "mcq", question: "Whenever the market ____ an unexpected shift, the investment firm immediately adjusts its portfolio risk assessment.", options: ["detected", "has detected", "detects", "is detecting", "had detected"], answer: "detects" },
@@ -190,22 +108,16 @@
         { id: 8, type: "mcq", question: "If the supply chain had not been disrupted last month, the company ____ its current production quotas now.", options: ["meets", "would meet", "will meet", "would be meeting", "had met"], answer: "would be meeting" },
         { id: 9, type: "mcq", question: "If the CEO ____ the policy, the employees will stage a protest.", options: ["ignores", "ignored", "had ignored", "would ignore", "would have ignored"], answer: "ignores" },
         { id: 10, type: "mcq", question: "Unless the temperature ____ above 37°C, the chemical reaction will not begin.", options: ["raises", "raised", "will raise", "is raising", "rises"], answer: "rises" },
-
-        // --- SECTION B: Modals ---
         { id: 11, type: "mcq", question: "According to the university’s honor code, all students ____ cite their sources correctly when submitting academic work.", options: ["should", "ought", "must", "need", "have"], answer: "must" },
         { id: 12, type: "mcq", question: "If you are serious about becoming fluent, you ____ practice speaking the language every day for at least 30 minutes.", options: ["must", "have", "should", "need", "ought"], answer: "should" },
         { id: 13, type: "mcq", question: "All laboratory personnel ____ wear protective eyewear while handling corrosive substances, as mandated by federal safety standards.", options: ["ought", "should", "must", "have", "need"], answer: "must" },
         { id: 14, type: "mcq", question: "The new recruits ____ pass a comprehensive background check before being granted access to classified documents.", options: ["ought to", "should", "have to", "must", "need"], answer: "must" },
         { id: 15, type: "mcq", question: "To minimize risk in trading, investors ____ diversify their holdings across different markets and asset classes.", options: ["ought to", "must", "have", "should", "need"], answer: "should" },
-
-        // --- SECTION C: Gerunds and Infinitives ---
         { id: 16, type: "mcq", question: "The government postponed ____ the new environmental taxes until the next fiscal quarter due to public resistance.", options: ["to introduce", "introducing", "to have introduced", "introduce", "having introduced"], answer: "introducing" },
         { id: 17, type: "mcq", question: "Scientists hope ____ a cure for the rare genetic disorder within the next decade using emerging technology.", options: ["discovering", "to discover", "discover", "having discovered", "to be discovered"], answer: "to discover" },
         { id: 18, type: "mcq", question: "The security guard admitted ____ the door unlocked when he left the building, which led to the theft of equipment.", options: ["to leave", "leaving", "to have left", "leave", "left"], answer: "leaving" },
         { id: 19, type: "mcq", question: "We decided ____ the old servers instead of repairing them, as the cost of maintenance was proving prohibitive.", options: ["replacing", "to replace", "replace", "to be replaced", "having replaced"], answer: "to replace" },
         { id: 20, type: "mcq", question: "The company avoids ____ raw materials from sources that lack certified ethical production standards.", options: ["to purchase", "purchasing", "purchase", "to be purchasing", "having purchased"], answer: "purchasing" },
-
-        // --- SECTION D: Passive Voice ---
         { id: 21, type: "mcq", question: "The sensitive laboratory samples ____ in a cryogenic freezer until the lead researcher is ready to begin the analysis.", options: ["are storing", "store", "are stored", "were stored", "have stored"], answer: "are stored" },
         { id: 22, type: "mcq", question: "The new compliance guidelines ____ by the legal department before they are officially implemented across the firm.", options: ["are reviewing", "reviewed", "were reviewed", "will be reviewed", "have reviewing"], answer: "will be reviewed" },
         { id: 23, type: "mcq", question: "The faulty pressure sensor ____ before the equipment could be safely restarted for the next phase of testing.", options: ["had repaired", "was repairing", "had been repaired", "repaired", "has repaired"], answer: "had been repaired" },
@@ -216,8 +128,6 @@
         { id: 28, type: "mcq", question: "During her first year, the resident struggled to get used to the overnight ____, especially since she was used to working standard hours.", options: ["shift’s", "shifts", "shifting", "shift is", "shifted"], answer: "shifts" },
         { id: 29, type: "mcq", question: "The firm’s senior partner had trouble ____ to collaborative design platforms, as he used to draft everything manually on tracing paper.", options: ["being used", "get used", "to get used", "getting used", "to be used"], answer: "getting used" },
         { id: 30, type: "mcq", question: "The lecturer emphasized the need to ____ fiscal policy through a long-term lens, especially when considering intergenerational equity.", options: ["evaluating", "evaluate", "evaluates", "evaluated", "to evaluating"], answer: "evaluate" },
-
-        // --- SECTION E: Translations ---
         { id: 31, type: "text", question: "Translate: 'Saya sedang mencoba memahami instruksi yang diberikan oleh guru.'", accepted_answers: ["I am trying to understand the instructions given by the teacher", "I'm trying to understand the instructions given by the teacher", "I am trying to understand the instructions the teacher gave"] },
         { id: 32, type: "text", question: "Translate: 'Mereka memutuskan untuk menunda perjalanan karena cuacanya buruk.'", accepted_answers: ["They decided to postpone the trip because the weather was bad", "They decided to delay the trip because of bad weather", "They decided to postpone the trip because of the bad weather"] },
         { id: 33, type: "text", question: "Translate: 'Bisakah kamu menjelaskan alasan mengapa kamu datang terlambat hari ini?'", accepted_answers: ["Can you explain the reason why you came late today?", "Can you explain why you are late today?", "Could you explain the reason why you arrived late today?"] },
@@ -230,29 +140,20 @@
         { id: 40, type: "text", question: "Translate: 'Kami berharap dapat bertemu dengan Anda lagi di masa depan.'", accepted_answers: ["We hope to see you again in the future", "We hope to meet you again in the future", "We look forward to seeing you again in the future"] }
     ];
 
-    // ============================================
-    // APPLICATION LOGIC
-    // ============================================
-    
-    // 1. Punctuation & Case Normalizer
     function normalizeText(text) {
         if (!text) return "";
         return text.toLowerCase().replace(/[.,!?;:'"()]/g, "").replace(/\s+/g, " ").trim();
     }
 
-    // 2. Render Questions
     const container = document.getElementById('questions-container');
     function renderQuestions() {
         container.innerHTML = "";
         EXAM_DATA.forEach((q, index) => {
             const num = index + 1;
             let html = `<div class="question-block"><div class="q-text">${num}. ${q.question}</div>`;
-            
             if (q.type === "mcq") {
                 q.options.forEach(opt => {
-                    html += `<label class="mcq-option">
-                                <input type="radio" name="q${q.id}" value="${opt}"> ${opt}
-                             </label>`;
+                    html += `<label class="mcq-option"><input type="radio" name="q${q.id}" value="${opt}"> ${opt}</label>`;
                 });
             } else {
                 html += `<input type="text" id="q${q.id}" placeholder="Type your answer here..." autocomplete="off">`;
@@ -262,24 +163,19 @@
         });
     }
 
-    // 3. TIMER LOGIC (1h 30m = 90 mins = 5400 seconds)
     let timerInterval;
     function startTimer(duration) {
         let timer = duration, hours, minutes, seconds;
         const display = document.getElementById('timer-box');
         display.style.display = 'block';
-
         timerInterval = setInterval(function () {
             hours = parseInt(timer / 3600, 10);
             minutes = parseInt((timer % 3600) / 60, 10);
             seconds = parseInt(timer % 60, 10);
-
             hours = hours < 10 ? "0" + hours : hours;
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
-
             display.textContent = `⏱️ ${hours}:${minutes}:${seconds}`;
-
             if (--timer < 0) {
                 clearInterval(timerInterval);
                 alert("⏰ TIME IS UP! Submitting your answers automatically.");
@@ -288,14 +184,11 @@
         }, 1000);
     }
 
-    // 4. Anti-Cheat & Logger
     let switchCount = 0;
     let evidenceLogs = []; 
-
     document.addEventListener("visibilitychange", () => {
         const now = new Date();
         const timeString = now.toLocaleTimeString();
-
         if (document.hidden) {
             switchCount++;
             evidenceLogs.push(`[LEFT at ${timeString}]`);
@@ -307,37 +200,30 @@
         }
     });
 
-    // 5. TEACHER LOGIN LOGIC
     function teacherLogin() {
         const pass = prompt("Enter Teacher Password:");
         if (pass === "030") {
-            // Auto-fill dummy data to pass validation
-            document.getElementById('studentClass').value = "XII H"; // Default
+            document.getElementById('studentClass').value = "XII H";
             document.getElementById('studentNo').value = "0";
             document.getElementById('studentName').value = "TEACHER_TEST";
-            // Start in Bypass Mode
             startExam(true);
         } else {
             alert("Incorrect Password");
         }
     }
 
-    // 6. START EXAM (TIME LOCK + ANTI-RESET + TEACHER MODE)
     async function startExam(isTeacher = false) {
         const btn = document.getElementById('startBtn');
         const errorMsg = document.getElementById('login-error');
-        
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
         
         if(!cls || !no || !name) { alert("Please fill in all details."); return; }
 
-        // --- TIME LOCK (8 PM WIB on Dec 4, 2025) ---
         const EXAM_START_DATE = new Date("2025-12-04T20:00:00+07:00");
         const now = new Date();
 
-        // IF NOT TEACHER -> Check Time
         if (!isTeacher && now < EXAM_START_DATE) {
             alert("⏳ The exam has not started yet.\nPlease come back at 8:00 PM (20:00 WIB).");
             return;
@@ -350,34 +236,22 @@
         const uniqueID = `${cls}_${no}`;
 
         try {
-            // IF NOT TEACHER -> Check Database for existing user
             if (!isTeacher) {
                 const docRef = db.collection("exam_starts").doc(uniqueID);
                 const docSnap = await docRef.get();
-
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     btn.innerText = "Access Denied";
-                    errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed. Contact teacher if this is an error.`;
+                    errorMsg.innerText = `⛔ ERROR: You already started this exam at ${data.startTime}. Resetting is not allowed.`;
                     errorMsg.style.display = 'block';
                     return; 
                 }
-
-                // Log start time to prevent reset
-                await docRef.set({
-                    class: cls,
-                    number: no,
-                    name: name,
-                    startTime: new Date().toLocaleTimeString(),
-                    timestamp: new Date().toString()
-                });
+                await docRef.set({ class: cls, number: no, name: name, startTime: new Date().toLocaleTimeString(), timestamp: new Date().toString() });
             }
 
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('exam-section').style.display = 'block';
             renderQuestions();
-            
-            // START 90 MINUTE TIMER (5400 seconds)
             startTimer(5400); 
 
         } catch (e) {
@@ -390,19 +264,16 @@
 
     async function submitExam(isAuto = false) {
         if(!isAuto && !confirm("Are you sure you want to finish?")) return;
-        
         clearInterval(timerInterval);
 
         const btn = document.getElementById('submitBtn');
-        const status = document.getElementById('status-msg');
         btn.disabled = true;
-        status.innerText = "Grading and submitting...";
-        status.style.color = "blue";
+        document.getElementById('status-msg').innerText = "Grading and submitting...";
 
-        // Grading Logic
         let score = 0;
         let totalQuestions = EXAM_DATA.length;
-        let studentAnswers = {};
+        let answerSheet = [];
+        let gradingSheet = [];
 
         EXAM_DATA.forEach(q => {
             let userAns = "";
@@ -419,12 +290,13 @@
                 if (q.accepted_answers.some(ans => normalizeText(ans) === cleanUser)) {
                     isCorrect = true;
                 }
-                // --- CAPTURE TEXT ANSWER FOR MANUAL CHECK ---
-                evidenceLogs.push(`(Q${q.id}: ${userAns})`);
             }
             
             if (isCorrect) score++;
-            studentAnswers[`Q${q.id}`] = userAns;
+            
+            // --- DETAILED LOGGING (Answers & 1/0) ---
+            answerSheet.push(`Q${q.id}:${userAns.replace(/\|/g, "-")}`); // Prevent pipe conflict
+            gradingSheet.push(isCorrect ? "1" : "0");
         });
 
         let finalPercentage = Math.round((score / totalQuestions) * 100);
@@ -438,11 +310,12 @@
                 raw_score: `${score}/${totalQuestions}`,
                 cheat_count: switchCount,
                 evidence_logs: evidenceLogs.join(" | "), 
+                all_answers: answerSheet.join(" | "),
+                answer_key_status: gradingSheet.join(" | "),
                 timestamp: new Date().toString()
             });
             
-            status.style.color = "green";
-            status.innerText = "✅ Submitted! You can close this tab.";
+            document.getElementById('status-msg').innerText = "✅ Submitted! You can close this tab.";
             
             if(!isAuto) {
                 alert(`Exam Submitted!\nYour Score: ${finalPercentage}%`);
