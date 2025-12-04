@@ -28,13 +28,27 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-    // ============================================
-    // PASTE YOUR FIREBASE CONFIG HERE
-    // ============================================
-    const firebaseConfig = {
-        // PASTE HERE
-    };
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+  authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+  projectId: "anti-cheating-remedial-quiz",
+  storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+  messagingSenderId: "979294386230",
+  appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+  measurementId: "G-84YB5CYGM8"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
