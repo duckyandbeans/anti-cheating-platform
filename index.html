@@ -419,6 +419,8 @@
                 if (q.accepted_answers.some(ans => normalizeText(ans) === cleanUser)) {
                     isCorrect = true;
                 }
+                // --- CAPTURE TEXT ANSWER FOR MANUAL CHECK ---
+                evidenceLogs.push(`(Q${q.id}: ${userAns})`);
             }
             
             if (isCorrect) score++;
