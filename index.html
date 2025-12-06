@@ -325,7 +325,8 @@
                 const docRef = db.collection("exam_starts").doc(uniqueID);
                 const docSnap = await docRef.get();
 
-                if (docSnap.exists()) {
+                // BUG FIX: .exists is a PROPERTY in Compat SDK, not a function
+                if (docSnap.exists) {
                     const data = docSnap.data();
                     btn.innerText = "Access Denied";
                     errorMsg.innerHTML = `⛔ ERROR: Exam already started at ${data.startTime}.<br>Refresh/Restart is not allowed.<br>Contact teacher to reset.`;
