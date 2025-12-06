@@ -165,7 +165,9 @@
         console.log("Firebase initialized successfully");
     } catch (e) {
         console.error("Firebase Error:", e);
-        alert("System Error: Could not connect to database.");
+        // Show init error immediately
+        document.getElementById('login-error').innerText = "System Error: Could not connect to database configuration.";
+        document.getElementById('login-error').style.display = 'block';
     }
 
     // ============================================
@@ -350,7 +352,9 @@
 
         } catch (e) {
             console.error(e);
-            alert("Connection error. Please refresh and try again.");
+            // REVEAL THE ACTUAL ERROR FOR DEBUGGING
+            const actualError = e.message || e;
+            alert("System Error: " + actualError + "\n\n(Check your internet connection or Firebase Rules)");
             btn.disabled = false;
             btn.innerText = "Start Exam";
         }
