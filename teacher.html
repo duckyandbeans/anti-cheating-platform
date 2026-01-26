@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Teacher Dashboard</title>
+    <style>
+        :root { --primary: #2563eb; --dark: #1e293b; --bg: #f1f5f9; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
+        
+        /* LOGIN SCREEN */
+        #login-screen { 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            height: 100vh; background: var(--dark); color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+        }
+        input { padding: 12px; font-size: 1.1rem; border-radius: 6px; border: none; margin-bottom: 10px; text-align: center; }
+        button { padding: 12px 24px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        
+        /* DASHBOARD GRID */
+        #dashboard { display: none; max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        
+        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card h2 { margin-top: 0; color: var(--primary); font-size: 1.4rem; }
+        .card p { color: #64748b; font-size: 0.9rem; }
+        
+        .btn-action { width: 100%; margin-top: 10px; background: #e2e8f0; color: #334155; }
+        .btn-action:hover { background: #cbd5e1; }
+        .btn-download { background: #10b981; color: white; }
+        .btn-download:hover { background: #059669; }
+        .btn-view { background: #6366f1; color: white; }
+        .btn-view:hover { background: #4f46e5; }
+
+        /* ESSAY VIEWER STYLES */
+        #essay-viewer { display: none; margin-top: 30px; background: white; padding: 20px; border-radius: 12px; }
+        .student-row { display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 15px 0; align-items: start; }
+        .student-info { min-width: 200px; }
+        .student-info img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); cursor: pointer; }
+        .essay-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+        .essay-thumb { height: 100px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; transition: transform 0.2s; }
+        .essay-thumb:hover { transform: scale(1.05); }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .badge-cheat { background: #fee2e2; color: #dc2626; }
+        .badge-clean { background: #dcfce7; color: #166534; }
+
+        /* LOADER */
+        .status-msg { margin-top: 10px; font-size: 0.9rem; color: #666; font-style: italic; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h1 style="color:white; margin-bottom:20px;">Teacher Portal</h1>
+        <input type="password" id="passwordInput" placeholder="Enter PIN">
+        <button class="btn-primary" onclick="checkLogin()">Unlock</button>
+        <p id="loginError" style="color:#ef4444; display:none; margin-top:10px;">Access Denied</p>
+    </div>
+
+    <div id="dashboard">
+        <div class="header">
+            <h1>📊 Exam Control Center</h1>
+            <button onclick="location.reload()" style="background:#ef4444; color:white;">Lock Dashboard</button>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>XII Grammar</h2>
+                <p>Data Source: <code>grade_xii_grammar_final</code></p>
+                <div class="status-msg" id="msg-xii"></div>
+                <button class="btn-download" onclick="downloadCSV('grade_xii_grammar_final', 'XII_Results.csv', 'msg-xii')">📥 Download Excel</button>
+            </div>
+
+            <div class="card">
+                <h2>C1 Advanced</h2>
+                <p>Data Source: <code>c1_advanced_quiz_results</code></p>
+                <div class="status-msg" id="msg-c1"></div>
+                <button class="btn-download" onclick="downloadCSV('c1_advanced_quiz_results', 'C1_Results.csv', 'msg-c1')">📥 Download Excel</button>
+            </div>
+
+            <div class="card">
+                <h2>B2 Grammar</h2>
+                <p>Data Source: <code>b2_grammar_quiz_results</code></p>
+                <div class="status-msg" id="msg-b2"></div>
+                <button class="btn-download" onclick="downloadCSV('b2_grammar_quiz_results', 'B2_Results.csv', 'msg-b2')">📥 Download Excel</button>
+            </div>
+
+            <div class="card" style="border: 2px solid var(--primary);">
+                <h2>📝 Essay & Camera</h2>
+                <p>Source: <code>exam_access_logs</code></p>
+                <p>Contains: Selfies, Essay Photos, Cheating Logs.</p>
+                <div class="status-msg" id="msg-essay"></div>
+                <button class="btn-download" onclick="downloadCSV('exam_access_logs', 'Essay_Report.csv', 'msg-essay')">📥 Download Excel</button>
+                <button class="btn-view" onclick="loadEssayViewer()">📸 View Essays & Photos</button>
+            </div>
+        </div>
+
+        <div id="essay-viewer">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #ddd; padding-bottom:10px; margin-bottom:20px;">
+                <h2 style="margin:0;">Student Submissions (Live)</h2>
+                <button onclick="document.getElementById('essay-viewer').style.display='none'" style="background:#64748b; color:white; padding:8px 15px;">Close Viewer</button>
+            </div>
+            <div id="essay-list-container">Loading...</div>
+        </div>
+    </div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    // --- LOGIN LOGIC ---
+    function checkLogin() {
+        const pass = document.getElementById('passwordInput').value;
+        if(pass === "030") {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    // --- GENERIC DOWNLOAD FUNCTION ---
+    async function downloadCSV(collectionName, fileName, msgElementId) {
+        const msg = document.getElementById(msgElementId);
+        msg.innerText = "Fetching data...";
+        
+        try {
+            const snap = await db.collection(collectionName).get();
+            if(snap.empty) { msg.innerText = "No data found."; return; }
+
+            // Build CSV Header
+            let csv = "data:text/csv;charset=utf-8,Class,ID,Name,Score,Status,Cheats,Start Time,Finish Time,Answers/Logs\n";
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                
+                // Handle different score fields (some use 'score', some 'mcq_score')
+                const finalScore = d.score || d.mcq_score || d.total_score || 0;
+                
+                // Handle complex answer objects (stringify them)
+                let extraData = "";
+                if(d.all_answers) extraData = JSON.stringify(d.all_answers);
+                else if(d.evidence_logs) extraData = d.evidence_logs;
+
+                // Clean data for CSV format
+                extraData = extraData.replace(/,/g, '|').replace(/"/g, "'").replace(/\n/g, " ");
+
+                csv += `${d.class},${d.number},"${d.name}",${finalScore},${d.status},${d.cheat_count || d.final_cheat_count || 0},"${d.start_time}","${d.finish_time}","${extraData}"\n`;
+            });
+
+            // Trigger Download
+            const link = document.createElement("a");
+            link.href = encodeURI(csv);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            msg.innerText = `✅ Downloaded ${snap.size} records.`;
+            
+        } catch(e) {
+            msg.innerText = "❌ Error: " + e.message;
+            console.error(e);
+        }
+    }
+
+    // --- ESSAY VIEWER LOGIC ---
+    // Helper to open image safely
+    window.openViewer = function(base64Data) {
+        const win = window.open();
+        if (win) {
+            win.document.write(`
+                <body style="margin:0; background:#222; display:flex; justify-content:center; align-items:center; min-height:100vh;">
+                    <img src="${base64Data}" style="max-width:95%; max-height:95vh; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                </body>
+            `);
+        } else {
+            alert("Please allow popups.");
+        }
+    }
+
+    async function loadEssayViewer() {
+        const container = document.getElementById('essay-list-container');
+        const section = document.getElementById('essay-viewer');
+        section.style.display = 'block';
+        container.innerHTML = "Loading images (this may take a moment)...";
+
+        try {
+            // Get data from 'exam_access_logs' (The Trap/Essay Collection)
+            const snap = await db.collection('exam_access_logs').orderBy('start_time', 'desc').get();
+            
+            if(snap.empty) { container.innerHTML = "No submissions found."; return; }
+
+            container.innerHTML = ""; // Clear loader
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                
+                // 1. Prepare Essay Images
+                let essayHTML = "";
+                if(d.essay_pages && d.essay_pages.length > 0) {
+                    d.essay_pages.forEach((src, idx) => {
+                        essayHTML += `
+                            <div style="text-align:center;">
+                                <img src="${src}" class="essay-thumb" onclick="openViewer('${src}')">
+                                <div style="font-size:0.7rem; color:#666;">Page ${idx+1}</div>
+                            </div>`;
+                    });
+                } else {
+                    essayHTML = "<span style='color:#ccc; font-style:italic;'>No pages scanned</span>";
+                }
+
+                // 2. Prepare Cheat Badge
+                const cheatBadge = (d.cheat_count > 0) 
+                    ? `<span class="badge badge-cheat">⚠️ ${d.cheat_count} Switches</span>` 
+                    : `<span class="badge badge-clean">✅ Clean</span>`;
+
+                // 3. Render Row
+                const row = document.createElement('div');
+                row.className = 'student-row';
+                row.innerHTML = `
+                    <div class="student-info">
+                        <div style="margin-bottom:5px;">
+                            <img src="${d.photo || 'https://via.placeholder.com/60'}" onclick="openViewer(this.src)" title="Click to enlarge selfie">
+                        </div>
+                        <div style="font-weight:bold; font-size:1.1rem;">${d.name}</div>
+                        <div style="color:#666;">${d.class} (#${d.number})</div>
+                        <div style="margin-top:5px;">${cheatBadge}</div>
+                        <div style="font-size:0.8rem; color:#999; margin-top:5px;">${d.status}</div>
+                    </div>
+                    <div style="flex-grow:1;">
+                        <div style="font-weight:bold; margin-bottom:10px; color:#475569;">Essay Pages:</div>
+                        <div class="essay-grid">${essayHTML}</div>
+                        <div style="margin-top:10px; font-size:0.85rem; background:#f8fafc; padding:10px; border-radius:6px; max-height:100px; overflow-y:auto;">
+                            <strong>Logs:</strong> ${d.evidence_logs || "No logs"}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+        } catch(e) {
+            container.innerHTML = "Error loading images: " + e.message;
+        }
+    }
+</script>
+</body>
+</html>
