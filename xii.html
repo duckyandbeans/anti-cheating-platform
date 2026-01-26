@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade XII Assessment</title>
+    <title>Grade XII Assessment + Answer Key</title>
     <style>
-        :root { --primary: #4f46e5; --danger: #ef4444; --bg: #f3f4f6; }
+        :root { --primary: #4f46e5; --danger: #ef4444; --success: #10b981; --bg: #f3f4f6; }
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: var(--bg); 
@@ -34,6 +34,12 @@
         .word-chip { background: white; border: 1px solid #ccc; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .word-chip.used { opacity: 0.3; pointer-events: none; background: #ddd; }
         .word-chip-answer { background: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
+
+        /* REVIEW STYLES */
+        .review-card { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc; }
+        .review-correct { background-color: #d1fae5; border-color: #10b981; } /* Green */
+        .review-wrong { background-color: #fee2e2; border-color: #ef4444; } /* Red */
+        .correct-answer-text { color: #047857; font-weight: bold; margin-top: 5px; font-size: 0.9rem; }
 
         #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; }
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
@@ -120,7 +126,7 @@
     let switchCount = 0;
     let sessionActive = false;
 
-    // --- 🔴 HARDCODED QUIZ DATA (Replaces quiz.json) ---
+    // --- QUIZ DATA ---
     const QUIZ_SOURCE = {
         "multiple_choice": [
             { "id": 1, "question": "The burglar _____ by the time the police finally arrived.", "options": ["fled", "was fleeing", "had fled", "has fled"], "answer": "had fled" },
@@ -279,7 +285,52 @@
             status: "COMPLETED", finish_time: new Date().toLocaleString(),
             score: score, all_answers: answers, final_cheat_count: switchCount
         });
-        document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted!</h1><p>Score: ${score}</p></div>`;
+
+        // --- NEW: GENERATE ANSWER KEY REPORT ---
+        let reviewHTML = "";
+        
+        // Review MCQ
+        QUIZ_SOURCE.multiple_choice.forEach((q, idx) => {
+            const userAns = answers[`Q${q.id}`];
+            const isCorrect = userAns === q.answer;
+            const cssClass = isCorrect ? "review-correct" : "review-wrong";
+            const icon = isCorrect ? "✅" : "❌";
+            
+            reviewHTML += `
+                <div class="review-card ${cssClass}">
+                    <div><strong>${idx + 1}. ${q.question}</strong></div>
+                    <div>Your Answer: ${userAns || "(No Answer)"} ${icon}</div>
+                    ${!isCorrect ? `<div class="correct-answer-text">Correct Answer: ${q.answer}</div>` : ""}
+                </div>
+            `;
+        });
+
+        // Review Sentence Builder
+        QUIZ_SOURCE.sentence_building.forEach((q, idx) => {
+            const userAns = answers[`SB_${q.id}`];
+            const isCorrect = userAns === q.correct_order;
+            const cssClass = isCorrect ? "review-correct" : "review-wrong";
+            const icon = isCorrect ? "✅" : "❌";
+
+            reviewHTML += `
+                <div class="review-card ${cssClass}">
+                    <div><strong>${idx + 31}. Arrange Sentence</strong></div>
+                    <div>Your Answer: ${userAns || "(No Answer)"} ${icon}</div>
+                    ${!isCorrect ? `<div class="correct-answer-text">Correct Order: ${q.correct_order}</div>` : ""}
+                </div>
+            `;
+        });
+
+        document.body.innerHTML = `
+            <div class="container">
+                <h1 style="color:green">Submission Complete!</h1>
+                <h2 style="text-align:center;">Final Score: ${score} / 33</h2>
+                <hr>
+                <h3>Review Your Answers:</h3>
+                ${reviewHTML}
+                <button class="btn" onclick="location.reload()" style="background:#666;">Close / Log Out</button>
+            </div>
+        `;
     }
 
     document.addEventListener("visibilitychange", () => {
