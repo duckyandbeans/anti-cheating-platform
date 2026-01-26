@@ -126,6 +126,10 @@
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
     // --- VARIABLES ---
+    
+    // 🔴 NEW COLLECTION NAME IS HERE:
+    const COLLECTION_NAME = "grade_xii_grammar_final"; 
+    
     let quizData = null;
     let idPhoto = "";
     let switchCount = 0;
@@ -189,7 +193,8 @@
         const name = document.getElementById('studentName').value;
         const cls = document.getElementById('studentClass').value;
         
-        await db.collection("quiz_xii_results").doc(currentDocID).set({
+        // USES NEW COLLECTION
+        await db.collection(COLLECTION_NAME).doc(currentDocID).set({
             name: name, class: cls, photo: idPhoto,
             start_time: new Date().toLocaleString(),
             status: "IN_PROGRESS", cheat_count: 0
@@ -238,7 +243,6 @@
         // B. SENTENCE BUILDING
         container.innerHTML += `<h3>Part B: Arrange the Sentences</h3>`;
         quizData.sentence_building.forEach((q, idx) => {
-            // We store the current answer state in a data attribute or standard array
             container.innerHTML += `
                 <div class="question-box" id="sb_container_${q.id}">
                     <div class="question-text">${idx+1}. Arrange the words:</div>
@@ -257,21 +261,17 @@
 
     // --- SENTENCE BUILDER LOGIC ---
     window.moveWord = function(qId, word, element) {
-        if(element.classList.contains('used')) return; // Prevent double click
+        if(element.classList.contains('used')) return; 
         
-        // 1. Mark original as used
         element.classList.add('used');
-
-        // 2. Add to answer area
         const ansArea = document.getElementById(`ans_${qId}`);
         const chip = document.createElement('div');
         chip.className = 'word-chip-answer';
         chip.innerText = word;
         
-        // 3. Logic to remove from answer area
         chip.onclick = function() {
-            ansArea.removeChild(chip); // Remove from answer
-            element.classList.remove('used'); // Re-enable original
+            ansArea.removeChild(chip);
+            element.classList.remove('used');
             updateHiddenInput(qId);
         };
 
@@ -306,11 +306,11 @@
         quizData.sentence_building.forEach(q => {
             const val = document.getElementById(`input_sb_${q.id}`).value;
             answersLog[`SB_${q.id}`] = val;
-            // Simple string compare grading
-            if(val === q.correct_order) scoreMCQ++; // Bonus point logic, or separate grading
+            if(val === q.correct_order) scoreMCQ++;
         });
 
-        await db.collection("quiz_xii_results").doc(currentDocID).update({
+        // USES NEW COLLECTION
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
             status: "COMPLETED",
             finish_time: new Date().toLocaleString(),
             mcq_score: scoreMCQ,
@@ -328,13 +328,15 @@
             switchCount++;
             document.getElementById('cheat-alert').style.display='block';
             document.getElementById('cheat-alert').innerText = `⚠️ ALERT: Tab Switch #${switchCount}`;
-            db.collection("quiz_xii_results").doc(currentDocID).update({cheat_count: switchCount});
+            // USES NEW COLLECTION
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({cheat_count: switchCount});
         }
     });
 
     // --- 7. TEACHER DOWNLOAD ---
     async function downloadExcel() {
-        const snap = await db.collection("quiz_xii_results").get();
+        // USES NEW COLLECTION
+        const snap = await db.collection(COLLECTION_NAME).get();
         let csv = "data:text/csv;charset=utf-8,Class,Name,Score,Cheats,Answers\n";
         snap.forEach(doc => {
             const d = doc.data();
