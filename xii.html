@@ -11,7 +11,7 @@
             background: var(--bg); 
             padding: 20px; 
             color: #1f2937;
-            -webkit-user-select: none; user-select: none; /* Anti-Copy */
+            -webkit-user-select: none; user-select: none;
         }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
@@ -21,33 +21,27 @@
         .btn:disabled { background: #9ca3af; cursor: not-allowed; }
         input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box;}
 
-        /* QUIZ STYLES */
         .question-box { margin-bottom: 30px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; position: relative; }
         .question-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; }
         
-        /* MCQ Options */
         .mcq-label { display: block; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; background: white; }
         .mcq-label:hover { background: #eff6ff; border-color: var(--primary); }
         .mcq-input { margin-right: 10px; }
         .mcq-input:checked + span { font-weight: bold; color: var(--primary); }
 
-        /* SENTENCE BUILDER STYLES */
         .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; min-height: 40px; padding: 10px; background: #eee; border-radius: 6px; }
         .answer-area { min-height: 50px; border-bottom: 2px dashed #4f46e5; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; align-items: center; background: #fff; }
         .word-chip { background: white; border: 1px solid #ccc; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .word-chip:hover { background: #f3f4f6; transform: translateY(-1px); }
         .word-chip.used { opacity: 0.3; pointer-events: none; background: #ddd; }
         .word-chip-answer { background: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
 
-        /* SECURITY UI */
         #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; }
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
         .watermark-text { transform: rotate(-30deg); margin: 50px; font-weight: 900; font-size: 20px; }
         .info-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 15px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
 
-        /* SECTIONS */
         #login-section, #system-check-section, #quiz-section, #teacher-section { display: none; }
-        #login-section { display: block; } /* Initial State */
+        #login-section { display: block; }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -63,33 +57,28 @@
     <div id="login-section">
         <h1>XII Assessment Login</h1>
         
-        <label style="font-weight:bold; font-size:0.9rem;">Class</label>
+        <label>Class</label>
         <select id="studentClass">
             <option value="">Select Class...</option>
             <option value="XII H">XII H</option>
             <option value="XII I">XII I</option>
         </select>
-
-        <label style="font-weight:bold; font-size:0.9rem;">Attendance Number</label>
+        <label>Attendance Number</label>
         <input type="number" id="studentNo" placeholder="e.g. 15">
-
-        <label style="font-weight:bold; font-size:0.9rem;">Full Name</label>
+        <label>Full Name</label>
         <input type="text" id="studentName" placeholder="Enter your full name">
 
         <button class="btn" onclick="verifyLogin()">Next</button>
-        <p id="login-error" style="color:red; text-align:center; display:none;"></p>
     </div>
 
     <div id="system-check-section">
         <h1>⚙️ System Check</h1>
-        
         <div class="info-box">
             <strong>⚠️ EXAM RULES:</strong><br><br>
-            1. <strong>Do Not Switch Tabs:</strong> If you leave this screen, it will be recorded as cheating.<br>
+            1. <strong>Do Not Switch Tabs:</strong> It will be recorded as cheating.<br>
             2. <strong>Stay Full Screen:</strong> Do not minimize the browser.<br>
             3. <strong>Honesty is Integrity.</strong>
         </div>
-        
         <div id="confirm-area" style="margin-top:20px;">
             <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
             <label for="rulesCheck">I understand the rules and am ready to start.</label>
@@ -102,11 +91,7 @@
             <h2 style="margin:0;">English Test</h2>
             <div style="color:red; font-weight:bold; font-size:0.9rem;">● REC</div>
         </div>
-        
-        <form id="quiz-form">
-            <div id="quiz-container">Loading questions...</div>
-        </form>
-
+        <form id="quiz-form"><div id="quiz-container"></div></form>
         <button class="btn" id="submitBtn" onclick="submitExam()">Submit Exam</button>
     </div>
 
@@ -118,7 +103,7 @@
 </div>
 
 <script>
-    // --- FIREBASE CONFIG (USE YOURS) ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -130,17 +115,53 @@
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
     // --- VARIABLES ---
-    
-    // 🔴 COLLECTION NAME:
     const COLLECTION_NAME = "grade_xii_grammar_final"; 
-    
-    let quizData = null;
-    let switchCount = 0;
-    let evidenceLogs = [];
     let currentDocID = null;
+    let switchCount = 0;
     let sessionActive = false;
 
-    // --- WATERMARK GENERATOR ---
+    // --- 🔴 HARDCODED QUIZ DATA (Replaces quiz.json) ---
+    const QUIZ_SOURCE = {
+        "multiple_choice": [
+            { "id": 1, "question": "The burglar _____ by the time the police finally arrived.", "options": ["fled", "was fleeing", "had fled", "has fled"], "answer": "had fled" },
+            { "id": 2, "question": "I _____ to the news on the radio when I heard a loud crash.", "options": ["listened", "was listening", "have listened", "had listened"], "answer": "was listening" },
+            { "id": 3, "question": "She realized she _____ her wallet at home when she reached the checkout counter.", "options": ["left", "has left", "had left", "was leaving"], "answer": "had left" },
+            { "id": 4, "question": "I _____ for the bus when I saw my old friend from college.", "options": ["waited", "was waiting", "had waited", "have waited"], "answer": "was waiting" },
+            { "id": 5, "question": "The storm _____ outside while we sat comfortably by the fire.", "options": ["raged", "was raging", "had raged", "has raged"], "answer": "was raging" },
+            { "id": 6, "question": "She was annoyed because she _____ for two hours when he finally arrived.", "options": ["waited", "has been waiting", "had been waiting", "was waiting"], "answer": "had been waiting" },
+            { "id": 7, "question": "The music _____ by the time we entered the concert hall.", "options": ["stopped", "was stopping", "had stopped", "has stopped"], "answer": "had stopped" },
+            { "id": 8, "question": "He was exhausted because he _____ in the garden all day.", "options": ["worked", "has worked", "had been working", "was working"], "answer": "had been working" },
+            { "id": 9, "question": "I didn't go to the movie with them because I _____ it before.", "options": ["saw", "was seeing", "had seen", "have seen"], "answer": "had seen" },
+            { "id": 10, "question": "It _____ to rain just as we stepped out of the house.", "options": ["began", "was beginning", "had begun", "has begun"], "answer": "began" },
+            { "id": 11, "question": "They _____ in that house for 20 years before they decided to sell it.", "options": ["lived", "were living", "have lived", "had been living"], "answer": "had been living" },
+            { "id": 12, "question": "The roads were slippery because it _____ all night.", "options": ["rained", "was raining", "has rained", "had been raining"], "answer": "had been raining" },
+            { "id": 13, "question": "What _____ before you came here?", "options": ["did you do", "were you doing", "had you been doing", "have you done"], "answer": "had you been doing" },
+            { "id": 14, "question": "By the time he was thirty, he _____ three best-selling books.", "options": ["wrote", "was writing", "had written", "has written"], "answer": "had written" },
+            { "id": 15, "question": "She _____ the piano for ten years before her first public concert.", "options": ["played", "was playing", "had been playing", "has played"], "answer": "had been playing" },
+            { "id": 16, "question": "He _____ to the audience when the fire alarm suddenly went off.", "options": ["spoke", "was speaking", "had spoken", "has spoken"], "answer": "was speaking" },
+            { "id": 17, "question": "She _____ such a beautiful view until that moment on the mountain.", "options": ["never saw", "did not see", "had never seen", "was never seeing"], "answer": "had never seen" },
+            { "id": 18, "question": "I _____ him for years before we met again at the reunion.", "options": ["knew", "was knowing", "had known", "had been knowing"], "answer": "had known" },
+            { "id": 19, "question": "I _____ to call you yesterday, but I completely forgot.", "options": ["meant", "was meaning", "had meant", "mean"], "answer": "meant" },
+            { "id": 20, "question": "The company _____ well for years before the sudden bankruptcy.", "options": ["worked", "was working", "has worked", "had been working"], "answer": "had been working" },
+            { "id": 21, "question": "Every summer, we _____ go to the beach for a week.", "options": ["did", "would", "were", "had"], "answer": "would" },
+            { "id": 22, "question": "I _____ like spinach when I was young, but now I love it.", "options": ["didn't use to", "didn't used to", "wouldn't", "don't use to"], "answer": "didn't use to" },
+            { "id": 23, "question": "Did you _____ have long hair when you were a teenager?", "options": ["use to", "used to", "using", "use"], "answer": "use to" },
+            { "id": 24, "question": "My grandma _____ always bake cookies on Sundays.", "options": ["used", "would", "was", "did"], "answer": "would" },
+            { "id": 25, "question": "In the evenings, he _____ write letters to his friends abroad.", "options": ["used", "was", "had", "would"], "answer": "would" },
+            { "id": 26, "question": "It was the first time I _____ sushi.", "options": ["ate", "was eating", "had eaten", "have eaten"], "answer": "had eaten" },
+            { "id": 27, "question": "The band _____ on stage when the lights suddenly went out.", "options": ["performed", "were performing", "had performed", "have performed"], "answer": "were performing" },
+            { "id": 28, "question": "The sun _____ and the birds were singing as we set off.", "options": ["shone", "was shining", "had shone", "shines"], "answer": "was shining" },
+            { "id": 29, "question": "When I arrived at the office, the meeting _____.", "options": ["finished", "was finishing", "has finished", "had finished"], "answer": "had finished" },
+            { "id": 30, "question": "I _____ about moving for a long time before I finally did it.", "options": ["thought", "was thinking", "have thought", "had been thinking"], "answer": "had been thinking" }
+        ],
+        "sentence_building": [
+            { "id": 31, "scrambled": ["used", "to", "He", "play", "football", "every", "weekend"], "correct_order": "He used to play football every weekend" },
+            { "id": 32, "scrambled": ["had", "been", "She", "working", "all", "day"], "correct_order": "She had been working all day" },
+            { "id": 33, "scrambled": ["would", "We", "visit", "grandma", "often", "very"], "correct_order": "We would visit grandma very often" }
+        ]
+    };
+
+    // --- LOGIC ---
     function generateWatermark() {
         const wm = document.getElementById('global-watermark');
         let html = "";
@@ -149,13 +170,11 @@
     }
     generateWatermark();
 
-    // --- 1. LOGIN ---
     function verifyLogin() {
         const name = document.getElementById('studentName').value;
         const no = document.getElementById('studentNo').value;
         const cls = document.getElementById('studentClass').value;
         
-        // TEACHER BYPASS
         if(name === "030" && no === "0" && cls === "") {
             document.getElementById('login-section').style.display='none';
             document.getElementById('teacher-section').style.display='block';
@@ -163,107 +182,71 @@
         }
 
         if(!name || !no || !cls) return alert("Please fill in all details.");
-
-        // CHECK DB FOR DUPLICATES
-        const id = `${cls}_${no}_${name.replace(/\s/g,'_')}`;
-        currentDocID = id;
-        
-        // Go straight to rules check (No Camera)
+        currentDocID = `${cls}_${no}_${name.replace(/\s/g,'_')}`;
         document.getElementById('login-section').style.display='none';
         document.getElementById('system-check-section').style.display='block';
     }
 
-    // --- 2. START & LOAD JSON ---
     async function startQuiz() {
-        // Create DB Entry
         const name = document.getElementById('studentName').value;
         const no = document.getElementById('studentNo').value;
         const cls = document.getElementById('studentClass').value;
         
         await db.collection(COLLECTION_NAME).doc(currentDocID).set({
-            name: name, 
-            number: no,
-            class: cls, 
+            name: name, number: no, class: cls,
             start_time: new Date().toLocaleString(),
-            status: "IN_PROGRESS", 
-            cheat_count: 0
+            status: "IN_PROGRESS", cheat_count: 0
         });
 
-        // Load JSON
-        try {
-            const res = await fetch('quiz.json');
-            quizData = await res.json();
-            renderQuiz();
-            
-            document.getElementById('system-check-section').style.display='none';
-            document.getElementById('quiz-section').style.display='block';
-            document.documentElement.requestFullscreen().catch(e=>{});
-            sessionActive = true;
-        } catch(e) {
-            alert("Error loading quiz.json! Make sure you are using a Server/Firebase Hosting.");
-        }
+        renderQuiz();
+        document.getElementById('system-check-section').style.display='none';
+        document.getElementById('quiz-section').style.display='block';
+        document.documentElement.requestFullscreen().catch(e=>{});
+        sessionActive = true;
     }
 
-    // --- 3. RENDER ENGINE ---
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         container.innerHTML = "";
-
-        // A. MULTIPLE CHOICE
+        
+        // A. MCQ
         container.innerHTML += `<h3>Part A: Multiple Choice</h3>`;
-        quizData.multiple_choice.forEach((q, idx) => {
+        QUIZ_SOURCE.multiple_choice.forEach((q, idx) => {
             let optionsHTML = "";
             q.options.forEach(opt => {
-                optionsHTML += `
-                    <label class="mcq-label">
-                        <input type="radio" class="mcq-input" name="mcq_${q.id}" value="${opt}">
-                        <span>${opt}</span>
-                    </label>
-                `;
+                optionsHTML += `<label class="mcq-label"><input type="radio" class="mcq-input" name="mcq_${q.id}" value="${opt}"><span>${opt}</span></label>`;
             });
-            container.innerHTML += `
-                <div class="question-box">
-                    <div class="question-text">${idx+1}. ${q.question}</div>
-                    ${optionsHTML}
-                </div>
-            `;
+            container.innerHTML += `<div class="question-box"><div class="question-text">${idx+1}. ${q.question}</div>${optionsHTML}</div>`;
         });
 
-        // B. SENTENCE BUILDING
+        // B. SENTENCE
         container.innerHTML += `<h3>Part B: Arrange the Sentences</h3>`;
-        quizData.sentence_building.forEach((q, idx) => {
+        QUIZ_SOURCE.sentence_building.forEach((q, idx) => {
             container.innerHTML += `
                 <div class="question-box" id="sb_container_${q.id}">
                     <div class="question-text">${idx+1}. Arrange the words:</div>
                     <div class="word-bank" id="bank_${q.id}">
-                        ${q.scrambled.map((word, wIdx) => 
-                            `<div class="word-chip" onclick="moveWord(${q.id}, '${word.replace(/'/g, "\\'")}', this)">${word}</div>`
-                        ).join('')}
+                        ${q.scrambled.map(word => `<div class="word-chip" onclick="moveWord(${q.id}, '${word.replace(/'/g, "\\'")}', this)">${word}</div>`).join('')}
                     </div>
                     <div class="question-text" style="font-size:0.9rem; color:#666;">Your Answer (Click to remove):</div>
                     <div class="answer-area" id="ans_${q.id}"></div>
                     <input type="hidden" name="sb_${q.id}" id="input_sb_${q.id}">
-                </div>
-            `;
+                </div>`;
         });
     }
 
-    // --- SENTENCE BUILDER LOGIC ---
     window.moveWord = function(qId, word, element) {
-        if(element.classList.contains('used')) return; 
-        
+        if(element.classList.contains('used')) return;
         element.classList.add('used');
         const ansArea = document.getElementById(`ans_${qId}`);
         const chip = document.createElement('div');
         chip.className = 'word-chip-answer';
         chip.innerText = word;
-        
         chip.onclick = function() {
             ansArea.removeChild(chip);
             element.classList.remove('used');
             updateHiddenInput(qId);
         };
-
         ansArea.appendChild(chip);
         updateHiddenInput(qId);
     }
@@ -274,43 +257,31 @@
         document.getElementById(`input_sb_${qId}`).value = words.join(" ");
     }
 
-    // --- 4. SUBMISSION ---
     async function submitExam() {
         if(!confirm("Submit Exam?")) return;
         sessionActive = false;
-        
-        let scoreMCQ = 0;
-        let totalMCQ = quizData.multiple_choice.length;
-        let answersLog = {};
+        let score = 0;
+        let answers = {};
 
-        // Grade MCQ
-        quizData.multiple_choice.forEach(q => {
-            const selected = document.querySelector(`input[name="mcq_${q.id}"]:checked`);
-            const val = selected ? selected.value : "";
-            answersLog[`Q${q.id}`] = val;
-            if(val === q.answer) scoreMCQ++;
+        QUIZ_SOURCE.multiple_choice.forEach(q => {
+            const val = (document.querySelector(`input[name="mcq_${q.id}"]:checked`) || {}).value || "";
+            answers[`Q${q.id}`] = val;
+            if(val === q.answer) score++;
         });
 
-        // Collect Sentence Builder Answers
-        quizData.sentence_building.forEach(q => {
+        QUIZ_SOURCE.sentence_building.forEach(q => {
             const val = document.getElementById(`input_sb_${q.id}`).value;
-            answersLog[`SB_${q.id}`] = val;
-            if(val === q.correct_order) scoreMCQ++;
+            answers[`SB_${q.id}`] = val;
+            if(val === q.correct_order) score++;
         });
 
         await db.collection(COLLECTION_NAME).doc(currentDocID).update({
-            status: "COMPLETED",
-            finish_time: new Date().toLocaleString(),
-            mcq_score: scoreMCQ,
-            total_mcq: totalMCQ,
-            all_answers: answersLog,
-            final_cheat_count: switchCount
+            status: "COMPLETED", finish_time: new Date().toLocaleString(),
+            score: score, all_answers: answers, final_cheat_count: switchCount
         });
-
-        document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted!</h1><p>Score recorded.</p></div>`;
+        document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted!</h1><p>Score: ${score}</p></div>`;
     }
 
-    // --- 5. ANTI-CHEAT ---
     document.addEventListener("visibilitychange", () => {
         if(document.hidden && sessionActive) {
             switchCount++;
@@ -320,14 +291,12 @@
         }
     });
 
-    // --- 6. TEACHER DOWNLOAD ---
     async function downloadExcel() {
         const snap = await db.collection(COLLECTION_NAME).get();
         let csv = "data:text/csv;charset=utf-8,Class,Number,Name,Score,Cheats,Answers\n";
         snap.forEach(doc => {
             const d = doc.data();
-            const ansStr = JSON.stringify(d.all_answers || {}).replace(/,/g, '|');
-            csv += `${d.class},${d.number},"${d.name}",${d.mcq_score},${d.cheat_count},${ansStr}\n`;
+            csv += `${d.class},${d.number},"${d.name}",${d.score},${d.cheat_count},"${JSON.stringify(d.all_answers||{}).replace(/"/g,"'")}"\n`;
         });
         const link = document.createElement("a");
         link.href = encodeURI(csv);
