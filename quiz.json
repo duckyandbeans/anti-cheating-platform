@@ -1,0 +1,201 @@
+{
+    "multiple_choice": [
+        {
+            "id": 1,
+            "question": "The burglar _____ by the time the police finally arrived.",
+            "options": ["fled", "was fleeing", "had fled", "has fled"],
+            "answer": "had fled"
+        },
+        {
+            "id": 2,
+            "question": "I _____ to the news on the radio when I heard a loud crash.",
+            "options": ["listened", "was listening", "have listened", "had listened"],
+            "answer": "was listening"
+        },
+        {
+            "id": 3,
+            "question": "She realized she _____ her wallet at home when she reached the checkout counter.",
+            "options": ["left", "has left", "had left", "was leaving"],
+            "answer": "had left"
+        },
+        {
+            "id": 4,
+            "question": "I _____ for the bus when I saw my old friend from college.",
+            "options": ["waited", "was waiting", "had waited", "have waited"],
+            "answer": "was waiting"
+        },
+        {
+            "id": 5,
+            "question": "The storm _____ outside while we sat comfortably by the fire.",
+            "options": ["raged", "was raging", "had raged", "has raged"],
+            "answer": "was raging"
+        },
+        {
+            "id": 6,
+            "question": "She was annoyed because she _____ for two hours when he finally arrived.",
+            "options": ["waited", "has been waiting", "had been waiting", "was waiting"],
+            "answer": "had been waiting"
+        },
+        {
+            "id": 7,
+            "question": "The music _____ by the time we entered the concert hall.",
+            "options": ["stopped", "was stopping", "had stopped", "has stopped"],
+            "answer": "had stopped"
+        },
+        {
+            "id": 8,
+            "question": "He was exhausted because he _____ in the garden all day.",
+            "options": ["worked", "has worked", "had been working", "was working"],
+            "answer": "had been working"
+        },
+        {
+            "id": 9,
+            "question": "I didn't go to the movie with them because I _____ it before.",
+            "options": ["saw", "was seeing", "had seen", "have seen"],
+            "answer": "had seen"
+        },
+        {
+            "id": 10,
+            "question": "It _____ to rain just as we stepped out of the house.",
+            "options": ["began", "was beginning", "had begun", "has begun"],
+            "answer": "began"
+        },
+        {
+            "id": 11,
+            "question": "They _____ in that house for 20 years before they decided to sell it.",
+            "options": ["lived", "were living", "have lived", "had been living"],
+            "answer": "had been living"
+        },
+        {
+            "id": 12,
+            "question": "The roads were slippery because it _____ all night.",
+            "options": ["rained", "was raining", "has rained", "had been raining"],
+            "answer": "had been raining"
+        },
+        {
+            "id": 13,
+            "question": "What _____ before you came here?",
+            "options": ["did you do", "were you doing", "had you been doing", "have you done"],
+            "answer": "had you been doing"
+        },
+        {
+            "id": 14,
+            "question": "By the time he was thirty, he _____ three best-selling books.",
+            "options": ["wrote", "was writing", "had written", "has written"],
+            "answer": "had written"
+        },
+        {
+            "id": 15,
+            "question": "She _____ the piano for ten years before her first public concert.",
+            "options": ["played", "was playing", "had been playing", "has played"],
+            "answer": "had been playing"
+        },
+        {
+            "id": 16,
+            "question": "He _____ to the audience when the fire alarm suddenly went off.",
+            "options": ["spoke", "was speaking", "had spoken", "has spoken"],
+            "answer": "was speaking"
+        },
+        {
+            "id": 17,
+            "question": "She _____ such a beautiful view until that moment on the mountain.",
+            "options": ["never saw", "did not see", "had never seen", "was never seeing"],
+            "answer": "had never seen"
+        },
+        {
+            "id": 18,
+            "question": "I _____ him for years before we met again at the reunion.",
+            "options": ["knew", "was knowing", "had known", "had been knowing"],
+            "answer": "had known"
+        },
+        {
+            "id": 19,
+            "question": "I _____ to call you yesterday, but I completely forgot.",
+            "options": ["meant", "was meaning", "had meant", "mean"],
+            "answer": "meant"
+        },
+        {
+            "id": 20,
+            "question": "The company _____ well for years before the sudden bankruptcy.",
+            "options": ["worked", "was working", "has worked", "had been working"],
+            "answer": "had been working"
+        },
+        {
+            "id": 21,
+            "question": "Every summer, we _____ go to the beach for a week.",
+            "options": ["did", "would", "were", "had"],
+            "answer": "would"
+        },
+        {
+            "id": 22,
+            "question": "I _____ like spinach when I was young, but now I love it.",
+            "options": ["didn't use to", "didn't used to", "wouldn't", "don't use to"],
+            "answer": "didn't use to"
+        },
+        {
+            "id": 23,
+            "question": "Did you _____ have long hair when you were a teenager?",
+            "options": ["use to", "used to", "using", "use"],
+            "answer": "use to"
+        },
+        {
+            "id": 24,
+            "question": "My grandma _____ always bake cookies on Sundays.",
+            "options": ["used", "would", "was", "did"],
+            "answer": "would"
+        },
+        {
+            "id": 25,
+            "question": "In the evenings, he _____ write letters to his friends abroad.",
+            "options": ["used", "was", "had", "would"],
+            "answer": "would"
+        },
+        {
+            "id": 26,
+            "question": "It was the first time I _____ sushi.",
+            "options": ["ate", "was eating", "had eaten", "have eaten"],
+            "answer": "had eaten"
+        },
+        {
+            "id": 27,
+            "question": "The band _____ on stage when the lights suddenly went out.",
+            "options": ["performed", "were performing", "had performed", "have performed"],
+            "answer": "were performing"
+        },
+        {
+            "id": 28,
+            "question": "The sun _____ and the birds were singing as we set off.",
+            "options": ["shone", "was shining", "had shone", "shines"],
+            "answer": "was shining"
+        },
+        {
+            "id": 29,
+            "question": "When I arrived at the office, the meeting _____.",
+            "options": ["finished", "was finishing", "has finished", "had finished"],
+            "answer": "had finished"
+        },
+        {
+            "id": 30,
+            "question": "I _____ about moving for a long time before I finally did it.",
+            "options": ["thought", "was thinking", "have thought", "had been thinking"],
+            "answer": "had been thinking"
+        }
+    ],
+    "sentence_building": [
+        {
+            "id": 31,
+            "scrambled": ["used", "to", "He", "play", "football", "every", "weekend"],
+            "correct_order": "He used to play football every weekend"
+        },
+        {
+            "id": 32,
+            "scrambled": ["had", "been", "She", "working", "all", "day"],
+            "correct_order": "She had been working all day"
+        },
+        {
+            "id": 33,
+            "scrambled": ["would", "We", "visit", "grandma", "often", "very"],
+            "correct_order": "We would visit grandma very often"
+        }
+    ]
+}
