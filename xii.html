@@ -41,10 +41,9 @@
 
         /* SECURITY UI */
         #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; }
-        .camera-box { width: 100%; max-width: 300px; margin: 0 auto; background: black; border-radius: 8px; overflow: hidden; }
-        video { width: 100%; display: block; }
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
         .watermark-text { transform: rotate(-30deg); margin: 50px; font-weight: 900; font-size: 20px; }
+        .info-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 15px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
 
         /* SECTIONS */
         #login-section, #system-check-section, #quiz-section, #teacher-section { display: none; }
@@ -63,32 +62,37 @@
 
     <div id="login-section">
         <h1>XII Assessment Login</h1>
-        <input type="text" id="studentName" placeholder="Full Name">
+        
+        <label style="font-weight:bold; font-size:0.9rem;">Class</label>
         <select id="studentClass">
-            <option value="">Select Class</option>
-            <option value="XII IPA 1">XII IPA 1</option>
-            <option value="XII IPA 2">XII IPA 2</option>
-            <option value="XII IPS">XII IPS</option>
+            <option value="">Select Class...</option>
+            <option value="XII H">XII H</option>
+            <option value="XII I">XII I</option>
         </select>
+
+        <label style="font-weight:bold; font-size:0.9rem;">Attendance Number</label>
+        <input type="number" id="studentNo" placeholder="e.g. 15">
+
+        <label style="font-weight:bold; font-size:0.9rem;">Full Name</label>
+        <input type="text" id="studentName" placeholder="Enter your full name">
+
         <button class="btn" onclick="verifyLogin()">Next</button>
         <p id="login-error" style="color:red; text-align:center; display:none;"></p>
     </div>
 
     <div id="system-check-section">
-        <h1>📸 Identity Verification</h1>
-        <p style="text-align:center;">Take a selfie to verify your identity.</p>
-        <div class="camera-box">
-            <video id="videoFeed" autoplay playsinline></video>
-        </div>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <div id="preview-area" style="text-align:center; display:none; margin-top:10px;">
-            <img id="photoPreview" style="width:150px; border-radius:8px; border:2px solid green;">
-        </div>
-        <button class="btn" id="snapBtn" onclick="takeSnapshot()">📷 Snap Photo</button>
+        <h1>⚙️ System Check</h1>
         
-        <div id="confirm-area" style="display:none; margin-top:20px;">
+        <div class="info-box">
+            <strong>⚠️ EXAM RULES:</strong><br><br>
+            1. <strong>Do Not Switch Tabs:</strong> If you leave this screen, it will be recorded as cheating.<br>
+            2. <strong>Stay Full Screen:</strong> Do not minimize the browser.<br>
+            3. <strong>Honesty is Integrity.</strong>
+        </div>
+        
+        <div id="confirm-area" style="margin-top:20px;">
             <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
-            <label>I understand that switching tabs is cheating.</label>
+            <label for="rulesCheck">I understand the rules and am ready to start.</label>
             <button class="btn" id="startBtn" onclick="startQuiz()" disabled>START QUIZ</button>
         </div>
     </div>
@@ -109,7 +113,7 @@
     <div id="teacher-section">
         <h1>👩‍🏫 Teacher Dashboard</h1>
         <button class="btn" onclick="downloadExcel()">📥 Download Report (.csv)</button>
-        <div id="student-list" style="margin-top:20px;"></div>
+        <button class="btn" onclick="location.reload()" style="background:#666; margin-top:10px;">Log Out</button>
     </div>
 </div>
 
@@ -127,11 +131,10 @@
 
     // --- VARIABLES ---
     
-    // 🔴 NEW COLLECTION NAME IS HERE:
+    // 🔴 COLLECTION NAME:
     const COLLECTION_NAME = "grade_xii_grammar_final"; 
     
     let quizData = null;
-    let idPhoto = "";
     let switchCount = 0;
     let evidenceLogs = [];
     let currentDocID = null;
@@ -149,55 +152,41 @@
     // --- 1. LOGIN ---
     function verifyLogin() {
         const name = document.getElementById('studentName').value;
+        const no = document.getElementById('studentNo').value;
         const cls = document.getElementById('studentClass').value;
         
         // TEACHER BYPASS
-        if(name === "030" && cls === "") {
+        if(name === "030" && no === "0" && cls === "") {
             document.getElementById('login-section').style.display='none';
             document.getElementById('teacher-section').style.display='block';
             return;
         }
 
-        if(!name || !cls) return alert("Fill all fields");
+        if(!name || !no || !cls) return alert("Please fill in all details.");
 
-        // CHECK DB
-        const id = `${cls}_${name.replace(/\s/g,'_')}`;
+        // CHECK DB FOR DUPLICATES
+        const id = `${cls}_${no}_${name.replace(/\s/g,'_')}`;
         currentDocID = id;
         
+        // Go straight to rules check (No Camera)
         document.getElementById('login-section').style.display='none';
         document.getElementById('system-check-section').style.display='block';
-        
-        // Start Camera
-        navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}})
-            .then(s => document.getElementById('videoFeed').srcObject = s);
     }
 
-    // --- 2. CAMERA ---
-    function takeSnapshot() {
-        const video = document.getElementById('videoFeed');
-        const canvas = document.getElementById('canvas');
-        canvas.width = 300; canvas.height = 300 * (video.videoHeight/video.videoWidth);
-        canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-        idPhoto = canvas.toDataURL('image/jpeg', 0.5);
-        
-        document.getElementById('photoPreview').src = idPhoto;
-        document.getElementById('preview-area').style.display='block';
-        video.style.display='none';
-        document.getElementById('snapBtn').style.display='none';
-        document.getElementById('confirm-area').style.display='block';
-    }
-
-    // --- 3. START & LOAD JSON ---
+    // --- 2. START & LOAD JSON ---
     async function startQuiz() {
         // Create DB Entry
         const name = document.getElementById('studentName').value;
+        const no = document.getElementById('studentNo').value;
         const cls = document.getElementById('studentClass').value;
         
-        // USES NEW COLLECTION
         await db.collection(COLLECTION_NAME).doc(currentDocID).set({
-            name: name, class: cls, photo: idPhoto,
+            name: name, 
+            number: no,
+            class: cls, 
             start_time: new Date().toLocaleString(),
-            status: "IN_PROGRESS", cheat_count: 0
+            status: "IN_PROGRESS", 
+            cheat_count: 0
         });
 
         // Load JSON
@@ -215,7 +204,7 @@
         }
     }
 
-    // --- 4. RENDER ENGINE ---
+    // --- 3. RENDER ENGINE ---
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         container.innerHTML = "";
@@ -285,7 +274,7 @@
         document.getElementById(`input_sb_${qId}`).value = words.join(" ");
     }
 
-    // --- 5. SUBMISSION ---
+    // --- 4. SUBMISSION ---
     async function submitExam() {
         if(!confirm("Submit Exam?")) return;
         sessionActive = false;
@@ -309,7 +298,6 @@
             if(val === q.correct_order) scoreMCQ++;
         });
 
-        // USES NEW COLLECTION
         await db.collection(COLLECTION_NAME).doc(currentDocID).update({
             status: "COMPLETED",
             finish_time: new Date().toLocaleString(),
@@ -322,26 +310,24 @@
         document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted!</h1><p>Score recorded.</p></div>`;
     }
 
-    // --- 6. ANTI-CHEAT ---
+    // --- 5. ANTI-CHEAT ---
     document.addEventListener("visibilitychange", () => {
         if(document.hidden && sessionActive) {
             switchCount++;
             document.getElementById('cheat-alert').style.display='block';
             document.getElementById('cheat-alert').innerText = `⚠️ ALERT: Tab Switch #${switchCount}`;
-            // USES NEW COLLECTION
             db.collection(COLLECTION_NAME).doc(currentDocID).update({cheat_count: switchCount});
         }
     });
 
-    // --- 7. TEACHER DOWNLOAD ---
+    // --- 6. TEACHER DOWNLOAD ---
     async function downloadExcel() {
-        // USES NEW COLLECTION
         const snap = await db.collection(COLLECTION_NAME).get();
-        let csv = "data:text/csv;charset=utf-8,Class,Name,Score,Cheats,Answers\n";
+        let csv = "data:text/csv;charset=utf-8,Class,Number,Name,Score,Cheats,Answers\n";
         snap.forEach(doc => {
             const d = doc.data();
             const ansStr = JSON.stringify(d.all_answers || {}).replace(/,/g, '|');
-            csv += `${d.class},"${d.name}",${d.mcq_score},${d.cheat_count},${ansStr}\n`;
+            csv += `${d.class},${d.number},"${d.name}",${d.mcq_score},${d.cheat_count},${ansStr}\n`;
         });
         const link = document.createElement("a");
         link.href = encodeURI(csv);
