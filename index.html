@@ -371,58 +371,87 @@
                 finish_time: new Date().toLocaleString(),
                 essay_pages: essayPhotos
             });
-            document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted Successfully!</h1><p>You may close this tab.</p></div>`;
+            document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted Successfully!</h1><p>You may close this tab. We are going to have a grammar and vocab test next meeting ٩(ˊᗜˋ*)و ♡</p></div>`;
         } catch(e) {
             alert("Upload failed. Try again.");
             btn.disabled = false;
         }
     }
-
+// HELPER: Opens Base64 images safely in a new window
+function openViewer(base64Data) {
+    const win = window.open();
+    if (win) {
+        win.document.write(`
+            <html>
+                <head><title>Image Viewer</title></head>
+                <body style="margin:0; background:#222; display:flex; justify-content:center; align-items:center; height:100vh;">
+                    <img src="${base64Data}" style="max-width:100%; max-height:100vh; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                </body>
+            </html>
+        `);
+    } else {
+        alert("Please allow popups to view the image.");
+    }
+}
     // --- 6. TEACHER DASHBOARD ---
     async function loadSubmissions() {
-        const list = document.getElementById('student-list');
-        const status = document.getElementById('teacher-status');
-        list.innerHTML = "";
-        status.innerText = "Loading data...";
+    const list = document.getElementById('student-list');
+    const status = document.getElementById('teacher-status');
+    list.innerHTML = "";
+    status.innerText = "Loading data...";
 
-        const snap = await db.collection("exam_access_logs").get();
-        if(snap.empty) { status.innerText = "No students found."; return; }
-
-        snap.forEach(doc => {
-            const d = doc.data();
-            const div = document.createElement('div');
-            div.className = 'student-card';
-            
-            // Render Essay Thumbnails
-            let essayHTML = "";
-            if(d.essay_pages && d.essay_pages.length > 0) {
-                d.essay_pages.forEach(src => {
-                    essayHTML += `<img src="${src}" class="essay-thumb" onclick="window.open(this.src)">`;
-                });
-            } else {
-                essayHTML = "<span style='color:red'>No Essay Scanned</span>";
-            }
-
-            const badge = d.cheat_count > 0 ? `<span style="background:#fee2e2; color:red; padding:2px 5px; border-radius:4px;">⚠️ ${d.cheat_count} Cheats</span>` : `<span style="color:green">✅ Clean</span>`;
-
-            div.innerHTML = `
-                <div class="student-header">
-                    <img src="${d.photo || 'https://via.placeholder.com/60'}" alt="Selfie">
-                    <div>
-                        <div style="font-weight:bold; font-size:1.1rem;">${d.class} - ${d.name}</div>
-                        <div style="font-size:0.9rem; color:#555;">Status: ${d.status} | ${badge}</div>
-                    </div>
-                </div>
-                <div style="margin-top:10px;">
-                    <strong>Essay Pages (Click to Open):</strong><br>
-                    <div class="essay-gallery">${essayHTML}</div>
-                </div>
-            `;
-            list.appendChild(div);
-        });
-        status.innerText = `Showing ${snap.size} students.`;
+    const snap = await db.collection("exam_access_logs").orderBy("start_time", "desc").get();
+    
+    if(snap.empty) { 
+        status.innerText = "No students found."; 
+        return; 
     }
 
+    snap.forEach(doc => {
+        const d = doc.data();
+        const div = document.createElement('div');
+        div.className = 'student-card';
+        
+        // 1. Prepare Essay Thumbnails (Using the new openViewer fix)
+        let essayHTML = "";
+        if(d.essay_pages && d.essay_pages.length > 0) {
+            d.essay_pages.forEach((src, index) => {
+                // We pass the image data to the new function on click
+                essayHTML += `
+                    <div style="text-align:center; min-width:80px;">
+                        <img src="${src}" class="essay-thumb" onclick="openViewer('${src}')">
+                        <div style="font-size:10px; color:#666; margin-top:4px;">Page ${index + 1}</div>
+                    </div>
+                `;
+            });
+        } else {
+            essayHTML = "<span style='color:red; font-size:0.9rem;'>No Essay Scanned</span>";
+        }
+
+        // 2. Prepare Cheat Badge
+        const badge = d.cheat_count > 0 
+            ? `<span style="background:#fee2e2; color:red; padding:2px 6px; border-radius:4px; font-weight:bold;">⚠️ ${d.cheat_count} Cheats</span>` 
+            : `<span style="color:green; font-weight:bold;">✅ Clean</span>`;
+
+        // 3. Render Card
+        div.innerHTML = `
+            <div class="student-header">
+                <img src="${d.photo || 'https://via.placeholder.com/60'}" alt="Selfie" onclick="openViewer(this.src)" style="cursor:pointer;">
+                <div>
+                    <div style="font-weight:bold; font-size:1.1rem;">${d.class} - ${d.name} <span style="font-size:0.8rem; color:#999;">(#${d.number})</span></div>
+                    <div style="font-size:0.9rem; color:#555;">Status: ${d.status} | ${badge}</div>
+                    <div style="font-size:0.8rem; color:#888;">Start: ${d.start_time || '-'} | Finish: ${d.finish_time || '-'}</div>
+                </div>
+            </div>
+            <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                <strong style="font-size:0.9rem; color:#333;">Essay Pages (Click to View):</strong><br>
+                <div class="essay-gallery" style="margin-top:5px;">${essayHTML}</div>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+    status.innerText = `Showing ${snap.size} submissions.`;
+}
     async function downloadExcel() {
         const status = document.getElementById('teacher-status');
         status.innerText = "Generating CSV...";
