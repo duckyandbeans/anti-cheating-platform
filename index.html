@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Exam View</title>
+    <title>Secure Exam Portal + Essay Scan</title>
     <style>
         :root { --primary: #4f46e5; --danger: #ef4444; --bg: #f3f4f6; }
         body { 
@@ -11,10 +11,9 @@
             background: var(--bg); 
             padding: 20px; 
             color: #1f2937;
-            -webkit-user-select: none; /* Chrome/Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+ */
-            user-select: none; /* Standard */
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            user-select: none; 
         }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
@@ -26,77 +25,65 @@
         .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem;}
         .btn:hover { background: #4338ca; }
         .btn:disabled { background: #9ca3af; cursor: not-allowed; }
-        
         .btn-finish { background: #10b981; }
         .btn-finish:hover { background: #059669; }
-        .btn-download { background: #0ea5e9; } 
 
-        /* WATERMARK CONTAINER */
-        .image-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 20px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            overflow: hidden;
+        /* CAMERA STYLES */
+        .camera-box {
+            width: 100%; max-width: 400px; margin: 0 auto;
+            border: 2px solid #333; border-radius: 8px; overflow: hidden;
+            background: #000; position: relative;
         }
-        .image-wrapper img {
-            width: 100%;
-            display: block;
-            pointer-events: none; /* Disables drag/right-click */
-        }
-        /* THE WATERMARK TEXT Overlay */
-        .watermark-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-content: center;
-            opacity: 0.12; /* Subtle but visible */
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 10;
-        }
-        .watermark-text {
-            transform: rotate(-30deg);
-            font-size: 16px;
-            font-weight: 800; /* Extra bold */
-            color: #000;
-            margin: 25px;
-            white-space: nowrap;
-            text-transform: uppercase;
+        video { width: 100%; height: auto; display: block; }
+        canvas { display: none; }
+        
+        /* PHOTO PREVIEWS */
+        .photo-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
+        .snapshot-preview { 
+            width: 100px; height: 140px; object-fit: cover; 
+            border: 2px solid #10b981; border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        #cheat-alert { 
-            background: #fee2e2; border: 1px solid #f87171; color: #991b1b; 
-            padding: 1rem; border-radius: 8px; margin-bottom: 2rem; 
-            display: none; text-align: center; font-weight: bold; 
-            position: sticky; top: 10px; z-index: 100;
-        }
+        /* WATERMARK */
+        .image-wrapper { position: relative; display: inline-block; width: 100%; margin-bottom: 20px; border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        .image-wrapper img { width: 100%; display: block; pointer-events: none; }
+        .watermark-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-content: center; opacity: 0.12; pointer-events: none; overflow: hidden; z-index: 10; }
+        .watermark-text { transform: rotate(-30deg); font-size: 16px; font-weight: 800; color: #000; margin: 25px; white-space: nowrap; text-transform: uppercase; }
 
-        /* SCREEN VISIBILITY CONTROLS */
+        #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; }
+
+        /* SECTIONS */
         #login-section { display: block; }
         #system-check-section { display: none; }
         #content-section { display: none; }
+        #submission-section { display: none; } /* NEW */
         #teacher-section { display: none; }
 
         .error-msg { color: var(--danger); text-align: center; display:none; margin-top: 10px; font-weight: bold; padding: 10px; background: #fee2e2; border-radius: 4px;}
         .info-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 15px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; }
+
+        /* TEACHER GRID */
+        .student-card { background: #f9fafb; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .student-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .student-header img { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 2px solid #4f46e5; }
+        .essay-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .essay-thumb { height: 100px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; transition: transform 0.2s; }
+        .essay-thumb:hover { transform: scale(1.05); }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
-<body oncontextmenu="return false;"> <div class="container">
+<body oncontextmenu="return false;">
+
+<div class="container">
     <div id="cheat-alert">⚠️ ALERT: Screen switch detected! Recording incident...</div>
 
     <div id="login-section">
         <h1>Exam Login</h1>
         <p style="text-align:center; color:#666;">Enter credentials to proceed.</p>
         <hr>
-        
         <div class="form-group">
             <label>Class</label>
             <select id="studentClass">
@@ -117,30 +104,32 @@
             <label>Full Name</label>
             <input type="text" id="studentName" placeholder="Enter your full name">
         </div>
-        
         <button class="btn" id="loginBtn" onclick="verifyLogin()">Next Step</button>
         <p class="error-msg" id="login-error"></p>
     </div>
 
     <div id="system-check-section">
-        <h1>⚙️ System Check</h1>
-        
-        <div class="info-box">
-            <strong>⚠️ READ CAREFULLY:</strong><br><br>
-            1. <strong>Test your Zoom:</strong> Pinch your screen or use browser zoom now to make sure you can read text comfortably.<br>
-            2. <strong>Adjust Brightness:</strong> Ensure your screen is bright enough.<br>
-            3. <strong>Close Notifications:</strong> Clicking a notification counts as leaving the exam.<br>
-            4. <strong>Do Not Switch Tabs:</strong> Once you click "START", leaving this screen is recorded as a cheating incident.<br>
+        <h1>📸 Identity Verification</h1>
+        <div class="info-box" style="margin-bottom: 20px;">
+            Please take a clear selfie to verify it is you.
         </div>
+        <div class="camera-box">
+            <video id="videoFeed" autoplay playsinline></video>
+        </div>
+        <div id="id-preview-container" style="text-align:center; display:none;">
+            <img id="photoPreview" class="snapshot-preview" style="display:inline-block; width:150px; height:150px;" alt="My Selfie">
+        </div>
+        <canvas id="canvas"></canvas>
 
-        <div style="margin-top: 30px;">
+        <button class="btn" id="snapBtn" onclick="takeIdSnapshot()" style="background:#4b5563;">📷 Snap Photo</button>
+        
+        <div id="confirmationBox" style="display:none; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
             <input type="checkbox" id="confirmCheck" onchange="toggleStartBtn()">
             <label for="confirmCheck" style="display:inline; margin-left: 8px; font-size: 0.9rem;">
-                I have tested my device settings. I understand that any screen switching from this point on is <strong>not accidental</strong>.
+                I am ready. I understand leaving the screen is cheating.
             </label>
+            <button class="btn" id="startBtn" onclick="startExamSession()" disabled>START EXAM</button>
         </div>
-
-        <button class="btn" id="startBtn" onclick="startExamSession()" disabled>START EXAM</button>
     </div>
 
     <div id="content-section">
@@ -148,26 +137,51 @@
         <div style="text-align:center; margin-bottom:20px; color:#ef4444; font-weight:bold; font-size: 0.9rem;">
             Monitoring Active. Do not leave this screen.
         </div>
-
         <div id="gallery"></div>
-
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
-            <button class="btn btn-finish" id="finishBtn" onclick="finishSession()">I'M DONE (SUBMIT)</button>
+            <button class="btn btn-finish" id="finishBtn" onclick="goToSubmission()">I'M DONE (SCAN ESSAY)</button>
         </div>
+    </div>
+
+    <div id="submission-section">
+        <h1>📝 Scan Your Essay</h1>
+        <div class="info-box">
+            <strong>Instructions:</strong><br>
+            1. Use the camera to take a clear photo of your handwritten pages.<br>
+            2. Make sure the text is readable.<br>
+            3. Click "Submit All" when finished.
+        </div>
+        
+        <div class="camera-box" style="margin-top:20px;">
+            <video id="essayVideoFeed" autoplay playsinline></video>
+        </div>
+        
+        <button class="btn" onclick="takeEssayPhoto()" style="background:#4b5563;">📷 Capture Page</button>
+        
+        <div class="photo-grid" id="essay-grid"></div>
+        <p id="photo-count" style="text-align:center; color:#666; margin-top:10px;">0 Pages Scanned</p>
+
+        <button class="btn btn-finish" id="finalSubmitBtn" onclick="submitFinal()" disabled>Submit All & Finish</button>
     </div>
 
     <div id="teacher-section" style="text-align: center;">
         <h1 style="color: var(--primary);">👩‍🏫 Teacher Dashboard</h1>
-        <div style="margin: 40px 0;">
-            <button class="btn btn-download" onclick="downloadExcel()">📥 Download Student Report (.csv)</button>
+        
+        <div style="display: flex; gap: 10px; justify-content: center; margin: 30px 0;">
+            <button class="btn btn-download" style="width: auto; margin:0;" onclick="downloadExcel()">📥 Download CSV</button>
+            <button class="btn" style="width: auto; margin:0; background:#6366f1;" onclick="loadSubmissions()">📸 View Essays</button>
         </div>
-        <p id="download-status" style="color: #666; font-size: 0.9rem;"></p>
-        <button class="btn" onclick="location.reload()" style="background:#666;">Log Out</button>
+        
+        <p id="teacher-status" style="color: #666; font-size: 0.9rem;"></p>
+        
+        <div id="student-list" style="margin-top: 20px; max-height: 600px; overflow-y: auto;"></div>
+
+        <button class="btn" onclick="location.reload()" style="background:#666; margin-top:30px;">Log Out</button>
     </div>
 </div>
 
 <script>
-    // CONFIGURATION
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -179,208 +193,251 @@
     };
 
     let db;
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-    } catch (e) {
-        alert("Database Error: " + e.message);
-    }
+    try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } 
+    catch (e) { alert("Database Error"); }
 
-    // STATE VARIABLES
+    // --- VARIABLES ---
     let switchCount = 0;
     let evidenceLogs = [];
     let sessionActive = false;
     let currentDocID = null; 
+    let idPhotoData = ""; 
+    let essayPhotos = []; // Array to store essay pages
 
-    // --- TRAP LOGIC ---
-    function logCheat(reason) {
-        if (!sessionActive) return;
-
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        switchCount++;
-        evidenceLogs.push(`[${reason} at ${timeString}]`);
-
-        const alertBox = document.getElementById('cheat-alert');
-        alertBox.style.display = 'block';
-        alertBox.innerText = `⚠️ WARNING: Screen switch detected (${switchCount})! Recorded.`;
-
-        if (currentDocID) {
-            db.collection("exam_access_logs").doc(currentDocID).update({
-                cheat_count: switchCount,
-                evidence_logs: evidenceLogs.join(" | ")
-            });
-        }
-    }
-
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) logCheat("Tab Switched");
-    });
-    window.addEventListener("blur", () => {
-        logCheat("Window Blurred/Clicked Away");
-    });
-
-    // --- 1. VERIFY LOGIN ---
+    // --- 1. LOGIN ---
     async function verifyLogin() {
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
         const err = document.getElementById('login-error');
-        const btn = document.getElementById('loginBtn');
 
-        err.style.display = 'none';
+        if (!cls || !no || !name) return err.innerText = "Fill all details", err.style.display = "block";
 
-        if (!cls || !no || !name) {
-            err.innerText = "Please fill in all details.";
-            err.style.display = "block";
-            return;
-        }
-
-        // TEACHER CHECK
         if (cls === "XI D" && no === "0" && name === "030") {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('teacher-section').style.display = 'block';
             return;
         }
 
-        btn.disabled = true;
-        btn.innerText = "Checking Database...";
-        
+        document.getElementById('loginBtn').innerText = "Checking...";
         const uniqueID = `${cls}_${no}`;
         currentDocID = uniqueID;
 
         try {
-            // Check if already taken
             const docSnap = await db.collection("exam_access_logs").doc(uniqueID).get();
             if (docSnap.exists) {
-                const data = docSnap.data();
-                btn.innerText = "Access Denied";
-                err.innerHTML = `⛔ DENIED: Already accessed at ${data.start_time}`;
+                document.getElementById('loginBtn').innerText = "Denied";
+                err.innerText = "Access Denied: Already Logged In";
                 err.style.display = 'block';
                 return;
             }
-
-            // Move to System Check Screen
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('system-check-section').style.display = 'block';
-            
-        } catch (e) {
-            console.error(e);
-            err.innerText = "Error: " + e.message;
-            err.style.display = 'block';
-            btn.disabled = false;
+            startCamera('videoFeed'); 
+        } catch (e) { alert("Error: " + e.message); }
+    }
+
+    // --- 2. CAMERA HELPERS ---
+    function startCamera(videoElementId) {
+        const video = document.getElementById(videoElementId);
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }) // Try rear camera for essay
+            .then(s => video.srcObject = s)
+            .catch(e => {
+                // Fallback to user facing if environment fails
+                navigator.mediaDevices.getUserMedia({ video: true }).then(s => video.srcObject = s);
+            });
         }
     }
 
-    // --- 2. SYSTEM CHECK LOGIC ---
-    function toggleStartBtn() {
-        const chk = document.getElementById('confirmCheck');
-        document.getElementById('startBtn').disabled = !chk.checked;
+    // Capture Selfie
+    function takeIdSnapshot() {
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Scale down for DB storage
+        const scale = 300 / video.videoWidth;
+        canvas.width = 300;
+        canvas.height = video.videoHeight * scale;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        idPhotoData = canvas.toDataURL('image/jpeg', 0.5);
+
+        document.getElementById('photoPreview').src = idPhotoData;
+        document.getElementById('id-preview-container').style.display = 'block';
+        video.style.display = 'none';
+        document.getElementById('snapBtn').style.display = 'none';
+        document.getElementById('confirmationBox').style.display = 'block';
     }
 
-    // --- 3. START EXAM (Generate Watermarks) ---
+    // Capture Essay Page
+    function takeEssayPhoto() {
+        const video = document.getElementById('essayVideoFeed');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Keep resolution decent for reading (800px width)
+        const scale = 800 / video.videoWidth;
+        canvas.width = 800;
+        canvas.height = video.videoHeight * scale;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Compress (0.6 quality)
+        const photoData = canvas.toDataURL('image/jpeg', 0.6);
+        essayPhotos.push(photoData);
+
+        // Update UI
+        const img = document.createElement('img');
+        img.src = photoData;
+        img.className = 'snapshot-preview';
+        document.getElementById('essay-grid').appendChild(img);
+        
+        document.getElementById('photo-count').innerText = `${essayPhotos.length} Pages Scanned`;
+        document.getElementById('finalSubmitBtn').disabled = false;
+        document.getElementById('finalSubmitBtn').innerText = `Submit ${essayPhotos.length} Pages`;
+    }
+
+    function toggleStartBtn() {
+        document.getElementById('startBtn').disabled = !document.getElementById('confirmCheck').checked;
+    }
+
+    // --- 3. START EXAM ---
     async function startExamSession() {
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
 
-        // CREATE DB ENTRY
         await db.collection("exam_access_logs").doc(currentDocID).set({
-            class: cls,
-            number: no,
-            name: name,
+            class: cls, number: no, name: name, photo: idPhotoData,
             start_time: new Date().toLocaleString(),
-            finish_time: "Not Finished",
-            status: "IN_PROGRESS",
-            cheat_count: 0,
-            evidence_logs: ""
+            finish_time: "Not Finished", status: "IN_PROGRESS",
+            cheat_count: 0, evidence_logs: "", essay_pages: []
         });
 
-        // GENERATE IMAGES WITH MORAL WATERMARKS
+        // Watermarks
         const gallery = document.getElementById('gallery');
-        const images = ['1.png', '2.png', '3.png']; // YOUR IMAGES
-        
-        images.forEach(imgSrc => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'image-wrapper';
-            
-            // Create Watermark Overlay
-            let watermarkHTML = "";
-            // We loop to create many copies of the text to cover the image
-            for(let i=0; i<25; i++) {
-                // Alternate between the two phrases
-                const text = (i % 2 === 0) ? "DO NOT CHEAT" : "HONESTY IS INTEGRITY";
-                watermarkHTML += `<div class="watermark-text">${text}</div>`;
-            }
-            
-            wrapper.innerHTML = `
-                <div class="watermark-overlay">${watermarkHTML}</div>
-                <img src="${imgSrc}" oncontextmenu="return false;">
-            `;
-            gallery.appendChild(wrapper);
+        ['1.png', '2.png', '3.png'].forEach(imgSrc => {
+            const div = document.createElement('div');
+            div.className = 'image-wrapper';
+            let wm = "";
+            for(let i=0; i<25; i++) wm += `<div class="watermark-text">${i%2===0?"DO NOT CHEAT":"HONESTY IS INTEGRITY"}</div>`;
+            div.innerHTML = `<div class="watermark-overlay">${wm}</div><img src="${imgSrc}">`;
+            gallery.appendChild(div);
         });
 
         sessionActive = true;
         document.getElementById('system-check-section').style.display = 'none';
         document.getElementById('content-section').style.display = 'block';
-        
-        // Attempt fullscreen again after they agree to terms
         document.documentElement.requestFullscreen().catch(e => {});
     }
 
-    // --- 4. FINISH ---
-    async function finishSession() {
-        if (!confirm("Are you sure you are done?")) return;
+    // --- 4. TRAP LOGIC ---
+    document.addEventListener("visibilitychange", () => { if (document.hidden) logCheat("Tab Switched"); });
+    window.addEventListener("blur", () => { logCheat("Window Blurred"); });
 
-        const btn = document.getElementById('finishBtn');
+    function logCheat(reason) {
+        if (!sessionActive) return;
+        switchCount++;
+        const now = new Date().toLocaleTimeString();
+        evidenceLogs.push(`[${reason} at ${now}]`);
+        document.getElementById('cheat-alert').style.display = 'block';
+        document.getElementById('cheat-alert').innerText = `⚠️ WARNING: Screen switch detected (${switchCount})!`;
+        if (currentDocID) db.collection("exam_access_logs").doc(currentDocID).update({ cheat_count: switchCount, evidence_logs: evidenceLogs.join(" | ") });
+    }
+
+    // --- 5. SUBMISSION FLOW ---
+    function goToSubmission() {
+        if (!confirm("Are you finished viewing the questions? You will now scan your essay.")) return;
+        
+        // Pause monitoring briefly so they can use camera without flagging "Cheat"
+        sessionActive = false; 
+        
+        document.getElementById('content-section').style.display = 'none';
+        document.getElementById('submission-section').style.display = 'block';
+        startCamera('essayVideoFeed');
+    }
+
+    async function submitFinal() {
+        if (!confirm("Submit all pages and finish?")) return;
+        
+        const btn = document.getElementById('finalSubmitBtn');
         btn.disabled = true;
-        btn.innerText = "Saving...";
-        sessionActive = false;
+        btn.innerText = "Uploading...";
 
-        if (currentDocID) {
+        try {
             await db.collection("exam_access_logs").doc(currentDocID).update({
                 status: "COMPLETED",
                 finish_time: new Date().toLocaleString(),
-                final_cheat_count: switchCount
+                essay_pages: essayPhotos
             });
+            document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted Successfully!</h1><p>You may close this tab.</p></div>`;
+        } catch(e) {
+            alert("Upload failed. Try again.");
+            btn.disabled = false;
         }
-
-        document.body.innerHTML = `
-            <div class="container" style="text-align:center">
-                <h1 style="color:green">Submitted</h1>
-                <p>You may close this tab.</p>
-            </div>
-        `;
     }
 
-    // --- 5. TEACHER DOWNLOAD ---
+    // --- 6. TEACHER DASHBOARD ---
+    async function loadSubmissions() {
+        const list = document.getElementById('student-list');
+        const status = document.getElementById('teacher-status');
+        list.innerHTML = "";
+        status.innerText = "Loading data...";
+
+        const snap = await db.collection("exam_access_logs").get();
+        if(snap.empty) { status.innerText = "No students found."; return; }
+
+        snap.forEach(doc => {
+            const d = doc.data();
+            const div = document.createElement('div');
+            div.className = 'student-card';
+            
+            // Render Essay Thumbnails
+            let essayHTML = "";
+            if(d.essay_pages && d.essay_pages.length > 0) {
+                d.essay_pages.forEach(src => {
+                    essayHTML += `<img src="${src}" class="essay-thumb" onclick="window.open(this.src)">`;
+                });
+            } else {
+                essayHTML = "<span style='color:red'>No Essay Scanned</span>";
+            }
+
+            const badge = d.cheat_count > 0 ? `<span style="background:#fee2e2; color:red; padding:2px 5px; border-radius:4px;">⚠️ ${d.cheat_count} Cheats</span>` : `<span style="color:green">✅ Clean</span>`;
+
+            div.innerHTML = `
+                <div class="student-header">
+                    <img src="${d.photo || 'https://via.placeholder.com/60'}" alt="Selfie">
+                    <div>
+                        <div style="font-weight:bold; font-size:1.1rem;">${d.class} - ${d.name}</div>
+                        <div style="font-size:0.9rem; color:#555;">Status: ${d.status} | ${badge}</div>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <strong>Essay Pages (Click to Open):</strong><br>
+                    <div class="essay-gallery">${essayHTML}</div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+        status.innerText = `Showing ${snap.size} students.`;
+    }
+
     async function downloadExcel() {
-        const statusMsg = document.getElementById('download-status');
-        statusMsg.innerText = "Fetching data...";
-
-        try {
-            const snapshot = await db.collection("exam_access_logs").get();
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Class,Number,Name,Status,Start Time,Finish Time,Cheat Count,Cheat Logs\n";
-
-            snapshot.forEach(doc => {
-                const d = doc.data();
-                const cleanLogs = (d.evidence_logs || "").replace(/,/g, " | ").replace(/\n/g, " ");
-                const row = `${d.class},${d.number},"${d.name}",${d.status},"${d.start_time}","${d.finish_time}",${d.cheat_count},"${cleanLogs}"`;
-                csvContent += row + "\n";
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Exam_Report.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            statusMsg.innerText = "✅ Downloaded!";
-        } catch (e) {
-            statusMsg.innerText = "❌ Error: " + e.message;
-        }
+        const status = document.getElementById('teacher-status');
+        status.innerText = "Generating CSV...";
+        const snap = await db.collection("exam_access_logs").get();
+        let csv = "data:text/csv;charset=utf-8,Class,Number,Name,Status,Start,Finish,Cheats,Logs\n";
+        snap.forEach(doc => {
+            const d = doc.data();
+            csv += `${d.class},${d.number},"${d.name}",${d.status},"${d.start_time}","${d.finish_time}",${d.cheat_count},"${(d.evidence_logs||"").replace(/\n/g," ")}"\n`;
+        });
+        const link = document.createElement("a");
+        link.href = encodeURI(csv);
+        link.download = "Exam_Report.csv";
+        document.body.appendChild(link);
+        link.click();
+        status.innerText = "Download Complete.";
     }
 </script>
 </body>
