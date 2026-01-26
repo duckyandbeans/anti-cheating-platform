@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restricted Exam Materials</title>
+    <title>Secure Exam View</title>
     <style>
         :root { --primary: #4f46e5; --danger: #ef4444; --bg: #f3f4f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: #1f2937; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            padding: 20px; 
+            color: #1f2937;
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+            user-select: none; /* Standard */
+        }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        h1 { text-align: center; color: #111827; }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+        h1 { text-align: center; color: #111827; font-size: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
         input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
         
         .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem;}
@@ -20,15 +29,46 @@
         
         .btn-finish { background: #10b981; }
         .btn-finish:hover { background: #059669; }
+        .btn-download { background: #0ea5e9; } 
 
-        .btn-download { background: #0ea5e9; } /* Blue for download */
-        .btn-download:hover { background: #0284c7; }
+        /* WATERMARK CONTAINER */
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-wrapper img {
+            width: 100%;
+            display: block;
+            pointer-events: none; /* Disables drag/right-click */
+        }
+        /* THE WATERMARK TEXT Overlay */
+        .watermark-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            opacity: 0.12; /* Subtle but visible */
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .watermark-text {
+            transform: rotate(-30deg);
+            font-size: 16px;
+            font-weight: 800; /* Extra bold */
+            color: #000;
+            margin: 25px;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
 
-        /* IMAGE GALLERY */
-        .image-gallery { display: flex; flex-direction: column; gap: 20px; align-items: center; }
-        .image-gallery img { width: 100%; max-width: 800px; border: 2px solid #e5e7eb; border-radius: 8px; }
-
-        /* WARNING BOX */
         #cheat-alert { 
             background: #fee2e2; border: 1px solid #f87171; color: #991b1b; 
             padding: 1rem; border-radius: 8px; margin-bottom: 2rem; 
@@ -36,25 +76,25 @@
             position: sticky; top: 10px; z-index: 100;
         }
 
-        /* SECTIONS */
+        /* SCREEN VISIBILITY CONTROLS */
         #login-section { display: block; }
+        #system-check-section { display: none; }
         #content-section { display: none; }
         #teacher-section { display: none; }
 
         .error-msg { color: var(--danger); text-align: center; display:none; margin-top: 10px; font-weight: bold; padding: 10px; background: #fee2e2; border-radius: 4px;}
+        .info-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 15px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
-
-<div class="container">
+<body oncontextmenu="return false;"> <div class="container">
     <div id="cheat-alert">⚠️ ALERT: Screen switch detected! Recording incident...</div>
 
     <div id="login-section">
-        <h1>Material Access Login</h1>
-        <p style="text-align:center; color:#666;">One-time access only. Do not reload.</p>
+        <h1>Exam Login</h1>
+        <p style="text-align:center; color:#666;">Enter credentials to proceed.</p>
         <hr>
         
         <div class="form-group">
@@ -78,21 +118,38 @@
             <input type="text" id="studentName" placeholder="Enter your full name">
         </div>
         
-        <button class="btn" id="startBtn" onclick="startSession()">Start Exam View</button>
+        <button class="btn" id="loginBtn" onclick="verifyLogin()">Next Step</button>
         <p class="error-msg" id="login-error"></p>
+    </div>
+
+    <div id="system-check-section">
+        <h1>⚙️ System Check</h1>
+        
+        <div class="info-box">
+            <strong>⚠️ READ CAREFULLY:</strong><br><br>
+            1. <strong>Test your Zoom:</strong> Pinch your screen or use browser zoom now to make sure you can read text comfortably.<br>
+            2. <strong>Adjust Brightness:</strong> Ensure your screen is bright enough.<br>
+            3. <strong>Close Notifications:</strong> Clicking a notification counts as leaving the exam.<br>
+            4. <strong>Do Not Switch Tabs:</strong> Once you click "START", leaving this screen is recorded as a cheating incident.<br>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <input type="checkbox" id="confirmCheck" onchange="toggleStartBtn()">
+            <label for="confirmCheck" style="display:inline; margin-left: 8px; font-size: 0.9rem;">
+                I have tested my device settings. I understand that any screen switching from this point on is <strong>not accidental</strong>.
+            </label>
+        </div>
+
+        <button class="btn" id="startBtn" onclick="startExamSession()" disabled>START EXAM</button>
     </div>
 
     <div id="content-section">
         <h2 style="text-align:center;">Exam Materials</h2>
-        <div style="text-align:center; margin-bottom:20px; color:#ef4444; font-weight:bold;">
-            DO NOT SWITCH TABS.
+        <div style="text-align:center; margin-bottom:20px; color:#ef4444; font-weight:bold; font-size: 0.9rem;">
+            Monitoring Active. Do not leave this screen.
         </div>
 
-        <div class="image-gallery">
-            <img src="1.png" alt="Page 1">
-            <img src="2.png" alt="Page 2">
-            <img src="3.png" alt="Page 3">
-        </div>
+        <div id="gallery"></div>
 
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
             <button class="btn btn-finish" id="finishBtn" onclick="finishSession()">I'M DONE (SUBMIT)</button>
@@ -101,23 +158,16 @@
 
     <div id="teacher-section" style="text-align: center;">
         <h1 style="color: var(--primary);">👩‍🏫 Teacher Dashboard</h1>
-        <p>Manage exam submissions and download reports.</p>
-        <hr>
-        
         <div style="margin: 40px 0;">
             <button class="btn btn-download" onclick="downloadExcel()">📥 Download Student Report (.csv)</button>
         </div>
-
         <p id="download-status" style="color: #666; font-size: 0.9rem;"></p>
-        
-        <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top:20px;">
-            <button class="btn" onclick="location.reload()" style="background:#666;">Log Out</button>
-        </div>
+        <button class="btn" onclick="location.reload()" style="background:#666;">Log Out</button>
     </div>
 </div>
 
 <script>
-    // 1. CONFIGURATION
+    // CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -136,13 +186,13 @@
         alert("Database Error: " + e.message);
     }
 
-    // 2. STATE VARIABLES
+    // STATE VARIABLES
     let switchCount = 0;
     let evidenceLogs = [];
     let sessionActive = false;
     let currentDocID = null; 
 
-    // 3. TRAP LOGIC
+    // --- TRAP LOGIC ---
     function logCheat(reason) {
         if (!sessionActive) return;
 
@@ -151,12 +201,10 @@
         switchCount++;
         evidenceLogs.push(`[${reason} at ${timeString}]`);
 
-        // Update UI
         const alertBox = document.getElementById('cheat-alert');
         alertBox.style.display = 'block';
         alertBox.innerText = `⚠️ WARNING: Screen switch detected (${switchCount})! Recorded.`;
 
-        // Update DB Immediately
         if (currentDocID) {
             db.collection("exam_access_logs").doc(currentDocID).update({
                 cheat_count: switchCount,
@@ -169,18 +217,17 @@
         if (document.hidden) logCheat("Tab Switched");
     });
     window.addEventListener("blur", () => {
-        logCheat("Window Blurred");
+        logCheat("Window Blurred/Clicked Away");
     });
 
-    // 4. START SESSION (Unified Login)
-    async function startSession() {
+    // --- 1. VERIFY LOGIN ---
+    async function verifyLogin() {
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
-        const btn = document.getElementById('startBtn');
         const err = document.getElementById('login-error');
+        const btn = document.getElementById('loginBtn');
 
-        // Reset Error
         err.style.display = 'none';
 
         if (!cls || !no || !name) {
@@ -189,126 +236,150 @@
             return;
         }
 
-        // --- CHECK FOR TEACHER LOGIN ---
+        // TEACHER CHECK
         if (cls === "XI D" && no === "0" && name === "030") {
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('teacher-section').style.display = 'block';
-            return; // Stop here, don't run student logic
+            return;
         }
-        // -------------------------------
 
         btn.disabled = true;
-        btn.innerText = "Verifying...";
-
-        // Create Unique ID (Class + Number)
+        btn.innerText = "Checking Database...";
+        
         const uniqueID = `${cls}_${no}`;
         currentDocID = uniqueID;
 
         try {
-            // A. Check if user already exists
+            // Check if already taken
             const docSnap = await db.collection("exam_access_logs").doc(uniqueID).get();
-
             if (docSnap.exists) {
                 const data = docSnap.data();
                 btn.innerText = "Access Denied";
-                err.innerHTML = `⛔ ACCESS DENIED.<br>Student ${cls}-${no} has already accessed this exam.<br>First Login: ${data.start_time}`;
+                err.innerHTML = `⛔ DENIED: Already accessed at ${data.start_time}`;
                 err.style.display = 'block';
                 return;
             }
 
-            // B. If new, create the document
-            await db.collection("exam_access_logs").doc(uniqueID).set({
-                class: cls,
-                number: no,
-                name: name,
-                start_time: new Date().toLocaleString(),
-                finish_time: "Not Finished",
-                status: "IN_PROGRESS",
-                cheat_count: 0,
-                evidence_logs: ""
-            });
-
-            // C. Start Exam
-            sessionActive = true;
+            // Move to System Check Screen
             document.getElementById('login-section').style.display = 'none';
-            document.getElementById('content-section').style.display = 'block';
+            document.getElementById('system-check-section').style.display = 'block';
             
-            // Attempt Fullscreen
-            document.documentElement.requestFullscreen().catch(e => {});
-
         } catch (e) {
             console.error(e);
-            err.innerText = "System Error: " + e.message;
+            err.innerText = "Error: " + e.message;
             err.style.display = 'block';
             btn.disabled = false;
         }
     }
 
-    // 5. FINISH SESSION
+    // --- 2. SYSTEM CHECK LOGIC ---
+    function toggleStartBtn() {
+        const chk = document.getElementById('confirmCheck');
+        document.getElementById('startBtn').disabled = !chk.checked;
+    }
+
+    // --- 3. START EXAM (Generate Watermarks) ---
+    async function startExamSession() {
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+
+        // CREATE DB ENTRY
+        await db.collection("exam_access_logs").doc(currentDocID).set({
+            class: cls,
+            number: no,
+            name: name,
+            start_time: new Date().toLocaleString(),
+            finish_time: "Not Finished",
+            status: "IN_PROGRESS",
+            cheat_count: 0,
+            evidence_logs: ""
+        });
+
+        // GENERATE IMAGES WITH MORAL WATERMARKS
+        const gallery = document.getElementById('gallery');
+        const images = ['1.png', '2.png', '3.png']; // YOUR IMAGES
+        
+        images.forEach(imgSrc => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+            
+            // Create Watermark Overlay
+            let watermarkHTML = "";
+            // We loop to create many copies of the text to cover the image
+            for(let i=0; i<25; i++) {
+                // Alternate between the two phrases
+                const text = (i % 2 === 0) ? "DO NOT CHEAT" : "HONESTY IS INTEGRITY";
+                watermarkHTML += `<div class="watermark-text">${text}</div>`;
+            }
+            
+            wrapper.innerHTML = `
+                <div class="watermark-overlay">${watermarkHTML}</div>
+                <img src="${imgSrc}" oncontextmenu="return false;">
+            `;
+            gallery.appendChild(wrapper);
+        });
+
+        sessionActive = true;
+        document.getElementById('system-check-section').style.display = 'none';
+        document.getElementById('content-section').style.display = 'block';
+        
+        // Attempt fullscreen again after they agree to terms
+        document.documentElement.requestFullscreen().catch(e => {});
+    }
+
+    // --- 4. FINISH ---
     async function finishSession() {
-        if (!confirm("Are you sure you are done? This will lock your submission.")) return;
+        if (!confirm("Are you sure you are done?")) return;
 
         const btn = document.getElementById('finishBtn');
         btn.disabled = true;
         btn.innerText = "Saving...";
         sessionActive = false;
 
-        try {
-            if (currentDocID) {
-                await db.collection("exam_access_logs").doc(currentDocID).update({
-                    status: "COMPLETED",
-                    finish_time: new Date().toLocaleString(),
-                    final_cheat_count: switchCount
-                });
-            }
-
-            document.body.innerHTML = `
-                <div class="container" style="text-align:center">
-                    <h1 style="color:green">Submission Saved</h1>
-                    <p>Name: ${document.getElementById('studentName').value}</p>
-                    <p>Finish Time: ${new Date().toLocaleTimeString()}</p>
-                    <p style="color:#666; font-size:0.9rem;">You may close this tab.</p>
-                    <p> All the best! We will have a grammar and vocabulary test in our next meeting ٩(ˊᗜˋ*)و ♡ </p>
-                </div>
-            `;
-        } catch (e) {
-            alert("Error saving: " + e.message);
-            btn.disabled = false;
+        if (currentDocID) {
+            await db.collection("exam_access_logs").doc(currentDocID).update({
+                status: "COMPLETED",
+                finish_time: new Date().toLocaleString(),
+                final_cheat_count: switchCount
+            });
         }
+
+        document.body.innerHTML = `
+            <div class="container" style="text-align:center">
+                <h1 style="color:green">Submitted</h1>
+                <p>You may close this tab.</p>
+            </div>
+        `;
     }
 
-    // 6. TEACHER EXCEL DOWNLOAD LOGIC
+    // --- 5. TEACHER DOWNLOAD ---
     async function downloadExcel() {
         const statusMsg = document.getElementById('download-status');
-        statusMsg.innerText = "Fetching data from database...";
+        statusMsg.innerText = "Fetching data...";
 
         try {
             const snapshot = await db.collection("exam_access_logs").get();
-            
-            // CSV Header
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Class,Number,Name,Status,Start Time,Finish Time,Cheat Count,Cheat Logs\n";
 
             snapshot.forEach(doc => {
                 const d = doc.data();
-                // Clean strings to prevent CSV breaking
                 const cleanLogs = (d.evidence_logs || "").replace(/,/g, " | ").replace(/\n/g, " ");
                 const row = `${d.class},${d.number},"${d.name}",${d.status},"${d.start_time}","${d.finish_time}",${d.cheat_count},"${cleanLogs}"`;
                 csvContent += row + "\n";
             });
 
-            // Trigger Download
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Exam_Cheating_Report.csv");
+            link.setAttribute("download", "Exam_Report.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-            statusMsg.innerText = "✅ Download Complete! Check your downloads folder.";
+            statusMsg.innerText = "✅ Downloaded!";
         } catch (e) {
-            statusMsg.innerText = "❌ Download failed: " + e.message;
+            statusMsg.innerText = "❌ Error: " + e.message;
         }
     }
 </script>
