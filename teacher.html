@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Teacher Dashboard</title>
+    <title>Master Teacher Dashboard (Live)</title>
     <style>
-        :root { --primary: #2563eb; --dark: #1e293b; --bg: #f1f5f9; --white: #ffffff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
+        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #334155; }
         
-        /* LOGIN SCREEN */
-        #login-screen { 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            height: 100vh; background: var(--dark); color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-        }
+        /* LOGIN */
+        #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: var(--dark); color: white; position: fixed; width: 100%; z-index: 2000; }
         input { padding: 12px; font-size: 1.1rem; border-radius: 6px; border: none; margin-bottom: 10px; text-align: center; }
-        button { padding: 12px 24px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button { padding: 12px 24px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
         
-        /* DASHBOARD GRID */
-        #dashboard { display: none; max-width: 1200px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* LAYOUT */
+        #dashboard { display: none; display: flex; height: 100vh; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        /* LEFT SIDEBAR (CONTROLS) */
+        .sidebar { width: 350px; background: white; border-right: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; flex-shrink: 0; }
+        .sidebar h2 { margin-top: 0; color: var(--dark); font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
         
-        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card h2 { margin-top: 0; color: var(--primary); font-size: 1.4rem; }
-        .card p { color: #64748b; font-size: 0.9rem; }
-        
-        .btn-action { width: 100%; margin-top: 10px; background: #e2e8f0; color: #334155; }
-        .btn-action:hover { background: #cbd5e1; }
-        .btn-download { background: #10b981; color: white; }
+        .control-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .control-card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--primary); }
+        .btn-download { width: 100%; padding: 10px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
         .btn-download:hover { background: #059669; }
-        .btn-view { background: #6366f1; color: white; }
-        .btn-view:hover { background: #4f46e5; }
+        .btn-view { width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* RIGHT SIDE (LIVE FEED) */
+        .feed-area { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
+        .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .live-indicator { display: inline-block; width: 10px; height: 10px; background: red; border-radius: 50%; margin-right: 8px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* ESSAY VIEWER STYLES */
-        #essay-viewer { display: none; margin-top: 30px; background: white; padding: 20px; border-radius: 12px; }
-        .student-row { display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 15px 0; align-items: start; }
-        .student-info { min-width: 200px; }
-        .student-info img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); cursor: pointer; }
-        .essay-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-        .essay-thumb { height: 100px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; transition: transform 0.2s; }
-        .essay-thumb:hover { transform: scale(1.05); }
-        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-        .badge-cheat { background: #fee2e2; color: #dc2626; }
-        .badge-clean { background: #dcfce7; color: #166534; }
+        /* NOTIFICATION CARDS */
+        #live-feed-list { display: flex; flex-direction: column; gap: 15px; }
+        .notif-card { 
+            background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--success); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); animation: slideIn 0.5s ease-out; display: flex; justify-content: space-between; align-items: center;
+        }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .notif-info h4 { margin: 0 0 5px 0; font-size: 1.1rem; color: var(--dark); }
+        .notif-info p { margin: 0; color: #64748b; font-size: 0.9rem; }
+        .notif-time { font-size: 0.8rem; color: #94a3b8; font-weight: bold; }
+        .notif-score { background: #dcfce7; color: #166534; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+        .cheat-warning { background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 10px; }
 
-        /* LOADER */
-        .status-msg { margin-top: 10px; font-size: 0.9rem; color: #666; font-style: italic; }
+        /* ESSAY POPUP */
+        #essay-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 1000px; height: 90%; border-radius: 12px; padding: 20px; overflow-y: auto; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+        
+        .essay-row { display: flex; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; }
+        .essay-thumbs img { height: 80px; border: 1px solid #ddd; border-radius: 4px; margin-right: 5px; cursor: pointer; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -57,61 +62,66 @@
 <body>
 
     <div id="login-screen">
-        <h1 style="color:white; margin-bottom:20px;">Teacher Portal</h1>
-        <input type="password" id="passwordInput" placeholder="Enter PIN">
-        <button class="btn-primary" onclick="checkLogin()">Unlock</button>
-        <p id="loginError" style="color:#ef4444; display:none; margin-top:10px;">Access Denied</p>
+        <h2>Teacher Portal</h2>
+        <input type="password" id="passwordInput" placeholder="Enter PIN (030)">
+        <button class="btn-primary" onclick="checkLogin()">Login</button>
+        <p id="loginError" style="color:#ef4444; display:none; margin-top:10px;">Incorrect PIN</p>
     </div>
 
-    <div id="dashboard">
-        <div class="header">
-            <h1>📊 Exam Control Center</h1>
-            <button onclick="location.reload()" style="background:#ef4444; color:white;">Lock Dashboard</button>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h2>XII Grammar</h2>
-                <p>Data Source: <code>grade_xii_grammar_final</code></p>
-                <div class="status-msg" id="msg-xii"></div>
-                <button class="btn-download" onclick="downloadCSV('grade_xii_grammar_final', 'XII_Results.csv', 'msg-xii')">📥 Download Excel</button>
+    <div id="dashboard" style="display:none;"> <div class="sidebar">
+            <h2>📂 Class Data</h2>
+            
+            <div class="control-card">
+                <h3>XII Grammar</h3>
+                <button class="btn-download" onclick="downloadCSV('grade_xii_grammar_final', 'XII_Results.csv')">📥 Excel Report</button>
             </div>
-
-            <div class="card">
-                <h2>C1 Advanced</h2>
-                <p>Data Source: <code>c1_advanced_quiz_results</code></p>
-                <div class="status-msg" id="msg-c1"></div>
-                <button class="btn-download" onclick="downloadCSV('c1_advanced_quiz_results', 'C1_Results.csv', 'msg-c1')">📥 Download Excel</button>
+            
+            <div class="control-card">
+                <h3>C1 Advanced</h3>
+                <button class="btn-download" onclick="downloadCSV('c1_advanced_quiz_results', 'C1_Results.csv')">📥 Excel Report</button>
             </div>
-
-            <div class="card">
-                <h2>B2 Grammar</h2>
-                <p>Data Source: <code>b2_grammar_quiz_results</code></p>
-                <div class="status-msg" id="msg-b2"></div>
-                <button class="btn-download" onclick="downloadCSV('b2_grammar_quiz_results', 'B2_Results.csv', 'msg-b2')">📥 Download Excel</button>
+            
+            <div class="control-card">
+                <h3>B2 Grammar</h3>
+                <button class="btn-download" onclick="downloadCSV('b2_grammar_quiz_results', 'B2_Results.csv')">📥 Excel Report</button>
             </div>
-
-            <div class="card" style="border: 2px solid var(--primary);">
-                <h2>📝 Essay & Camera</h2>
-                <p>Source: <code>exam_access_logs</code></p>
-                <p>Contains: Selfies, Essay Photos, Cheating Logs.</p>
-                <div class="status-msg" id="msg-essay"></div>
-                <button class="btn-download" onclick="downloadCSV('exam_access_logs', 'Essay_Report.csv', 'msg-essay')">📥 Download Excel</button>
-                <button class="btn-view" onclick="loadEssayViewer()">📸 View Essays & Photos</button>
+            
+            <div class="control-card">
+                <h3>Essay / Trap Exam</h3>
+                <button class="btn-download" onclick="downloadCSV('exam_access_logs', 'Essay_Report.csv')">📥 Excel Report</button>
+                <button class="btn-view" style="margin-top:5px;" onclick="openEssayModal()">📸 View Photos</button>
+            </div>
+            
+            <div style="margin-top:20px; font-size:0.8rem; color:#94a3b8; text-align:center;">
+                System Status: <span style="color:var(--success)">● Online</span>
             </div>
         </div>
 
-        <div id="essay-viewer">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #ddd; padding-bottom:10px; margin-bottom:20px;">
-                <h2 style="margin:0;">Student Submissions (Live)</h2>
-                <button onclick="document.getElementById('essay-viewer').style.display='none'" style="background:#64748b; color:white; padding:8px 15px;">Close Viewer</button>
+        <div class="feed-area">
+            <div class="feed-header">
+                <h1><span class="live-indicator"></span>Live Activity Feed</h1>
+                <button onclick="location.reload()" style="padding:8px 16px; border:1px solid #ddd; background:white; border-radius:6px; cursor:pointer;">Refresh Connection</button>
             </div>
-            <div id="essay-list-container">Loading...</div>
+            
+            <div id="live-feed-list">
+                <div style="text-align:center; color:#94a3b8; margin-top:50px;">
+                    Waiting for new submissions...<br>
+                    (Notifications will appear here instantly)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="essay-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('essay-modal').style.display='none'">&times;</span>
+            <h2>Essay & Selfie Gallery</h2>
+            <div id="essay-gallery-content">Loading...</div>
         </div>
     </div>
 
 <script>
-    // --- FIREBASE CONFIG ---
+    // --- CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -122,139 +132,143 @@
     };
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
-    // --- LOGIN LOGIC ---
+    // --- SOUND EFFECT ---
+    const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); 
+    // (Simple ding sound)
+
+    // --- LOGIN ---
     function checkLogin() {
-        const pass = document.getElementById('passwordInput').value;
-        if(pass === "030") {
+        if(document.getElementById('passwordInput').value === "030") {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'flex';
+            startLiveListeners(); // START LISTENING ONLY AFTER LOGIN
         } else {
             document.getElementById('loginError').style.display = 'block';
         }
     }
 
-    // --- GENERIC DOWNLOAD FUNCTION ---
-    async function downloadCSV(collectionName, fileName, msgElementId) {
-        const msg = document.getElementById(msgElementId);
-        msg.innerText = "Fetching data...";
+    // --- REAL-TIME LISTENERS ---
+    const collections = [
+        { name: 'grade_xii_grammar_final', label: 'XII Grammar' },
+        { name: 'c1_advanced_quiz_results', label: 'C1 Advanced' },
+        { name: 'b2_grammar_quiz_results', label: 'B2 Grammar' },
+        { name: 'exam_access_logs', label: 'Essay Exam' }
+    ];
+
+    let isFirstLoad = true;
+
+    function startLiveListeners() {
+        const feed = document.getElementById('live-feed-list');
         
-        try {
-            const snap = await db.collection(collectionName).get();
-            if(snap.empty) { msg.innerText = "No data found."; return; }
+        collections.forEach(col => {
+            db.collection(col.name).onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    // Check if it's a modification (Submission usually updates status to COMPLETED)
+                    // OR if it's added and already completed (in case of page refresh)
+                    const d = change.doc.data();
+                    
+                    // We only care if status is COMPLETED and it's a recent event (to avoid flooding on load)
+                    if (d.status === "COMPLETED" && (change.type === 'modified' || change.type === 'added')) {
+                        
+                        // Prevent flooding "added" events on first page load
+                        if(change.type === 'added' && isFirstLoad) return;
 
-            // Build CSV Header
-            let csv = "data:text/csv;charset=utf-8,Class,ID,Name,Score,Status,Cheats,Start Time,Finish Time,Answers/Logs\n";
-            
-            snap.forEach(doc => {
-                const d = doc.data();
-                
-                // Handle different score fields (some use 'score', some 'mcq_score')
-                const finalScore = d.score || d.mcq_score || d.total_score || 0;
-                
-                // Handle complex answer objects (stringify them)
-                let extraData = "";
-                if(d.all_answers) extraData = JSON.stringify(d.all_answers);
-                else if(d.evidence_logs) extraData = d.evidence_logs;
-
-                // Clean data for CSV format
-                extraData = extraData.replace(/,/g, '|').replace(/"/g, "'").replace(/\n/g, " ");
-
-                csv += `${d.class},${d.number},"${d.name}",${finalScore},${d.status},${d.cheat_count || d.final_cheat_count || 0},"${d.start_time}","${d.finish_time}","${extraData}"\n`;
+                        addNotificationCard(col.label, d);
+                        notifSound.play().catch(e => {}); // Play sound (might be blocked by browser until interaction)
+                    }
+                });
             });
+        });
 
-            // Trigger Download
-            const link = document.createElement("a");
-            link.href = encodeURI(csv);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            msg.innerText = `✅ Downloaded ${snap.size} records.`;
-            
-        } catch(e) {
-            msg.innerText = "❌ Error: " + e.message;
-            console.error(e);
-        }
+        // Turn off first load flag after 2 seconds
+        setTimeout(() => { 
+            isFirstLoad = false; 
+            if(feed.innerText.includes("Waiting")) feed.innerHTML = ""; 
+        }, 2000);
     }
 
-    // --- ESSAY VIEWER LOGIC ---
-    // Helper to open image safely
-    window.openViewer = function(base64Data) {
-        const win = window.open();
-        if (win) {
-            win.document.write(`
-                <body style="margin:0; background:#222; display:flex; justify-content:center; align-items:center; min-height:100vh;">
-                    <img src="${base64Data}" style="max-width:95%; max-height:95vh; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
-                </body>
-            `);
-        } else {
-            alert("Please allow popups.");
-        }
+    function addNotificationCard(examName, data) {
+        const feed = document.getElementById('live-feed-list');
+        
+        // Remove "Waiting" text if it exists
+        if(feed.innerText.includes("Waiting")) feed.innerHTML = "";
+
+        const cheatHTML = (data.cheat_count > 0 || data.final_cheat_count > 0) 
+            ? `<span class="cheat-warning">⚠️ ${data.cheat_count || data.final_cheat_count} Switches</span>` 
+            : ``;
+
+        const scoreDisplay = (data.score !== undefined) ? `Score: ${data.score}` : 
+                             (data.mcq_score !== undefined) ? `Score: ${data.mcq_score}` : `Submitted`;
+
+        const card = document.createElement('div');
+        card.className = 'notif-card';
+        card.innerHTML = `
+            <div class="notif-info">
+                <h4>${data.name} <span style="font-weight:normal; font-size:0.9rem;">(${data.class})</span></h4>
+                <p>Submitted <strong>${examName}</strong> ${cheatHTML}</p>
+                <div class="notif-time">${new Date().toLocaleTimeString()}</div>
+            </div>
+            <div class="notif-score">${scoreDisplay}</div>
+        `;
+        
+        // Add to TOP of list
+        feed.prepend(card);
     }
 
-    async function loadEssayViewer() {
-        const container = document.getElementById('essay-list-container');
-        const section = document.getElementById('essay-viewer');
-        section.style.display = 'block';
-        container.innerHTML = "Loading images (this may take a moment)...";
+    // --- DOWNLOAD LOGIC ---
+    async function downloadCSV(collectionName, fileName) {
+        const snap = await db.collection(collectionName).get();
+        let csv = "data:text/csv;charset=utf-8,Class,ID,Name,Score,Status,Cheats,Time,Details\n";
+        
+        snap.forEach(doc => {
+            const d = doc.data();
+            const score = d.score || d.mcq_score || 0;
+            const extra = JSON.stringify(d.all_answers || d.evidence_logs || "").replace(/,/g, '|').replace(/"/g, "'");
+            csv += `${d.class},${d.number},"${d.name}",${score},${d.status},${d.cheat_count||0},"${d.finish_time}","${extra}"\n`;
+        });
+        
+        const link = document.createElement("a");
+        link.href = encodeURI(csv);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 
-        try {
-            // Get data from 'exam_access_logs' (The Trap/Essay Collection)
-            const snap = await db.collection('exam_access_logs').orderBy('start_time', 'desc').get();
+    // --- ESSAY VIEWER ---
+    window.openImage = function(src) {
+        const w = window.open("");
+        w.document.write(`<img src="${src}" style="max-width:100%">`);
+    }
+
+    async function openEssayModal() {
+        const modal = document.getElementById('essay-modal');
+        const content = document.getElementById('essay-gallery-content');
+        modal.style.display = 'flex';
+        content.innerHTML = "Loading...";
+
+        const snap = await db.collection('exam_access_logs').orderBy('finish_time', 'desc').limit(20).get();
+        content.innerHTML = "";
+
+        snap.forEach(doc => {
+            const d = doc.data();
+            let imagesHTML = "";
+            if(d.essay_pages) {
+                d.essay_pages.forEach(img => imagesHTML += `<img src="${img}" onclick="openImage('${img}')">`);
+            }
             
-            if(snap.empty) { container.innerHTML = "No submissions found."; return; }
-
-            container.innerHTML = ""; // Clear loader
-
-            snap.forEach(doc => {
-                const d = doc.data();
-                
-                // 1. Prepare Essay Images
-                let essayHTML = "";
-                if(d.essay_pages && d.essay_pages.length > 0) {
-                    d.essay_pages.forEach((src, idx) => {
-                        essayHTML += `
-                            <div style="text-align:center;">
-                                <img src="${src}" class="essay-thumb" onclick="openViewer('${src}')">
-                                <div style="font-size:0.7rem; color:#666;">Page ${idx+1}</div>
-                            </div>`;
-                    });
-                } else {
-                    essayHTML = "<span style='color:#ccc; font-style:italic;'>No pages scanned</span>";
-                }
-
-                // 2. Prepare Cheat Badge
-                const cheatBadge = (d.cheat_count > 0) 
-                    ? `<span class="badge badge-cheat">⚠️ ${d.cheat_count} Switches</span>` 
-                    : `<span class="badge badge-clean">✅ Clean</span>`;
-
-                // 3. Render Row
-                const row = document.createElement('div');
-                row.className = 'student-row';
-                row.innerHTML = `
-                    <div class="student-info">
-                        <div style="margin-bottom:5px;">
-                            <img src="${d.photo || 'https://via.placeholder.com/60'}" onclick="openViewer(this.src)" title="Click to enlarge selfie">
-                        </div>
-                        <div style="font-weight:bold; font-size:1.1rem;">${d.name}</div>
-                        <div style="color:#666;">${d.class} (#${d.number})</div>
-                        <div style="margin-top:5px;">${cheatBadge}</div>
-                        <div style="font-size:0.8rem; color:#999; margin-top:5px;">${d.status}</div>
-                    </div>
-                    <div style="flex-grow:1;">
-                        <div style="font-weight:bold; margin-bottom:10px; color:#475569;">Essay Pages:</div>
-                        <div class="essay-grid">${essayHTML}</div>
-                        <div style="margin-top:10px; font-size:0.85rem; background:#f8fafc; padding:10px; border-radius:6px; max-height:100px; overflow-y:auto;">
-                            <strong>Logs:</strong> ${d.evidence_logs || "No logs"}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-
-        } catch(e) {
-            container.innerHTML = "Error loading images: " + e.message;
-        }
+            const div = document.createElement('div');
+            div.className = 'essay-row';
+            div.innerHTML = `
+                <div style="width:200px;">
+                    <img src="${d.photo}" style="width:60px; height:60px; object-fit:cover; border-radius:50%;" onclick="openImage('${d.photo}')">
+                    <div style="font-weight:bold;">${d.name}</div>
+                    <div>${d.class}</div>
+                </div>
+                <div class="essay-thumbs" style="flex-grow:1;">${imagesHTML || "No pages"}</div>
+            `;
+            content.appendChild(div);
+        });
     }
 </script>
 </body>
