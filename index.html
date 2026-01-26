@@ -3,75 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUMATIF AKHIR SEMESTER - BAHASA INGGRIS</title>
+    <title>Exam Materials - Secure View</title>
     <style>
         :root {
             --primary: #4f46e5;
             --danger: #ef4444;
-            --success: #10b981;
             --bg: #f3f4f6;
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: #1f2937; line-height: 1.6; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         
-        h1 { text-align: center; color: #111827; margin-bottom: 0.5rem; font-size: 1.8rem; }
-        .sub-header { text-align: center; color: #6b7280; margin-bottom: 2rem; font-size: 0.9rem; }
-        
+        h1 { text-align: center; color: #111827; margin-bottom: 0.5rem; }
         .form-group { margin-bottom: 1.5rem; }
         label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
-        input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
-        input:focus, select:focus { outline: 2px solid var(--primary); border-color: transparent; }
-
-        /* Reading Passage Box */
-        .reading-passage {
-            background-color: #f0f9ff;
-            border: 1px solid #bae6fd;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: #0c4a6e;
-        }
-        .section-title {
-            font-weight: 800;
-            color: var(--primary);
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-
-        /* Question Cards */
-        .question-block { 
-            background: #f9fafb; 
-            border: 1px solid #e5e7eb; 
-            padding: 1.5rem; 
-            margin-bottom: 1.5rem; 
-            border-radius: 8px; 
-            border-left: 5px solid var(--primary);
-        }
-        .q-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem; }
-        
-        /* MCQ Options */
-        .mcq-option { display: flex; align-items: flex-start; padding: 8px 0; cursor: pointer; transition: background 0.1s; border-radius: 4px; }
-        .mcq-option:hover { background: #eef2ff; }
-        .mcq-option input { width: auto; margin-right: 12px; margin-top: 5px; cursor: pointer; }
+        input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 1rem; }
         
         .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #4338ca; }
-        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
-        #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; animation: pulse 2s infinite; }
-        #timer-box { position: fixed; top: 15px; right: 15px; background: #111827; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: none; z-index: 9999; border: 2px solid var(--primary); }
+        /* IMAGE GALLERY STYLES */
+        .exam-image {
+            width: 100%;
+            margin-bottom: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #cheat-alert { 
+            background: #fee2e2; 
+            border: 1px solid #f87171; 
+            color: #991b1b; 
+            padding: 1rem; 
+            border-radius: 8px; 
+            margin-bottom: 2rem; 
+            display: none; 
+            text-align: center; 
+            font-weight: bold; 
+            animation: pulse 2s infinite; 
+        }
+        
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         
         #exam-section { display: none; }
-        #status-msg { text-align: center; margin-top: 1rem; font-weight: 600; }
-        .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; padding: 10px; background: #fee2e2; border-radius: 4px; }
-        .teacher-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: #9ca3af; cursor: pointer; text-decoration: underline; }
+        .error-msg { color: var(--danger); font-weight: bold; text-align: center; margin-top: 10px; display:none; }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -79,16 +54,13 @@
 </head>
 <body>
 
-<div id="timer-box">⏱️ 01:00:00</div>
-
 <div class="container">
-    <div id="cheat-alert">⚠️ WARNING: You have left the exam screen! This event is being recorded.</div>
+    <div id="cheat-alert">⚠️ ALERT: You switched tabs! This has been recorded.</div>
 
-    <!-- LOGIN SCREEN -->
     <div id="login-section">
-        <h1>SUMATIF AKHIR SEMESTER GANJIL</h1>
-        <p class="sub-header">SMA SWASTA CINTA BUDAYA / CHONG WEN<br>T.P. 2025-2026</p>
-        <hr style="margin-bottom: 2rem; border-top: 1px solid #e5e7eb;">
+        <h1>SECURE EXAM MATERIALS</h1>
+        <p style="text-align:center; color:#6b7280;">Login to access the diagrams.</p>
+        <hr style="margin-bottom: 2rem;">
         
         <div class="form-group">
             <label>Class</label>
@@ -103,7 +75,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Student Number (No. Absen)</label>
+            <label>Student Number</label>
             <input type="number" id="studentNo" placeholder="e.g. 15">
         </div>
         <div class="form-group">
@@ -111,23 +83,25 @@
             <input type="text" id="studentName" placeholder="Enter your full name">
         </div>
         
-        <button class="btn" id="startBtn" onclick="startExam()">Start Exam</button>
+        <button class="btn" id="startBtn" onclick="startExam()">View Materials</button>
         <p class="error-msg" id="login-error"></p>
-        <div class="teacher-link" onclick="teacherLogin()">Teacher's Login</div>
     </div>
 
-    <!-- EXAM SCREEN -->
     <div id="exam-section">
-        <h2 style="text-align:center;">English Assessment</h2>
-        <div style="text-align:center; margin-bottom:20px; color:#666;">Time Limit: 60 Minutes</div>
-        <div id="questions-container"></div>
-        <button class="btn" id="submitBtn" onclick="submitExam()">Submit Answers</button>
-        <p id="status-msg"></p>
+        <h2 style="text-align:center;">Exam Diagrams</h2>
+        <p style="text-align:center; color:red; font-weight:bold;">DO NOT SWITCH TABS. MONITORING IS ACTIVE.</p>
+        
+        <img src="1.png" alt="Diagram 1" class="exam-image" onerror="this.src='https://via.placeholder.com/800x400?text=Image+1+Missing'">
+        <img src="2.png" alt="Diagram 2" class="exam-image" onerror="this.src='https://via.placeholder.com/800x400?text=Image+2+Missing'">
+        <img src="3.png" alt="Diagram 3" class="exam-image" onerror="this.src='https://via.placeholder.com/800x400?text=Image+3+Missing'">
+
+        <br><br>
+        <button class="btn" id="submitBtn" onclick="finishSession()">I Have Finished Studying</button>
     </div>
 </div>
 
 <script>
-    // FIREBASE CONFIG
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -144,238 +118,109 @@
         db = firebase.firestore();
     } catch (e) {
         console.error("Firebase Error:", e);
-        document.getElementById('login-error').innerText = "System Error: Database connection failed.";
+        document.getElementById('login-error').innerText = "Database Error.";
         document.getElementById('login-error').style.display = 'block';
     }
 
-    // --- DATA CONTENT ---
-    
-    const TEXT_READING = `<strong>The Velara Coastal District</strong>, once a thriving hub of maritime trade, now illustrates the devastating convergence of climate change and socio-economic decline. For generations, the indigenous fisherfolk have relied on artisanal fishing in these waters, a livelihood now threatened by rising sea temperatures and ocean acidification. The recent expansion of a nearby offshore drilling platform, a major source of noise and chemical pollution, has led to visibly degraded coral reefs and reports of heavy metal contamination in local fish stocks. This toxic environment contributes directly to the region's economic stagnation and health crises, with youth migration rates surging as traditional marine trades become financially unviable. The median income for those remaining is significantly below the national poverty line, forcing families into makeshift settlements vulnerable to storm surges.<br><br>
-    In response, a consortium of marine biologists and sociologists from a prestigious technological institute has launched a longitudinal study. The project’s rigorous selection process recruits elite doctoral candidates, fully funded by grants, who collaborate with local community leaders. Their objective is dual-pronged: to engineer resilient coral restoration techniques, such as 3D-printed reef structures, and to map the epidemiological effects on the coastal population. The team’s investigation seeks to furnish irrefutable proof of the crisis, transcending anecdotal evidence to establish causal data connecting industrial runoff to specific neurological disorders in children.<br><br>
-    Preliminary data from the toxicology unit is unsettling. Blood samples from local infants have indicated elevated levels of mercury and lead, suggesting that prenatal exposure to contaminated seafood may impede neurodevelopment. This could result in permanent deficits in cognitive function and motor skills. Moreover, the pervasive anxiety regarding food security appears to deregulate stress hormones in adults, disrupting the circadian rhythm and inducing chronic insomnia. The scientists assert that without immediate remediation, the community’s diminishing educational attainment and labor productivity will become entrenched, condemning the population to systemic destitution. The institute aspires for their findings to not only rehabilitate the marine habitat but also serve as a blueprint for environmental justice litigation worldwide.`;
-
-    const TEXT_CLOZE = `<strong>Instructions:</strong> Choose the best word to fill each blank.<br><br>
-    When analyzing the decline of ecosystems, it is insufficient to merely identify a ___ (31) between pollution and health issues. Observations may show that sick populations live near factories, but researchers must secure ___ (32) to prove that the toxins are the specific mechanism of harm.<br><br>
-    Take, for instance, coastal populations in ___ (33) zones that depend on ___ (34). If the water is ___ (35) due to acidification, fish populations collapse. This inevitably leads to widespread ___ (36) among the locals who rely on seafood for protein. This is alarming because early childhood is a sensitive period for ___ (37).<br><br>
-    Modern science employs toxicology screenings to see how heavy metals affect ___ (38). The data indicates that exposure during development can lower IQ and motor function. This cognitive impairment negatively influences a child's ___ (39). Consequently, these children may fail to meet the ___ (40) for higher education, perpetuating the cycle of economic hardship.`;
-
-    const EXAM_DATA = [
-        // SECTION A: ERROR ANALYSIS
-        { section: "A. Error Analysis", id: 1, question: "The research committee is committed <u>to investigate</u> (A) the long-term <u>effects of</u> (B) sleep deprivation, and they have <u>prioritized</u> (C) funding for experimental trials. The board is <u>reviewing</u> (D) the proposal now. (No Error) (E)", options: ["to investigate", "effects of", "prioritized", "reviewing", "No Error"], answer: "to investigate" },
-        { id: 2, question: "<u>Provided that</u> (A) the software undergoes <u>rigorous</u> (B) security testing, the developers <u>guaranteeing</u> (C) that user data will remain private and <u>secure</u> (D) from external breaches. (No Error) (E)", options: ["Provided that", "rigorous", "guaranteeing", "secure", "No Error"], answer: "guaranteeing" },
-        { id: 3, question: "The newly appointed CEO had difficulty <u>getting used to</u> (A) the <u>company’s</u> (B) informal culture, as she was <u>used to maintaining</u> (C) strict <u>hierarchical</u> (D) protocols in her previous role. (No Error) (E)", options: ["getting used to", "company’s", "used to maintaining", "hierarchical", "No Error"], answer: "No Error" },
-        { id: 4, question: "Unless the government <u>does not implement</u> (A) stricter carbon <u>tax</u> (B) regulations, industrial emissions will continue to rise, <u>threatening</u> (C) global climate stability. (No Error) (D/E)", options: ["does not implement", "tax", "threatening", "No Error", "No Error"], answer: "does not implement" },
-        { id: 5, question: "The professor confessed <u>to have overlooked</u> (A) the statistical <u>anomaly</u> (B) in the first dataset, but he vowed to <u>correct</u> (C) the error before publishing the final paper. (No Error) (D/E)", options: ["to have overlooked", "anomaly", "correct", "No Error", "No Error"], answer: "to have overlooked" },
-        { id: 6, question: "Despite the patient’s initial refusal <u>to undergoing</u> (A) physical <u>therapy</u> (B), the doctor insisted that it was necessary for <u>restoring</u> (C) full mobility. (No Error) (D/E)", options: ["to undergoing", "therapy", "restoring", "No Error", "No Error"], answer: "to undergoing" },
-        { id: 7, question: "If the engineers <u>had detected</u> (A) the structural flaw earlier, they <u>would have delayed</u> (B) the launch and <u>redesigned</u> (C) the booster system to prevent the catastrophe. (No Error) (D/E)", options: ["had detected", "would have delayed", "redesigned", "No Error", "No Error"], answer: "No Error" },
-        { id: 8, question: "The architect objected <u>to change</u> (A) the building’s original <u>design</u> (B), arguing that the modifications would <u>compromise</u> (C) its aesthetic integrity. (No Error) (D/E)", options: ["to change", "design", "compromise", "No Error", "No Error"], answer: "to change" },
-        { id: 9, question: "Even if the economy <u>recovers</u> (A) quickly, the unemployment rate <u>would still remain</u> (B) high due to the rapid <u>automation</u> (C) of manufacturing jobs. (No Error) (D/E)", options: ["recovers", "would still remain", "automation", "No Error", "No Error"], answer: "would still remain" },
-        { id: 10, question: "The interns look forward <u>to receive</u> (A) mentorship from senior <u>staff</u> (B), as this guidance is crucial for their professional <u>development</u> (C). (No Error) (D/E)", options: ["to receive", "staff", "development", "No Error", "No Error"], answer: "to receive" },
-
-        // SECTION B: MULTIPLE CHOICES
-        { section: "B. Multiple Choices", id: 11, question: "Whether or not the board ___ the proposal, the department ___ with the audit and ___ existing protocols. This action ___ compliance with new regulations.", options: ["approves / will proceed / review / ensures", "approve / proceeds / reviews / ensure", "approved / would proceed / would review / ensured", "approves / proceed / review / ensure", "will approve / will proceed / will review / ensures"], answer: "approves / will proceed / review / ensures" },
-        { id: 12, question: "Had the researchers ___ the variables correctly, the experiment ___ different results and ___ the hypothesis. This oversight ___ the entire study.", options: ["controlled / would yield / supported / invalidated", "controlled / would have yielded / supported / invalidated", "control / will yield / support / invalidates", "controlled / would have yielded / would have supported / invalidated", "have controlled / would yield / would support / invalidates"], answer: "controlled / would have yielded / would have supported / invalidated" },
-        { id: 13, question: "If the marketing team ___ the campaign launch, they ___ consumer interest and ___ sales targets. However, this delay ___ brand momentum.", options: ["postpones / will risk / miss / slows", "postponed / would risk / miss / would slow", "had postponed / would have risked / missed / slowed", "postpones / risks / misses / slows", "postponed / will risk / miss / will slow"], answer: "postpones / risks / misses / slows" },
-        { id: 14, question: "Unless the factory ___ waste management systems, it ___ heavy fines, ___ its operating license, or ___ legal action from residents. Continued negligence ___ the company's future.", options: ["upgrades / will face / lose / face / threatens", "upgraded / would face / lose / face / threatened", "upgrades / face / lose / face / threaten", "upgrades / will face / lose / encounter / threatens", "had upgraded / would have faced / lost / faced / threatened"], answer: "upgrades / will face / lose / face / threatens" },
-        { id: 15, question: "If the conservation program ___ five years ago, the local wildlife population ___ stable today.", options: ["started / is", "had started / would be", "starts / will be", "has started / was", "started / would have been"], answer: "had started / would be" },
-        { id: 16, question: "The detective attempted ___ the witness, despite ___ ___ resistance from local authorities. He continued ___ for evidence and avoided ___ suspicion.", options: ["Questioning/ facing/ heavy/ looking/ raising", "To question/ facing/ heavy/ looking/ raising", "To question/ to face/ heavy/ to look/ to raise", "Questioning/ to face/ heavily/ looking/ raising", "To question/ facing/ heavy/ to look/ raising"], answer: "To question/ facing/ heavy/ looking/ raising" },
-        { id: 17, question: "It is essential ___ cultural nuances in international business. Many diplomats advise ___ aggressive tactics, prefer ___ rapport, and avoid ___ offense.", options: ["Understanding/ avoiding/ building/ causing", "To understand/ to avoid/ to build/ to cause", "To understand/ avoiding/ building/ causing", "Understanding/ to avoid/ to build/ causing", "To understand/ avoiding/ to build/ to cause"], answer: "To understand/ avoiding/ building/ causing" },
-        { id: 18, question: "The tired commuter is just ___ on the train bench ___ at his phone. I wish I could do something ___ him up.", options: ["Sitting / staring / to cheer", "Sat / stared / cheering", "Sitting / staring / cheering", "To sit / to stare / to cheer", "Sit / stare / cheer"], answer: "Sitting / staring / to cheer" },
-        { id: 19, question: "I reminded the student that the deadline ___ next Friday. I urged him ___ ___ his paper early. He promised ___ it by Wednesday.", options: ["Was / to start / writing / submitting", "Is / to start / writing / to submit", "Would be / starting / writing / submitting", "Was / start / writing / to submit", "Is / starting / writing / submitting"], answer: "Is / to start / writing / to submit" },
-        { id: 20, question: "Surgeons must ___ steady hands. I cannot imagine ___ delicate procedures and ___ a mistake.", options: ["Having / performing / making", "Have / performing / making", "To have / to perform / to make", "Have / to perform / make", "Having / to perform / making"], answer: "Have / performing / making" },
-
-        // SECTION C: READING COMPREHENSION (Passage inserted in logic)
-        { section: "C. Reading Comprehension", id: 21, question: "According to the passage, the Velara community's traditional livelihood is endangered primarily by:", options: ["The introduction of deep-sea trawling by foreign vessels.", "A lack of interest in fishing among the younger generation.", "A combination of climate factors and industrial activity.", "The strict regulations imposed by the technological institute.", "Frequent tsunamis caused by offshore drilling."], answer: "A combination of climate factors and industrial activity." },
-        { id: 22, question: "The institute's project described in the text focuses on two main goals:", options: ["Increasing tourism revenue and building modern housing.", "Restoring the marine environment and studying health impacts.", "Reducing noise pollution and promoting offshore drilling.", "Providing scholarships to local fishermen and banning plastic.", "Improving the national gross domestic product and exporting fish."], answer: "Restoring the marine environment and studying health impacts." },
-        { id: 23, question: "What specific innovation is the research team using to address the environmental aspect of the crisis?", options: ["Causal data analysis", "3D-printed reef structures", "Circadian rhythm monitors", "Biodegradable fishing nets", "Mercury filtration systems"], answer: "3D-printed reef structures" },
-        { id: 24, question: "The passage links prenatal exposure to contaminated seafood with which potential negative outcome?", options: ["A regulated circadian rhythm", "An increase in artisanal fishing", "Permanent cognitive and motor deficits", "A longer overall lifespan", "An increase in youth migration"], answer: "Permanent cognitive and motor deficits" },
-        { id: 25, question: "The researchers aim to establish 'causal data' (paragraph 2). In this context, it means they want to:", options: ["Observe a coincidence between two unrelated events.", "Prove that industrial runoff directly produces neurological disorders.", "Find a simple correlation between fishing and poverty.", "Document the anecdotes of the local community leaders.", "Recruit more doctoral candidates for the study."], answer: "Prove that industrial runoff directly produces neurological disorders." },
-        { id: 26, question: "Which environmental issue is NOT explicitly mentioned as affecting the Velara District?", options: ["Ocean acidification", "Rising sea temperatures", "Chemical pollution", "Degraded coral reefs", "Deforestation of coastal mangroves"], answer: "Deforestation of coastal mangroves" },
-        { id: 27, question: "According to the text, what is a primary social consequence of the declining marine trades?", options: ["A surge in youth migration to other areas.", "An increase in traditional cultural festivals.", "A rise in the national poverty line.", "A decrease in storm surges.", "An improvement in educational attainment."], answer: "A surge in youth migration to other areas." },
-        { id: 28, question: "The institute hopes their work will ultimately:", options: ["Justify the expansion of the offshore drilling platform.", "Provide a model for environmental justice litigation globally.", "Train local fishermen to become marine biologists.", "Stop the youth from migrating to cities.", "Increase the profitability of the drilling platform."], answer: "Provide a model for environmental justice litigation globally." },
-        { id: 29, question: "The passage uses 'epidemiological' (paragraph 2) to refer to:", options: ["The study of ocean currents and tides.", "The engineering of 3D-printed structures.", "The study of the distribution and control of diseases.", "The economic analysis of trade routes.", "The process of political selection."], answer: "The study of the distribution and control of diseases." },
-        { id: 30, question: "What is implied about the researchers working on this project?", options: ["They are undergraduate students paying their own tuition.", "They are elite doctoral candidates funded by grants.", "They are former residents of the Velara District.", "They are primarily interested in political office.", "They are working against the wishes of community leaders."], answer: "They are elite doctoral candidates funded by grants." },
-
-        // SECTION D: CLOZE (Text inserted in logic)
-        { section: "D. Cloze Passage", id: 31, question: "Identify a ___ (31) between pollution and health issues.", options: ["cognition", "correlation", "industry", "evidence", "degree"], answer: "correlation" },
-        { id: 32, question: "Researchers must secure ___ (32) to prove that the toxins are the specific mechanism of harm.", options: ["causal data", "white/grey matter", "average wage", "scholarship", "peer"], answer: "causal data" },
-        { id: 33, question: "Take, for instance, coastal populations in ___ (33) zones.", options: ["remote", "sustainable", "unfertile", "biodegradable", "harsh"], answer: "remote" },
-        { id: 34, question: "That depend on ___ (34).", options: ["mountaineering", "extreme tourism", "artisanal fishing", "community", "career"], answer: "artisanal fishing" },
-        { id: 35, question: "If the water is ___ (35) due to acidification.", options: ["remote", "adaptive", "degraded", "sustainable", "stable"], answer: "degraded" },
-        { id: 36, question: "This inevitably leads to widespread ___ (36) among the locals.", options: ["unemployment", "poverty", "landslide", "malnutrition", "drought"], answer: "malnutrition" },
-        { id: 37, question: "Early childhood is a sensitive period for ___ (37).", options: ["lifespan", "career", "neurodevelopment", "cognition", "circadian rhythm"], answer: "neurodevelopment" },
-        { id: 38, question: "Modern science employs toxicology screenings to see how heavy metals affect ___ (38).", options: ["neurodevelopment", "gross domestic product", "academic performance", "housing", "sewage"], answer: "neurodevelopment" },
-        { id: 39, question: "This cognitive impairment negatively influences a child's ___ (39).", options: ["non-academic achievement", "adaptive biological process", "average wage", "academic performance", "undergraduate"], answer: "academic performance" },
-        { id: 40, question: "Consequently, these children may fail to meet the ___ (40) for higher education.", options: ["entry requirements", "student loans", "scholarships", "degrees", "career"], answer: "entry requirements" }
-    ];
-
-    // --- RENDER LOGIC ---
-    const container = document.getElementById('questions-container');
-    function renderQuestions() {
-        container.innerHTML = "";
-        
-        EXAM_DATA.forEach((q, index) => {
-            // Add Reading Passage before Q21
-            if (q.id === 21) {
-                container.innerHTML += `<div class="reading-passage">
-                    <div style="font-weight:bold; margin-bottom:10px;">Reading Passage for Questions 21 – 30</div>
-                    ${TEXT_READING}
-                </div>`;
-            }
-            // Add Cloze Text before Q31
-            if (q.id === 31) {
-                container.innerHTML += `<div class="reading-passage">
-                    <div style="font-weight:bold; margin-bottom:10px;">Cloze Text for Questions 31 – 40</div>
-                    ${TEXT_CLOZE}
-                </div>`;
-            }
-
-            // Add Section Headers
-            if (q.section) {
-                container.innerHTML += `<div class="section-title">${q.section}</div>`;
-            }
-
-            let html = `<div class="question-block">
-                <div class="q-text">${q.id}. ${q.question}</div>`;
-            
-            q.options.forEach(opt => {
-                // If option is literally "No Error", keep it. 
-                html += `<label class="mcq-option">
-                            <input type="radio" name="q${q.id}" value="${opt}"> ${opt}
-                         </label>`;
-            });
-            html += `</div>`;
-            container.innerHTML += html;
-        });
-    }
-
-    // --- TIMER & AUTH LOGIC (Standard) ---
-    let timerInterval;
-    function startTimer(duration) {
-        let timer = duration;
-        const display = document.getElementById('timer-box');
-        display.style.display = 'block';
-        timerInterval = setInterval(() => {
-            let hours = parseInt(timer / 3600, 10);
-            let minutes = parseInt((timer % 3600) / 60, 10);
-            let seconds = parseInt(timer % 60, 10);
-            hours = hours < 10 ? "0" + hours : hours;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            display.textContent = `⏱️ ${hours}:${minutes}:${seconds}`;
-            if (--timer < 0) { clearInterval(timerInterval); submitExam(true); }
-        }, 1000);
-    }
-
+    // --- CHEAT TRACKING LOGIC ---
     let switchCount = 0;
-    let evidenceLogs = []; 
-    document.addEventListener("visibilitychange", () => {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
+    let cheatLogs = [];
 
+    // This listens for Tab Switching or Minimizing
+    document.addEventListener("visibilitychange", () => {
+        const studentName = document.getElementById('studentName').value || "Unknown";
+        
         if (document.hidden) {
+            // User LEFT the tab
             switchCount++;
-            evidenceLogs.push(`[LEFT at ${timeString}]`);
+            const time = new Date().toLocaleTimeString();
+            cheatLogs.push(`Left at ${time}`);
+            
+            // Show Alert
             const alertBox = document.getElementById('cheat-alert');
             alertBox.style.display = 'block';
-            alertBox.innerText = `⚠️ WARNING: You have left the exam screen! Count: ${switchCount}`; // Update text
-        } else {
-            evidenceLogs.push(`[RETURNED at ${timeString}]`);
+            alertBox.innerText = `⚠️ WARNING: You switched tabs! Count: ${switchCount}`;
+            
+            console.log(`Cheat Detected: ${studentName} switched tabs. Count: ${switchCount}`);
         }
     });
 
-    function teacherLogin() {
-        if (prompt("Enter Teacher Password:") === "030") {
-            startExam(true);
-        } else { alert("Incorrect Password"); }
-    }
-
-    async function startExam(isTeacher = false) {
-        const btn = document.getElementById('startBtn');
-        const errorMsg = document.getElementById('login-error');
+    // --- START LOGIC ---
+    async function startExam() {
         const cls = document.getElementById('studentClass').value;
         const no = document.getElementById('studentNo').value;
         const name = document.getElementById('studentName').value;
-        
-        if (!isTeacher && (!cls || !no || !name)) { alert("Please fill in all details."); return; }
+        const btn = document.getElementById('startBtn');
 
-        const EXAM_START_DATE = new Date("2025-12-04T20:00:00+07:00"); 
-        if (!isTeacher && new Date() < EXAM_START_DATE) {
-            alert("Exam has not started yet."); return;
+        if (!cls || !no || !name) {
+            alert("Please enter Class, Number, and Name.");
+            return;
         }
 
         btn.disabled = true;
-        btn.innerText = "Checking...";
-        let uniqueID = isTeacher ? "TEACHER_TEST" : `${cls}_${no}`;
+        btn.innerText = "Loading...";
 
+        // Log the "Start" event to Firebase
         try {
-            if (!isTeacher) {
-                const docRef = db.collection("exam_starts").doc(uniqueID);
-                const docSnap = await docRef.get();
-                if (docSnap.exists) {
-                    btn.innerText = "Locked";
-                    errorMsg.innerHTML = "⛔ You already started this exam. No resets allowed.";
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                await docRef.set({ class: cls, number: no, name: name, startTime: new Date().toLocaleTimeString() });
-            }
+            await db.collection("exam_results").add({
+                type: "START_LOG",
+                name: name,
+                class: cls,
+                number: no,
+                timestamp: new Date().toString(),
+                status: "Started Viewing"
+            });
+
+            // Switch Screens
             document.getElementById('login-section').style.display = 'none';
             document.getElementById('exam-section').style.display = 'block';
-            renderQuestions();
-            startTimer(3600); // 60 mins (3600 seconds)
+
+            // Go Fullscreen (Optional - makes it harder to cheat)
+            document.documentElement.requestFullscreen().catch(e => console.log(e));
+
         } catch (e) {
-            console.error(e);
-            alert("Error: " + e.message);
+            alert("Connection Error. Refresh and try again.");
             btn.disabled = false;
         }
     }
 
-    async function submitExam(isAuto = false) {
-        if (!isAuto && !confirm("Finish Exam?")) return;
-        clearInterval(timerInterval);
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('status-msg').innerText = "Submitting...";
+    // --- FINISH LOGIC ---
+    async function finishSession() {
+        const name = document.getElementById('studentName').value;
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const btn = document.getElementById('submitBtn');
 
-        let score = 0;
-        let answerSheet = [];
-        let gradingSheet = [];
-        const studentName = document.getElementById('studentName').value || "TEACHER";
+        if(!confirm("Are you sure you are done? Your cheat log will be submitted.")) return;
 
-        EXAM_DATA.forEach(q => {
-            const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-            const userAns = selected ? selected.value : "NO_ANSWER";
-            const isCorrect = (userAns === q.answer);
-            if (isCorrect) score++;
-            
-            // Log clean answer (remove pipes/colons to avoid CSV break)
-            answerSheet.push(`Q${q.id}:${userAns.replace(/[:|]/g, "")}`);
-            gradingSheet.push(isCorrect ? "1" : "0");
-        });
-
-        const finalPercentage = Math.round((score / EXAM_DATA.length) * 100);
+        btn.disabled = true;
+        btn.innerText = "Saving...";
 
         try {
+            // Save the FINAL report to Firebase
             await db.collection("exam_results").add({
-                class: document.getElementById('studentClass').value || "TEACHER",
-                number: document.getElementById('studentNo').value || "0",
-                name: studentName,
-                total_score: finalPercentage,
-                raw_score: `${score}/${EXAM_DATA.length}`,
-                cheat_count: switchCount,
-                evidence_logs: evidenceLogs.join(" | "), 
-                all_answers: answerSheet.join(" | "),
-                answer_key_status: gradingSheet.join(" | "),
+                type: "FINAL_REPORT",
+                name: name,
+                class: cls,
+                number: no,
+                cheat_count: switchCount, // <--- The important part
+                cheat_details: cheatLogs.join(" | "),
                 timestamp: new Date().toString()
             });
-            
-            if(!isAuto) alert(`Score: ${finalPercentage}%`);
-            document.body.innerHTML = `<div class="container" style="text-align:center"><h1>Done!</h1><h2>Score: ${finalPercentage}%</h2></div>`;
+
+            document.body.innerHTML = `
+                <div class="container" style="text-align:center">
+                    <h1 style="color:green">Session Closed</h1>
+                    <p>You switched tabs <strong>${switchCount}</strong> times.</p>
+                    <p>Data sent to teacher.</p>
+                </div>`;
+                
         } catch (e) {
-            alert("Upload failed. Check internet.");
-            document.getElementById('submitBtn').disabled = false;
+            alert("Error saving data. Check internet.");
+            btn.disabled = false;
         }
     }
 </script>
+
 </body>
 </html>
