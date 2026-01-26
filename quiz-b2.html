@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2 Grammar Assessment</title>
+    <style>
+        :root { --primary: #047857; --accent: #10b981; --danger: #ef4444; --bg: #f0fdf4; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); 
+            padding: 20px; 
+            color: #334155;
+            -webkit-user-select: none; user-select: none;
+        }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        
+        h1 { text-align: center; color: var(--primary); margin-bottom: 0.5rem; }
+        .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 20px; font-size: 1rem; transition: 0.2s; }
+        .btn:hover { background: #065f46; }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        input, select { width: 100%; padding: 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; font-size: 1rem; }
+        label { font-weight: 600; display: block; margin-bottom: 5px; color: #475569; }
+
+        /* QUIZ CARDS */
+        .question-box { margin-bottom: 25px; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .question-text { font-weight: 700; font-size: 1.05rem; margin-bottom: 15px; color: #1e293b; line-height: 1.6; }
+        
+        .mcq-label { display: flex; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: 0.15s; }
+        .mcq-label:hover { background: #ecfdf5; border-color: var(--accent); }
+        .mcq-input { margin-right: 12px; transform: scale(1.2); }
+        .mcq-input:checked + span { font-weight: 700; color: var(--primary); }
+
+        /* REVIEW STYLES */
+        .review-card { padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .review-correct { background-color: #ecfdf5; border-color: #10b981; }
+        .review-wrong { background-color: #fef2f2; border-color: #ef4444; }
+        .explanation-text { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 0.9rem; color: #4b5563; font-style: italic; }
+
+        /* UTILS */
+        #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .info-box { background: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 15px; border-radius: 6px; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.03; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 24px; color: #000; }
+
+        #login-section, #system-check-section, #quiz-section, #teacher-section { display: none; }
+        #login-section { display: block; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="global-watermark" class="watermark-overlay"></div>
+
+<div class="container">
+    <div id="cheat-alert">⚠️ ALERT: Screen switch detected!</div>
+
+    <div id="login-section">
+        <h1>B2 Grammar Exam</h1>
+        <p style="text-align:center; color:#64748b; margin-bottom: 30px;">Past Tenses & Hypotheticals</p>
+        
+        <label>Class Group</label>
+        <select id="studentClass">
+            <option value="">Select Class...</option>
+            <option value="B2 Upper Int">B2 Upper Int</option>
+            <option value="B2 Prep">B2 Prep</option>
+            <option value="Private Student">Private Student</option>
+        </select>
+
+        <label>Student ID / Attendance No.</label>
+        <input type="number" id="studentNo" placeholder="e.g. 101">
+
+        <label>Full Name</label>
+        <input type="text" id="studentName" placeholder="Enter your full name">
+
+        <button class="btn" onclick="verifyLogin()">Next Step</button>
+    </div>
+
+    <div id="system-check-section">
+        <h1>⚙️ Exam Environment</h1>
+        
+        <div class="info-box">
+            <strong>⚠️ SECURITY PROTOCOLS:</strong><br><br>
+            1. <strong>Full Screen Required:</strong> Do not minimize or resize the browser.<br>
+            2. <strong>Focus Tracking:</strong> Switching tabs is recorded as a violation.<br>
+            3. <strong>Academic Integrity:</strong> This assessment measures your true proficiency level.<br>
+        </div>
+        
+        <div style="margin-top:20px;">
+            <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
+            <label for="rulesCheck" style="display:inline; font-weight:400;">I confirm that I am ready to begin under exam conditions.</label>
+            <button class="btn" id="startBtn" onclick="startQuiz()" disabled>START ASSESSMENT</button>
+        </div>
+    </div>
+
+    <div id="quiz-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:15px; margin-bottom:20px;">
+            <div style="font-weight:bold; color:var(--primary);">B2 Assessment</div>
+            <div style="color:var(--danger); font-weight:bold; font-size:0.9rem; animation: pulse 2s infinite;">● LIVE MONITORING</div>
+        </div>
+        
+        <form id="quiz-form">
+            <div id="quiz-container">Loading...</div>
+        </form>
+
+        <button class="btn" id="submitBtn" onclick="submitExam()">Submit Final Answers</button>
+    </div>
+
+    <div id="teacher-section">
+        <h1>👩‍🏫 Teacher Dashboard</h1>
+        <div style="text-align:center; margin-bottom:20px; color:#64748b;">Manage Results for B2 Exam</div>
+        <button class="btn" onclick="downloadExcel()">📥 Download Results (.csv)</button>
+        <button class="btn" onclick="location.reload()" style="background:#64748b; margin-top:10px;">Log Out</button>
+    </div>
+</div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    // --- VARIABLES ---
+    const COLLECTION_NAME = "b2_grammar_quiz_results"; // NEW COLLECTION
+    let currentDocID = null;
+    let switchCount = 0;
+    let sessionActive = false;
+
+    // --- B2 DATA SOURCE ---
+    const QUIZ_SOURCE = [
+        { "id": 1, "question": "He picked up the report, ______ it carefully, and then filed it away.", "options": ["examined", "was examining", "had examined", "examines"], "answer": "examined", "explain": "A list of consecutive, completed past actions requires the Past Simple." },
+        { "id": 2, "question": "The earthquake ______ the small town for exactly thirty seconds.", "options": ["shook", "was shaking", "had shaken", "has shaken"], "answer": "shook", "explain": "We view the event as a single completed fact (30 seconds)." },
+        { "id": 3, "question": "She ______ the door, took off her coat, and turned on the lights.", "options": ["opened", "was opening", "had opened", "has opened"], "answer": "opened", "explain": "A standard narrative sequence of events requires Past Simple." },
+        { "id": 4, "question": "As soon as I ______ the noise, I jumped out of bed.", "options": ["heard", "was hearing", "had heard", "hear"], "answer": "heard", "explain": "'As soon as' triggers Past Simple for immediate reactions." },
+        { "id": 5, "question": "The ceremony ______ place on the 15th of May.", "options": ["took", "was taking", "has taken", "had taken"], "answer": "took", "explain": "Stating a fact about a completed event." },
+        { "id": 6, "question": "Who ______ 'Pride and Prejudice'?", "options": ["wrote", "did write", "was writing", "has written"], "answer": "wrote", "explain": "When the question word ('Who') is the subject, we do not use the auxiliary 'did'." },
+        { "id": 7, "question": "I ______ the answer immediately when the teacher asked.", "options": ["knew", "was knowing", "had known", "know"], "answer": "knew", "explain": "'Know' is a state verb and is rarely used in continuous forms." },
+        { "id": 8, "question": "It ______ a cold and rainy night when we arrived.", "options": ["was", "had been", "is", "would be"], "answer": "was", "explain": "Setting the scene with a state/description." },
+        { "id": 9, "question": "Where ______ when you were a child?", "options": ["did you live", "were you living", "had you lived", "did you used to live"], "answer": "did you live", "explain": "Asking about a completed period in the past." },
+        { "id": 10, "question": "The meeting ______ for two hours and finished at noon.", "options": ["lasted", "was lasting", "has lasted", "had lasted"], "answer": "lasted", "explain": "A historical fact covering a period that is now finished." },
+        { "id": 11, "question": "Last year, I ______ to the gym every single day.", "options": ["went", "was going", "have gone", "had gone"], "answer": "went", "explain": "Simple past used for a past habit." },
+        { "id": 12, "question": "I ______ like spicy food, but now I love it.", "options": ["didn't use to", "didn't used to", "wouldn't", "don't use to"], "answer": "didn't use to", "explain": "Negative form of past habit. Note spelling: no 'd' in 'use'." },
+        { "id": 13, "question": "Every summer, we ______ visit our grandparents at the lake.", "options": ["would", "used to", "did", "were"], "answer": "would", "explain": "Used for characteristic repeated actions in the past (often nostalgic)." },
+        { "id": 14, "question": "The Romans ______ a lot of time building roads.", "options": ["spent", "were spending", "would spend", "did spend"], "answer": "spent", "explain": "General statement about a past era." },
+        { "id": 15, "question": "Did you ______ play tennis when you were at school?", "options": ["use to", "used to", "usually", "use"], "answer": "use to", "explain": "Question form with 'did' drops the 'd'." },
+        { "id": 16, "question": "He ______ be a professional athlete before he retired.", "options": ["used to", "would", "was used to", "use to"], "answer": "used to", "explain": "'Used to' is required for past states (being an athlete). 'Would' cannot be used for states." },
+        { "id": 17, "question": "Whenever I visited her, she ______ make me a cup of tea.", "options": ["would", "used to", "did", "was"], "answer": "would", "explain": "Repeated action in the past triggered by 'Whenever'." },
+        { "id": 18, "question": "I never ______ why he decided to leave the country.", "options": ["understood", "was understanding", "did understand", "had understood"], "answer": "understood", "explain": "State verb 'understand' in negative past." },
+        { "id": 19, "question": "When ______ to drive?", "options": ["did you learn", "were you learning", "have you learned", "did you learnt"], "answer": "did you learn", "explain": "Simple question about a past accomplishment." },
+        { "id": 20, "question": "My grandfather ______ this house for fifty years.", "options": ["owned", "was owning", "would own", "has owned"], "answer": "owned", "explain": "'Own' is a state verb. We cannot use 'would' or continuous forms with ownership." },
+        { "id": 21, "question": "I ______ tell you to lock the door! Why didn't you listen?", "options": ["did", "do", "done", "had"], "answer": "did", "explain": "Emphatic 'did' is used to add stress to the affirmative verb." },
+        { "id": 22, "question": "It's high time you ______ your studies seriously.", "options": ["took", "take", "had taken", "would take"], "answer": "took", "explain": "'It's high time' + Past Simple (Subjunctive mood) creates a present/future advice meaning." },
+        { "id": 23, "question": "I would rather you ______ him the truth yesterday.", "options": ["had told", "told", "tell", "have told"], "answer": "had told", "explain": "'I would rather you had told him' refers to past regrets. 'Told' would refer to now/future." },
+        { "id": 24, "question": "If I ______ the answer, I would tell you immediately.", "options": ["knew", "know", "had known", "was knowing"], "answer": "knew", "explain": "Second Conditional (Hypothetical Present)." },
+        { "id": 25, "question": "Suppose you ______ the lottery, what would you do?", "options": ["won", "win", "had won", "would win"], "answer": "won", "explain": "'Suppose' + Past Simple = Hypothetical Present/Future." },
+        { "id": 26, "question": "I wish I ______ taller.", "options": ["were", "am", "would be", "have been"], "answer": "were", "explain": "'I wish I were' is the subjunctive form for hypothetical situations." },
+        { "id": 27, "question": "Not until later ______ the missing file.", "options": ["did I discover", "I discovered", "discovered I", "I did discover"], "answer": "did I discover", "explain": "Negative adverbial 'Not until' triggers inversion." },
+        { "id": 28, "question": "Only when he apologized ______ I forgive him.", "options": ["did", "would", "had", "was"], "answer": "did", "explain": "'Only when' triggers inversion in the main clause." },
+        { "id": 29, "question": "Why ______ you do that?", "options": ["did", "were", "had", "would"], "answer": "did", "explain": "Simple question asking for a reason for a past action." },
+        { "id": 30, "question": "Why ______ you late for the meeting?", "options": ["were", "did", "was", "had been"], "answer": "were", "explain": "'Be' is the main verb. We don't use 'did' with 'be'." }
+    ];
+
+    // --- LOGIC ---
+    function generateWatermark() {
+        const wm = document.getElementById('global-watermark');
+        let html = "";
+        for(let i=0; i<40; i++) html += `<div class="watermark-text">${i%2?"B2 EXAM":"SECURE"}</div>`;
+        wm.innerHTML = html;
+    }
+    generateWatermark();
+
+    function verifyLogin() {
+        const name = document.getElementById('studentName').value;
+        const no = document.getElementById('studentNo').value;
+        const cls = document.getElementById('studentClass').value;
+        
+        // TEACHER LOGIN
+        if(name === "030" && no === "0" && cls === "") {
+            document.getElementById('login-section').style.display='none';
+            document.getElementById('teacher-section').style.display='block';
+            return;
+        }
+
+        if(!name || !no || !cls) return alert("Please fill in all details.");
+        
+        // UNIQUE ID
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        
+        document.getElementById('login-section').style.display='none';
+        document.getElementById('system-check-section').style.display='block';
+    }
+
+    async function startQuiz() {
+        const name = document.getElementById('studentName').value;
+        const no = document.getElementById('studentNo').value;
+        const cls = document.getElementById('studentClass').value;
+        
+        await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+            name: name, number: no, class: cls,
+            start_time: new Date().toLocaleString(),
+            status: "IN_PROGRESS", cheat_count: 0
+        });
+
+        renderQuiz();
+        document.getElementById('system-check-section').style.display='none';
+        document.getElementById('quiz-section').style.display='block';
+        document.documentElement.requestFullscreen().catch(e=>{});
+        sessionActive = true;
+    }
+
+    function renderQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = "";
+        
+        QUIZ_SOURCE.forEach((q, idx) => {
+            let optionsHTML = "";
+            q.options.forEach(opt => {
+                optionsHTML += `<label class="mcq-label"><input type="radio" class="mcq-input" name="q_${q.id}" value="${opt}"><span>${opt}</span></label>`;
+            });
+            container.innerHTML += `<div class="question-box"><div class="question-text">${idx+1}. ${q.question}</div>${optionsHTML}</div>`;
+        });
+    }
+
+    async function submitExam() {
+        if(!confirm("Are you sure you want to submit? This cannot be undone.")) return;
+        sessionActive = false;
+        
+        let score = 0;
+        let total = QUIZ_SOURCE.length;
+        let answers = {};
+        
+        QUIZ_SOURCE.forEach(q => {
+            const val = (document.querySelector(`input[name="q_${q.id}"]:checked`) || {}).value || "";
+            answers[`Q${q.id}`] = val;
+            if(val === q.answer) score++;
+        });
+
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            status: "COMPLETED", finish_time: new Date().toLocaleString(),
+            score: score, total: total, all_answers: answers, final_cheat_count: switchCount
+        });
+
+        // GENERATE REPORT CARD
+        let reviewHTML = "";
+        
+        QUIZ_SOURCE.forEach((q, idx) => {
+            const userAns = answers[`Q${q.id}`];
+            const isCorrect = userAns === q.answer;
+            const cssClass = isCorrect ? "review-correct" : "review-wrong";
+            const icon = isCorrect ? "✅" : "❌";
+            
+            reviewHTML += `
+                <div class="review-card ${cssClass}">
+                    <div><strong>${idx+1}. ${q.question}</strong></div>
+                    <div style="margin-top:5px;">Your Answer: <strong>${userAns || "(Skipped)"}</strong> ${icon}</div>
+                    ${!isCorrect ? `<div style="color:#b91c1c; font-weight:bold; font-size:0.9rem;">Correct: ${q.answer}</div>` : ""}
+                    <div class="explanation-text">💡 ${q.explain}</div>
+                </div>
+            `;
+        });
+
+        document.body.innerHTML = `
+            <div class="container">
+                <h1 style="color:var(--primary)">Assessment Complete</h1>
+                <div style="background:var(--primary); color:white; padding:20px; border-radius:8px; text-align:center; margin-bottom:30px;">
+                    <div style="font-size:3rem; font-weight:bold;">${score} / ${total}</div>
+                    <div>Final Score</div>
+                </div>
+                <hr>
+                ${reviewHTML}
+                <button class="btn" onclick="location.reload()" style="background:#64748b;">Exit Exam</button>
+            </div>
+        `;
+    }
+
+    // --- ANTI-CHEAT ---
+    document.addEventListener("visibilitychange", () => {
+        if(document.hidden && sessionActive) {
+            switchCount++;
+            document.getElementById('cheat-alert').style.display='block';
+            document.getElementById('cheat-alert').innerText = `⚠️ VIOLATION RECORDED: Tab Switch #${switchCount}`;
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({cheat_count: switchCount});
+        }
+    });
+
+    // --- TEACHER DOWNLOAD ---
+    async function downloadExcel() {
+        const snap = await db.collection(COLLECTION_NAME).get();
+        let csv = "data:text/csv;charset=utf-8,Class,ID,Name,Score,Total,Cheats,Answers\n";
+        snap.forEach(doc => {
+            const d = doc.data();
+            const ansStr = JSON.stringify(d.all_answers || {}).replace(/,/g, '|').replace(/"/g,"'");
+            csv += `${d.class},${d.number},"${d.name}",${d.score},${d.total},${d.cheat_count},"${ansStr}"\n`;
+        });
+        const link = document.createElement("a");
+        link.href = encodeURI(csv);
+        link.download = "B2_Exam_Results.csv";
+        document.body.appendChild(link);
+        link.click();
+    }
+</script>
+</body>
+</html>
