@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XI Final Assessment</title>
+    <style>
+        :root { --primary: #7c3aed; --bg: #f5f3ff; --text: #1f2937; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; color: var(--text); user-select: none; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        h1, h2 { text-align: center; color: var(--primary); }
+        .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn:hover { background: #6d28d9; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        input, select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
+
+        /* WATERMARK */
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.05; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: black; }
+
+        /* SECTIONS */
+        .section-box { margin-bottom: 30px; border: 1px solid #eee; padding: 15px; border-radius: 8px; }
+        .graph-img { width: 100%; max-width: 200px; border: 1px solid #ccc; margin: 5px; display: inline-block; }
+        
+        /* MCQ */
+        .question-box { background: #fafafa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
+        .mcq-label { display: block; padding: 8px; background: white; border: 1px solid #ddd; margin-top: 5px; border-radius: 4px; cursor: pointer; }
+        .mcq-input:checked + span { color: var(--primary); font-weight: bold; }
+
+        /* CAMERA */
+        .camera-box { width: 100%; max-width: 400px; margin: 0 auto; background: black; border-radius: 8px; overflow: hidden; }
+        video { width: 100%; display: block; }
+        .preview-img { width: 100%; border: 2px solid var(--primary); border-radius: 8px; margin-top: 10px; display: none; }
+
+        /* ALERTS */
+        #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; margin-bottom: 10px; }
+        .cheat-counter { position: fixed; top: 10px; right: 10px; background: #fee2e2; color: red; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid red; }
+
+        /* RESULTS */
+        .result-box { text-align: center; padding: 20px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 10px; }
+        .wrong-list { margin-top: 10px; color: #dc2626; font-size: 0.9rem; }
+
+        #login-section, #system-check-section, #quiz-section { display: none; }
+        #login-section { display: block; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="global-watermark" class="watermark-overlay"></div>
+<div id="cheat-display" class="cheat-counter" style="display:none;">Cheats: 0</div>
+
+<div class="container">
+    <div id="cheat-alert">⚠️ TAB SWITCH DETECTED!</div>
+
+    <div id="login-section">
+        <h1>XI Final Exam</h1>
+        <label>Class</label>
+        <select id="studentClass">
+            <option value="">Select Class...</option>
+            <option value="XI A">XI A</option>
+            <option value="XI B">XI B</option>
+            <option value="XI C">XI C</option>
+        </select>
+        <label>Attendance No.</label>
+        <input type="number" id="studentNo" placeholder="e.g. 15">
+        <label>Full Name</label>
+        <input type="text" id="studentName" placeholder="Enter Full Name">
+        <button class="btn" onclick="verifyLogin()">Login / Resume</button>
+    </div>
+
+    <div id="system-check-section">
+        <h2>⚠️ Exam Rules</h2>
+        <p>1. <strong>Section 1:</strong> Analyze the 3 graphs and upload your essay.</p>
+        <p>2. <strong>Section 2:</strong> 40 Multiple Choice Questions.</p>
+        <p>3. <strong>Scoring:</strong> Graded out of 30. (10 Bonus Questions).</p>
+        <p>4. <strong>Anti-Cheat:</strong> Tab switching is recorded.</p>
+        <div style="margin-top:20px; text-align: center;">
+            <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
+            <label for="rulesCheck">I am ready. (If you are resuming, click Start to restore data)</label>
+        </div>
+        <button class="btn" id="startBtn" onclick="startQuiz()" disabled>START / RESUME</button>
+    </div>
+
+    <div id="quiz-section">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold;">
+            <span>XI Final Assessment</span>
+            <span style="color:red">● Live</span>
+        </div>
+
+        <div class="section-box">
+            <h3>Part 1: Graph Analysis</h3>
+            <div style="text-align:center;">
+                <img src="1.png" class="graph-img" alt="Graph 1">
+                <img src="2.png" class="graph-img" alt="Graph 2">
+                <img src="3.png" class="graph-img" alt="Graph 3">
+            </div>
+            <p>Write your analysis on paper. When done, <strong>Scan/Photograph</strong> it below:</p>
+            
+            <div class="camera-box">
+                <video id="videoFeed" autoplay playsinline></video>
+            </div>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <img id="essayPreview" class="preview-img">
+            
+            <button class="btn" onclick="takeSnapshot()" style="background:#374151; margin-top:10px;">📷 Capture Essay</button>
+            <div id="upload-status" style="text-align:center; color:green; display:none; margin-top:5px;">✅ Photo Saved!</div>
+        </div>
+
+        <div class="section-box">
+            <h3>Part 2: Multiple Choice (40 Qs)</h3>
+            <p style="font-size:0.9rem; color:#666;">Answer all 40. Score is calculated based on 30.</p>
+            <div id="mcq-container"></div>
+        </div>
+
+        <button class="btn" onclick="submitFinal()">Submit Final Exam</button>
+    </div>
+</div>
+
+<script>
+    // --- FIREBASE SETUP ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "grade_xi_final";
+    let currentDocID = null;
+    let switchCount = 0;
+    let sessionActive = false;
+    let essayPhotoData = "";
+    let userAnswers = {}; // Store answers in real-time
+
+    // --- GENERATE 40 MCQs (Placeholder Data) ---
+    // You can replace these with real questions later
+    const MC_QUESTIONS = [];
+    for(let i=1; i<=40; i++) {
+        // Simple logic to generate dummy answers (A, B, C, D repeating)
+        const opts = ["Option A", "Option B", "Option C", "Option D"];
+        const correctMap = ["Option A", "Option B", "Option C", "Option D"];
+        const correctAns = correctMap[(i % 4)]; 
+        
+        MC_QUESTIONS.push({
+            id: i,
+            question: `Question Number ${i}: This is a placeholder question text. Select the correct option.`,
+            options: opts,
+            answer: correctAns 
+        });
+    }
+
+    // --- WATERMARK ---
+    function initWatermark() {
+        const wm = document.getElementById('global-watermark');
+        let html = "";
+        for(let i=0; i<40; i++) html += `<div class="watermark-text">THIS IS AN EXAM<br>DO NOT CHEAT</div>`;
+        wm.innerHTML = html;
+    }
+    initWatermark();
+
+    // --- LOGIN & RESTORE ---
+    async function verifyLogin() {
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+
+        if(!cls || !no || !name) return alert("Fill all fields");
+
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        
+        // CHECK IF ALREADY SUBMITTED
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        if(docSnap.exists && docSnap.data().status === "COMPLETED") {
+            alert("You have already submitted this exam. You cannot enter again.");
+            return;
+        }
+
+        document.getElementById('login-section').style.display='none';
+        document.getElementById('system-check-section').style.display='block';
+    }
+
+    async function startQuiz() {
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+
+        // CHECK DB FOR EXISTING SESSION TO RESTORE
+        const docRef = db.collection(COLLECTION_NAME).doc(currentDocID);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            // Restore Photo
+            if (data.essay_photo) {
+                essayPhotoData = data.essay_photo;
+                document.getElementById('essayPreview').src = essayPhotoData;
+                document.getElementById('essayPreview').style.display = 'block';
+                document.getElementById('upload-status').style.display = 'block';
+            }
+            // Restore Cheats
+            switchCount = data.cheat_count || 0;
+            // Restore Answers
+            userAnswers = data.temp_answers || {};
+        } else {
+            // New Session
+            await docRef.set({
+                class: cls, number: no, name: name,
+                start_time: new Date().toLocaleString(),
+                status: "IN_PROGRESS",
+                cheat_count: 0,
+                temp_answers: {}
+            });
+        }
+
+        renderQuiz();
+        document.getElementById('system-check-section').style.display='none';
+        document.getElementById('quiz-section').style.display='block';
+        document.getElementById('cheat-display').style.display='block';
+        document.getElementById('cheat-display').innerText = `Cheats: ${switchCount}`;
+        
+        startCamera();
+        sessionActive = true;
+    }
+
+    // --- RENDER ---
+    function renderQuiz() {
+        const container = document.getElementById('mcq-container');
+        container.innerHTML = "";
+        
+        MC_QUESTIONS.forEach(q => {
+            let optionsHTML = "";
+            q.options.forEach(opt => {
+                // Check if this option was previously selected (Restore state)
+                const isChecked = (userAnswers[`Q${q.id}`] === opt) ? "checked" : "";
+                
+                optionsHTML += `
+                    <label class="mcq-label">
+                        <input type="radio" class="mcq-input" name="q_${q.id}" value="${opt}" ${isChecked} onchange="saveProgress('Q${q.id}', '${opt}')">
+                        <span>${opt}</span>
+                    </label>`;
+            });
+            container.innerHTML += `
+                <div class="question-box">
+                    <div style="font-weight:bold; margin-bottom:10px;">${q.id}. ${q.question}</div>
+                    ${optionsHTML}
+                </div>`;
+        });
+    }
+
+    // --- AUTO-SAVE PROGRESS ---
+    // Saves answer to DB every time they click an option
+    function saveProgress(qKey, value) {
+        userAnswers[qKey] = value;
+        db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            temp_answers: userAnswers
+        }, { merge: true });
+    }
+
+    // --- CAMERA LOGIC ---
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(s => document.getElementById('videoFeed').srcObject = s)
+            .catch(e => console.log("Camera error", e));
+    }
+
+    function takeSnapshot() {
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('canvas');
+        // Compress image (max width 600px)
+        const scale = 600 / video.videoWidth;
+        canvas.width = 600;
+        canvas.height = video.videoHeight * scale;
+        
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        essayPhotoData = canvas.toDataURL('image/jpeg', 0.6); // Medium quality
+
+        document.getElementById('essayPreview').src = essayPhotoData;
+        document.getElementById('essayPreview').style.display = 'block';
+        document.getElementById('upload-status').style.display = 'block';
+
+        // Save Photo to DB immediately
+        db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            essay_photo: essayPhotoData
+        });
+    }
+
+    // --- SUBMISSION LOGIC ---
+    async function submitFinal() {
+        if(!confirm("Are you sure? You cannot change answers after submitting.")) return;
+        
+        sessionActive = false;
+        let correctCount = 0;
+        let wrongList = [];
+
+        MC_QUESTIONS.forEach(q => {
+            const userVal = userAnswers[`Q${q.id}`];
+            if(userVal === q.answer) {
+                correctCount++;
+            } else {
+                wrongList.push(q.id);
+            }
+        });
+
+        // Scoring: Based on 30 questions
+        // If they get 30/40, that's 100%. If they get 40/40, it's 133% (Teacher can cap manually)
+        let rawScore = Math.round((correctCount / 30) * 100);
+        
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            status: "COMPLETED",
+            finish_time: new Date().toLocaleString(),
+            final_score: rawScore,
+            correct_count: correctCount,
+            wrong_list: wrongList,
+            final_cheat_count: switchCount
+        });
+
+        // SHOW RESULT SCREEN (No Answer Key)
+        document.body.innerHTML = `
+            <div class="container">
+                <div class="result-box">
+                    <h1 style="color:green">Assessment Submitted</h1>
+                    <h2>Score: ${rawScore}</h2>
+                    <p>(Based on 30 Questions)</p>
+                    <hr>
+                    <p><strong>Correct:</strong> ${correctCount} / 40</p>
+                    <p><strong>Wrong:</strong> ${40 - correctCount}</p>
+                    <div class="wrong-list">
+                        <strong>Questions you missed:</strong><br>
+                        ${wrongList.length > 0 ? wrongList.join(", ") : "None! Perfect!"}
+                    </div>
+                </div>
+                <button class="btn" onclick="location.reload()" style="background:#666">Close</button>
+            </div>
+        `;
+    }
+
+    // --- ANTI-CHEAT ---
+    document.addEventListener("visibilitychange", () => {
+        if(document.hidden && sessionActive) {
+            switchCount++;
+            document.getElementById('cheat-display').innerText = `Cheats: ${switchCount}`;
+            document.getElementById('cheat-alert').style.display = 'block';
+            setTimeout(() => document.getElementById('cheat-alert').style.display='none', 3000);
+            
+            // Save cheat count immediately
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: switchCount });
+        }
+    });
+
+</script>
+</body>
+</html>
