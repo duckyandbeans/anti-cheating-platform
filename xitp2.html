@@ -7,7 +7,7 @@
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: var(--text); user-select: none; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         
         h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
         .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem; transition: 0.2s; }
@@ -20,40 +20,63 @@
         }
         label { font-weight: 600; display: block; margin-bottom: 5px; color: #475569; }
 
-        /* SPLIT SCREEN LAYOUT FOR READING */
+        /* --- INTELLIGENT READING LAYOUT --- */
+        
+        /* DESKTOP: Split View (Side by Side) */
         .split-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 0;
-            margin-bottom: 40px;
-            height: 600px; /* Fixed height forces internal scrolling */
+            flex-direction: row;
+            height: 600px; /* Fixed height for desktop to allow internal scrolling */
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             overflow: hidden;
+            margin-bottom: 40px;
             background: #fff;
         }
         .reading-pane {
             flex: 1;
-            min-width: 300px;
-            background: #fff7ed;
             padding: 25px;
-            overflow-y: auto; /* Scrollable Text */
+            background: #fff7ed;
+            color: #7c2d12;
+            overflow-y: auto; /* Scrollable */
             border-right: 2px solid #fed7aa;
             font-size: 1rem;
             line-height: 1.7;
-            color: #7c2d12;
         }
         .questions-pane {
             flex: 1;
-            min-width: 300px;
-            background: #f8fafc;
             padding: 25px;
-            overflow-y: auto; /* Scrollable Questions */
+            background: #f8fafc;
+            overflow-y: auto; /* Scrollable */
+        }
+
+        /* MOBILE FIX: Stacked View */
+        @media (max-width: 768px) {
+            .split-container {
+                display: flex;
+                flex-direction: column; /* Stack vertically */
+                height: auto !important; /* Allow page to grow naturally */
+                border: none;
+            }
+            .reading-pane {
+                flex: none;
+                width: 100%;
+                max-height: 300px; /* Limit height so it doesn't take whole screen */
+                overflow-y: auto;  /* Allow scrolling INSIDE the text box */
+                border: 2px solid #fed7aa;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                box-sizing: border-box; /* Prevent padding issues */
+            }
+            .questions-pane {
+                flex: none;
+                width: 100%;
+                height: auto;
+                overflow: visible; /* Let the page scroll naturally */
+                padding: 0;
+            }
         }
         
-        /* Standard Questions (Vocab/Grammar) */
-        .standard-section { max-width: 800px; margin: 0 auto; }
-
         /* QUESTION BOX STYLES */
         .question-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .question-text { font-weight: 700; font-size: 1rem; margin-bottom: 10px; line-height: 1.5; }
@@ -63,12 +86,6 @@
         
         .mcq-input { width: auto !important; margin-right: 12px; margin-top: 4px; transform: scale(1.3); flex-shrink: 0; }
         .mcq-input:checked + span { color: var(--primary); font-weight: 700; }
-
-        /* MOBILE FIX */
-        @media (max-width: 768px) {
-            .split-container { flex-direction: column; height: auto; }
-            .reading-pane, .questions-pane { height: 300px; border-right: none; border-bottom: 2px solid #e2e8f0; }
-        }
 
         /* WATERMARK */
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
@@ -119,9 +136,9 @@
     <div id="system-check-section">
         <h2>⚠️ Exam Rules</h2>
         <div style="background:#fff7ed; border:1px solid #fdba74; padding:15px; border-radius:8px; margin-bottom:20px;">
-            <p>1. <strong>Split View:</strong> For Reading sections, text is on the left, questions on the right.</p>
-            <p>2. <strong>Bonus Scoring:</strong> Score is based on 30 items (10 Bonus).</p>
-            <p>3. <strong>Anti-Cheat:</strong> Do not switch tabs.</p>
+            <p>1. <strong>40 Questions:</strong> Vocabulary, Grammar, Reading.</p>
+            <p>2. <strong>Bonus Scoring:</strong> The passing score is calculated based on 30 items. (10 Bonus Items).</p>
+            <p>3. <strong>Anti-Cheat:</strong> Do not switch tabs or minimize the browser.</p>
             <p>4. <strong>Auto-Save:</strong> Refresh if stuck.</p>
         </div>
         <div style="text-align: center;">
@@ -198,23 +215,23 @@
         {id:25, q:"Many mistakes ______ in the final report, which caused confusion.", opts:["were made","made","are making","have made"], ans:"were made"},
 
         // SECTION 3: READING 1 (26-30)
-        {id:26, q:"According to the text, why are elite athletes vulnerable to mental health issues?", opts:["They are physically weaker than average people.","They face intense pressure to win and public judgment.","They do not have enough time to train.","They lack determination."], ans:"They face intense pressure to win and public judgment.", passage: TEXT_PASSAGE_1},
-        {id:27, q:"What does the phrase 'toughing it out' imply about the past attitude in sports?", opts:["Athletes used to be physically stronger.","Athletes were encouraged to ignore their mental struggles.","Athletes were more open about their feelings.","Athletes preferred tough competitions."], ans:"Athletes were encouraged to ignore their mental struggles.", passage: TEXT_PASSAGE_1},
-        {id:28, q:"Why is retirement or injury particularly difficult for elite athletes?", opts:["They lose their financial income immediately.","They lose their sense of identity and belonging.","They have to find new hobbies.","They are no longer famous."], ans:"They lose their sense of identity and belonging.", passage: TEXT_PASSAGE_1},
-        {id:29, q:"The text suggests that self-esteem in athletes is often linked to:", opts:["Their family support.","Their physical appearance.","Their performance in their sport.","Their wealth."], ans:"Their performance in their sport.", passage: TEXT_PASSAGE_1},
-        {id:30, q:"What role do sports psychologists play now?", opts:["They replace the physical coaches.","They help athletes ignore their emotions.","They teach coping mechanisms like mindfulness.","They manage the athletes' travel schedules."], ans:"They teach coping mechanisms like mindfulness.", passage: TEXT_PASSAGE_1},
+        {id:26, q:"According to the text, why are elite athletes vulnerable to mental health issues?", opts:["They are physically weaker than average people.","They face intense pressure to win and public judgment.","They do not have enough time to train.","They lack determination."], ans:"They face intense pressure to win and public judgment."},
+        {id:27, q:"What does the phrase 'toughing it out' imply about the past attitude in sports?", opts:["Athletes used to be physically stronger.","Athletes were encouraged to ignore their mental struggles.","Athletes were more open about their feelings.","Athletes preferred tough competitions."], ans:"Athletes were encouraged to ignore their mental struggles."},
+        {id:28, q:"Why is retirement or injury particularly difficult for elite athletes?", opts:["They lose their financial income immediately.","They lose their sense of identity and belonging.","They have to find new hobbies.","They are no longer famous."], ans:"They lose their sense of identity and belonging."},
+        {id:29, q:"The text suggests that self-esteem in athletes is often linked to:", opts:["Their family support.","Their physical appearance.","Their performance in their sport.","Their wealth."], ans:"Their performance in their sport."},
+        {id:30, q:"What role do sports psychologists play now?", opts:["They replace the physical coaches.","They help athletes ignore their emotions.","They teach coping mechanisms like mindfulness.","They manage the athletes' travel schedules."], ans:"They teach coping mechanisms like mindfulness."},
 
         // SECTION 3: READING 2 (31-40)
-        {id:31, q:"What is the main trend shown in the imagined chart described in the text?", opts:["More PE hours generally lead to lower GPAs.","There is no relationship between PE and grades.","More PE hours generally correspond to higher GPAs.","Students who don't exercise have the highest grades."], ans:"More PE hours generally correspond to higher GPAs.", passage: TEXT_PASSAGE_2},
-        {id:32, q:"Based on the text, what happens to students who train for more than 7 hours a week?", opts:["Their grades continue to skyrocket.","Their grades slightly decline.","They become professional athletes.","They concentration improves indefinitely."], ans:"Their grades slightly decline.", passage: TEXT_PASSAGE_2},
-        {id:33, q:"Which vocabulary phrase is used in the text to introduce a deeper reason for the findings?", opts:["Let's turn to","One reason may be","To explain more about that","Another way that"], ans:"To explain more about that", passage: TEXT_PASSAGE_2},
-        {id:34, q:"According to the researchers, why does exercise help academic performance?", opts:["It makes students too tired to misbehave.","It releases endorphins and improves concentration.","It guarantees admission to college.","It reduces the time spent on video games."], ans:"It releases endorphins and improves concentration.", passage: TEXT_PASSAGE_2},
-        {id:35, q:"What conclusion does the text draw about exercise?", opts:["It is only for elite athletes.","It is dangerous for students.","Balance is key; too much can be detrimental.","It should replace all academic classes."], ans:"Balance is key; too much can be detrimental.", passage: TEXT_PASSAGE_2},
-        {id:36, q:"The word 'correlation' in the text is closest in meaning to:", opts:["Difference","Connection","Problem","Separation"], ans:"Connection", passage: TEXT_PASSAGE_2},
-        {id:37, q:"If a student exercises 0 hours a week, their GPA is likely to be:", opts:["The highest in the class.","The lowest among the groups studied.","Exactly 3.0.","Unaffected."], ans:"The lowest among the groups studied.", passage: TEXT_PASSAGE_2},
-        {id:38, q:"The text implies that endorphins help with:", opts:["Muscle growth only.","Sleeping patterns.","Memory and concentration.","Social skills."], ans:"Memory and concentration.", passage: TEXT_PASSAGE_2},
-        {id:39, q:"The 'dip' in grades after 7 hours is attributed to:", opts:["Lack of interest.","Fatigue and less time to study.","Too many endorphins.","Poor coaching."], ans:"Fatigue and less time to study.", passage: TEXT_PASSAGE_2},
-        {id:40, q:"What is the best title for Passage 2?", opts:["Why PE Should Be Banned.","The Dangers of Elite Sport.","The Link Between Physical Activity and Academic Success.","How to Train for a Marathon."], ans:"The Link Between Physical Activity and Academic Success.", passage: TEXT_PASSAGE_2}
+        {id:31, q:"What is the main trend shown in the imagined chart described in the text?", opts:["More PE hours generally lead to lower GPAs.","There is no relationship between PE and grades.","More PE hours generally correspond to higher GPAs.","Students who don't exercise have the highest grades."], ans:"More PE hours generally correspond to higher GPAs."},
+        {id:32, q:"Based on the text, what happens to students who train for more than 7 hours a week?", opts:["Their grades continue to skyrocket.","Their grades slightly decline.","They become professional athletes.","They concentration improves indefinitely."], ans:"Their grades slightly decline."},
+        {id:33, q:"Which vocabulary phrase is used in the text to introduce a deeper reason for the findings?", opts:["Let's turn to","One reason may be","To explain more about that","Another way that"], ans:"To explain more about that"},
+        {id:34, q:"According to the researchers, why does exercise help academic performance?", opts:["It makes students too tired to misbehave.","It releases endorphins and improves concentration.","It guarantees admission to college.","It reduces the time spent on video games."], ans:"It releases endorphins and improves concentration."},
+        {id:35, q:"What conclusion does the text draw about exercise?", opts:["It is only for elite athletes.","It is dangerous for students.","Balance is key; too much can be detrimental.","It should replace all academic classes."], ans:"Balance is key; too much can be detrimental."},
+        {id:36, q:"The word 'correlation' in the text is closest in meaning to:", opts:["Difference","Connection","Problem","Separation"], ans:"Connection"},
+        {id:37, q:"If a student exercises 0 hours a week, their GPA is likely to be:", opts:["The highest in the class.","The lowest among the groups studied.","Exactly 3.0.","Unaffected."], ans:"The lowest among the groups studied."},
+        {id:38, q:"The text implies that endorphins help with:", opts:["Muscle growth only.","Sleeping patterns.","Memory and concentration.","Social skills."], ans:"Memory and concentration."},
+        {id:39, q:"The 'dip' in grades after 7 hours is attributed to:", opts:["Lack of interest.","Fatigue and less time to study.","Too many endorphins.","Poor coaching."], ans:"Fatigue and less time to study."},
+        {id:40, q:"What is the best title for Passage 2?", opts:["Why PE Should Be Banned.","The Dangers of Elite Sport.","The Link Between Physical Activity and Academic Success.","How to Train for a Marathon."], ans:"The Link Between Physical Activity and Academic Success."}
     ];
 
     // --- WATERMARK ---
