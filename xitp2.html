@@ -4,65 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XI TP 2: Final MCQ Assessment</title>
-  <style>
+    <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; --success: #10b981; --danger: #ef4444; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: var(--text); user-select: none; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         
         h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
         .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem; transition: 0.2s; }
         .btn:hover { background: #1d4ed8; }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         
-        /* FIX: Only style text/number inputs as big boxes, NOT radio buttons */
-        input[type="text"], 
-        input[type="number"], 
-        select { 
-            width: 100%; 
-            padding: 0.8rem; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 6px; 
-            margin-bottom: 15px; 
-            box-sizing: border-box; 
-            font-size: 1rem; 
+        /* INPUT STYLES */
+        input[type="text"], input[type="number"], select { 
+            width: 100%; padding: 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; font-size: 1rem; 
+        }
+        label { font-weight: 600; display: block; margin-bottom: 5px; color: #475569; }
+
+        /* SPLIT SCREEN LAYOUT FOR READING */
+        .split-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin-bottom: 40px;
+            height: 600px; /* Fixed height forces internal scrolling */
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .reading-pane {
+            flex: 1;
+            min-width: 300px;
+            background: #fff7ed;
+            padding: 25px;
+            overflow-y: auto; /* Scrollable Text */
+            border-right: 2px solid #fed7aa;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #7c2d12;
+        }
+        .questions-pane {
+            flex: 1;
+            min-width: 300px;
+            background: #f8fafc;
+            padding: 25px;
+            overflow-y: auto; /* Scrollable Questions */
         }
         
-        label { font-weight: 600; display: block; margin-bottom: 5px; color: #475569; }
+        /* Standard Questions (Vocab/Grammar) */
+        .standard-section { max-width: 800px; margin: 0 auto; }
+
+        /* QUESTION BOX STYLES */
+        .question-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .question-text { font-weight: 700; font-size: 1rem; margin-bottom: 10px; line-height: 1.5; }
+        
+        .mcq-label { display: flex; align-items: flex-start; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; margin-top: 6px; border-radius: 6px; cursor: pointer; transition: 0.1s; }
+        .mcq-label:hover { border-color: var(--primary); background: #eff6ff; }
+        
+        .mcq-input { width: auto !important; margin-right: 12px; margin-top: 4px; transform: scale(1.3); flex-shrink: 0; }
+        .mcq-input:checked + span { color: var(--primary); font-weight: 700; }
+
+        /* MOBILE FIX */
+        @media (max-width: 768px) {
+            .split-container { flex-direction: column; height: auto; }
+            .reading-pane, .questions-pane { height: 300px; border-right: none; border-bottom: 2px solid #e2e8f0; }
+        }
 
         /* WATERMARK */
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
         .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: #000; }
-
-        /* READING PASSAGE */
-        .reading-box { background: #fff7ed; border-left: 5px solid #f97316; padding: 20px; margin: 25px 0; font-size: 1rem; line-height: 1.7; border-radius: 4px; color: #7c2d12; }
-
-        /* QUESTIONS */
-        .question-box { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .question-text { font-weight: 700; font-size: 1.05rem; margin-bottom: 15px; line-height: 1.5; }
-        
-        /* MCQ RADIO FIX */
-        .mcq-label { 
-            display: flex; 
-            align-items: flex-start; /* Aligns top if text is long */
-            padding: 12px; 
-            background: white; 
-            border: 1px solid #e2e8f0; 
-            margin-top: 8px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            transition: 0.1s; 
-        }
-        .mcq-label:hover { border-color: var(--primary); background: #eff6ff; }
-        
-        /* Reset radio button style so it doesn't look like a text box */
-        .mcq-input { 
-            width: auto !important; 
-            margin-right: 12px; 
-            margin-top: 4px; /* Align with text */
-            transform: scale(1.3); 
-            flex-shrink: 0; /* Prevents squishing */
-        }
-        .mcq-input:checked + span { color: var(--primary); font-weight: 700; }
 
         /* ALERTS */
         #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; margin-bottom: 20px; border: 1px solid #f87171; }
@@ -94,10 +104,9 @@
         <label>Class</label>
         <select id="studentClass">
             <option value="">Select Class...</option>
-            <option value="XI D">XI D</option>
-            <option value="XI E">XI E</option>
-            <option value="XI H">XI H</option>
-            <option value="XI I">XI I</option>
+            <option value="XI A">XI A</option>
+            <option value="XI B">XI B</option>
+            <option value="XI C">XI C</option>
         </select>
         <label>Attendance No.</label>
         <input type="number" id="studentNo" placeholder="e.g. 15">
@@ -109,10 +118,10 @@
     <div id="system-check-section">
         <h2>⚠️ Exam Rules</h2>
         <div style="background:#fff7ed; border:1px solid #fdba74; padding:15px; border-radius:8px; margin-bottom:20px;">
-            <p>1. <strong>40 Questions:</strong> Vocabulary, Grammar, Reading.</p>
-            <p>2. <strong>Bonus Scoring:</strong> The passing score is calculated based on 30 items. (10 Bonus Items).</p>
-            <p>3. <strong>Anti-Cheat:</strong> Do not switch tabs or minimize the browser.</p>
-            <p>4. <strong>Auto-Save:</strong> If your internet fails, refresh and log in again to resume.</p>
+            <p>1. <strong>Split View:</strong> For Reading sections, text is on the left, questions on the right.</p>
+            <p>2. <strong>Bonus Scoring:</strong> Score is based on 30 items (10 Bonus).</p>
+            <p>3. <strong>Anti-Cheat:</strong> Do not switch tabs.</p>
+            <p>4. <strong>Auto-Save:</strong> Refresh if stuck.</p>
         </div>
         <div style="text-align: center;">
             <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
@@ -127,7 +136,7 @@
             <span style="color:var(--danger); animation: pulse 2s infinite;">● Live Monitoring</span>
         </div>
 
-        <div id="mcq-container">Loading Questions...</div>
+        <div id="quiz-content-area"></div>
 
         <button class="btn" onclick="submitFinal()" style="background:var(--success);">Submit Final Answers</button>
     </div>
@@ -145,16 +154,16 @@
     };
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
-    const COLLECTION_NAME = "grade_xi_part2_mcq"; // Dedicated Collection
+    const COLLECTION_NAME = "grade_xi_part2_mcq";
     let currentDocID = null;
     let switchCount = 0;
     let sessionActive = false;
     let userAnswers = {}; 
 
     // --- READING TEXTS ---
-    const TEXT_PASSAGE_1 = `<strong>Passage 1: Mental Health in Elite Sport</strong><br>Elite athletes are often viewed as superhumans, possessing bodies and minds capable of enduring extreme stress. However, recent events in the sporting world have shone a light on the fragile mental health of these competitors. The pressure to win, combined with intense public scrutiny, can lead to severe anxiety and depression. Unlike in the past, where "toughing it out" was the norm, athletes are now speaking up.<br><br>One major issue is the identity crisis many athletes face. Their self-esteem is often entirely tied to their performance. When they suffer an injury or retire, they lose their sense of belonging and purpose. Furthermore, the constant travel and isolation from family remove their support systems, making them vulnerable. Sports psychologists are now an integral part of coaching teams, teaching coping mechanisms like mindfulness to help athletes maintain their focus and determination without sacrificing their well-being.`;
+    const TEXT_PASSAGE_1 = `<strong>Passage 1: Mental Health in Elite Sport</strong><br><br>Elite athletes are often viewed as superhumans, possessing bodies and minds capable of enduring extreme stress. However, recent events in the sporting world have shone a light on the fragile mental health of these competitors. The pressure to win, combined with intense public scrutiny, can lead to severe anxiety and depression. Unlike in the past, where "toughing it out" was the norm, athletes are now speaking up.<br><br>One major issue is the identity crisis many athletes face. Their self-esteem is often entirely tied to their performance. When they suffer an injury or retire, they lose their sense of belonging and purpose. Furthermore, the constant travel and isolation from family remove their support systems, making them vulnerable. Sports psychologists are now an integral part of coaching teams, teaching coping mechanisms like mindfulness to help athletes maintain their focus and determination without sacrificing their well-being.`;
 
-    const TEXT_PASSAGE_2 = `<strong>Passage 2: Interpreting Physical Education Data</strong><br>A recent study tracked 500 high school students to analyze the correlation between physical education (PE) and academic performance. The data, presented in the chart, reveals a clear trend. Students who participated in zero hours of PE per week had the lowest average GPA. As the hours of physical activity increased, so did the students' grades.<br><br>To explain more about that, researchers believe that physical activity stimulates blood flow to the brain and releases endorphins, which improve concentration and memory. However, the data also showed that beyond 7 hours of intense training, grades slightly dipped, likely due to fatigue and lack of study time. This suggests that while exercise is beneficial, balance is key.`;
+    const TEXT_PASSAGE_2 = `<strong>Passage 2: Interpreting Physical Education Data</strong><br><br>A recent study tracked 500 high school students to analyze the correlation between physical education (PE) and academic performance. The data, presented in the chart, reveals a clear trend. Students who participated in zero hours of PE per week had the lowest average GPA. As the hours of physical activity increased, so did the students' grades.<br><br>To explain more about that, researchers believe that physical activity stimulates blood flow to the brain and releases endorphins, which improve concentration and memory. However, the data also showed that beyond 7 hours of intense training, grades slightly dipped, likely due to fatigue and lack of study time. This suggests that while exercise is beneficial, balance is key.`;
 
     // --- FULL QUESTION DATA ---
     const MC_QUESTIONS = [
@@ -189,22 +198,22 @@
 
         // SECTION 3: READING 1 (26-30)
         {id:26, q:"According to the text, why are elite athletes vulnerable to mental health issues?", opts:["They are physically weaker than average people.","They face intense pressure to win and public judgment.","They do not have enough time to train.","They lack determination."], ans:"They face intense pressure to win and public judgment.", passage: TEXT_PASSAGE_1},
-        {id:27, q:"What does the phrase 'toughing it out' imply about the past attitude in sports?", opts:["Athletes used to be physically stronger.","Athletes were encouraged to ignore their mental struggles.","Athletes were more open about their feelings.","Athletes preferred tough competitions."], ans:"Athletes were encouraged to ignore their mental struggles."},
-        {id:28, q:"Why is retirement or injury particularly difficult for elite athletes?", opts:["They lose their financial income immediately.","They lose their sense of identity and belonging.","They have to find new hobbies.","They are no longer famous."], ans:"They lose their sense of identity and belonging."},
-        {id:29, q:"The text suggests that self-esteem in athletes is often linked to:", opts:["Their family support.","Their physical appearance.","Their performance in their sport.","Their wealth."], ans:"Their performance in their sport."},
-        {id:30, q:"What role do sports psychologists play now?", opts:["They replace the physical coaches.","They help athletes ignore their emotions.","They teach coping mechanisms like mindfulness.","They manage the athletes' travel schedules."], ans:"They teach coping mechanisms like mindfulness."},
+        {id:27, q:"What does the phrase 'toughing it out' imply about the past attitude in sports?", opts:["Athletes used to be physically stronger.","Athletes were encouraged to ignore their mental struggles.","Athletes were more open about their feelings.","Athletes preferred tough competitions."], ans:"Athletes were encouraged to ignore their mental struggles.", passage: TEXT_PASSAGE_1},
+        {id:28, q:"Why is retirement or injury particularly difficult for elite athletes?", opts:["They lose their financial income immediately.","They lose their sense of identity and belonging.","They have to find new hobbies.","They are no longer famous."], ans:"They lose their sense of identity and belonging.", passage: TEXT_PASSAGE_1},
+        {id:29, q:"The text suggests that self-esteem in athletes is often linked to:", opts:["Their family support.","Their physical appearance.","Their performance in their sport.","Their wealth."], ans:"Their performance in their sport.", passage: TEXT_PASSAGE_1},
+        {id:30, q:"What role do sports psychologists play now?", opts:["They replace the physical coaches.","They help athletes ignore their emotions.","They teach coping mechanisms like mindfulness.","They manage the athletes' travel schedules."], ans:"They teach coping mechanisms like mindfulness.", passage: TEXT_PASSAGE_1},
 
         // SECTION 3: READING 2 (31-40)
         {id:31, q:"What is the main trend shown in the imagined chart described in the text?", opts:["More PE hours generally lead to lower GPAs.","There is no relationship between PE and grades.","More PE hours generally correspond to higher GPAs.","Students who don't exercise have the highest grades."], ans:"More PE hours generally correspond to higher GPAs.", passage: TEXT_PASSAGE_2},
-        {id:32, q:"Based on the text, what happens to students who train for more than 7 hours a week?", opts:["Their grades continue to skyrocket.","Their grades slightly decline.","They become professional athletes.","They concentration improves indefinitely."], ans:"Their grades slightly decline."},
-        {id:33, q:"Which vocabulary phrase is used in the text to introduce a deeper reason for the findings?", opts:["Let's turn to","One reason may be","To explain more about that","Another way that"], ans:"To explain more about that"},
-        {id:34, q:"According to the researchers, why does exercise help academic performance?", opts:["It makes students too tired to misbehave.","It releases endorphins and improves concentration.","It guarantees admission to college.","It reduces the time spent on video games."], ans:"It releases endorphins and improves concentration."},
-        {id:35, q:"What conclusion does the text draw about exercise?", opts:["It is only for elite athletes.","It is dangerous for students.","Balance is key; too much can be detrimental.","It should replace all academic classes."], ans:"Balance is key; too much can be detrimental."},
-        {id:36, q:"The word 'correlation' in the text is closest in meaning to:", opts:["Difference","Connection","Problem","Separation"], ans:"Connection"},
-        {id:37, q:"If a student exercises 0 hours a week, their GPA is likely to be:", opts:["The highest in the class.","The lowest among the groups studied.","Exactly 3.0.","Unaffected."], ans:"The lowest among the groups studied."},
-        {id:38, q:"The text implies that endorphins help with:", opts:["Muscle growth only.","Sleeping patterns.","Memory and concentration.","Social skills."], ans:"Memory and concentration."},
-        {id:39, q:"The 'dip' in grades after 7 hours is attributed to:", opts:["Lack of interest.","Fatigue and less time to study.","Too many endorphins.","Poor coaching."], ans:"Fatigue and less time to study."},
-        {id:40, q:"What is the best title for Passage 2?", opts:["Why PE Should Be Banned.","The Dangers of Elite Sport.","The Link Between Physical Activity and Academic Success.","How to Train for a Marathon."], ans:"The Link Between Physical Activity and Academic Success."}
+        {id:32, q:"Based on the text, what happens to students who train for more than 7 hours a week?", opts:["Their grades continue to skyrocket.","Their grades slightly decline.","They become professional athletes.","They concentration improves indefinitely."], ans:"Their grades slightly decline.", passage: TEXT_PASSAGE_2},
+        {id:33, q:"Which vocabulary phrase is used in the text to introduce a deeper reason for the findings?", opts:["Let's turn to","One reason may be","To explain more about that","Another way that"], ans:"To explain more about that", passage: TEXT_PASSAGE_2},
+        {id:34, q:"According to the researchers, why does exercise help academic performance?", opts:["It makes students too tired to misbehave.","It releases endorphins and improves concentration.","It guarantees admission to college.","It reduces the time spent on video games."], ans:"It releases endorphins and improves concentration.", passage: TEXT_PASSAGE_2},
+        {id:35, q:"What conclusion does the text draw about exercise?", opts:["It is only for elite athletes.","It is dangerous for students.","Balance is key; too much can be detrimental.","It should replace all academic classes."], ans:"Balance is key; too much can be detrimental.", passage: TEXT_PASSAGE_2},
+        {id:36, q:"The word 'correlation' in the text is closest in meaning to:", opts:["Difference","Connection","Problem","Separation"], ans:"Connection", passage: TEXT_PASSAGE_2},
+        {id:37, q:"If a student exercises 0 hours a week, their GPA is likely to be:", opts:["The highest in the class.","The lowest among the groups studied.","Exactly 3.0.","Unaffected."], ans:"The lowest among the groups studied.", passage: TEXT_PASSAGE_2},
+        {id:38, q:"The text implies that endorphins help with:", opts:["Muscle growth only.","Sleeping patterns.","Memory and concentration.","Social skills."], ans:"Memory and concentration.", passage: TEXT_PASSAGE_2},
+        {id:39, q:"The 'dip' in grades after 7 hours is attributed to:", opts:["Lack of interest.","Fatigue and less time to study.","Too many endorphins.","Poor coaching."], ans:"Fatigue and less time to study.", passage: TEXT_PASSAGE_2},
+        {id:40, q:"What is the best title for Passage 2?", opts:["Why PE Should Be Banned.","The Dangers of Elite Sport.","The Link Between Physical Activity and Academic Success.","How to Train for a Marathon."], ans:"The Link Between Physical Activity and Academic Success.", passage: TEXT_PASSAGE_2}
     ];
 
     // --- WATERMARK ---
@@ -259,7 +268,7 @@
             });
         }
 
-        renderQuiz();
+        renderQuizLayout();
         document.getElementById('system-check-section').style.display='none';
         document.getElementById('quiz-section').style.display='block';
         document.getElementById('cheat-display').style.display='block';
@@ -269,33 +278,61 @@
         document.documentElement.requestFullscreen().catch(e=>{});
     }
 
-    // --- RENDER QUESTIONS ---
-    function renderQuiz() {
-        const container = document.getElementById('mcq-container');
-        container.innerHTML = "";
+    // --- ADVANCED RENDER (SPLIT & STANDARD) ---
+    function renderQuizLayout() {
+        const contentArea = document.getElementById('quiz-content-area');
+        contentArea.innerHTML = "";
         
-        MC_QUESTIONS.forEach(q => {
-            // INSERT PASSAGE IF IT EXISTS
-            if(q.passage) {
-                container.innerHTML += `<div class="reading-box">${q.passage}</div>`;
-            }
+        // 1. STANDARD SECTION (Vocabulary + Grammar: Q1-25)
+        let standardHTML = `<div class="standard-section"><h2>Part 1: Vocabulary & Grammar</h2>`;
+        
+        for(let i=0; i<25; i++) {
+            const q = MC_QUESTIONS[i];
+            standardHTML += createQuestionHTML(q);
+        }
+        standardHTML += `</div><hr style="margin:40px 0; border:0; border-top:2px solid #ddd;">`;
+        contentArea.innerHTML += standardHTML;
 
-            let optionsHTML = "";
-            q.opts.forEach(opt => {
-                const isChecked = (userAnswers[`Q${q.id}`] === opt) ? "checked" : "";
-                
-                optionsHTML += `
-                    <label class="mcq-label">
-                        <input type="radio" class="mcq-input" name="q_${q.id}" value="${opt}" ${isChecked} onchange="saveProgress('Q${q.id}', '${opt}')">
-                        <span>${opt}</span>
-                    </label>`;
-            });
-            container.innerHTML += `
-                <div class="question-box">
-                    <div class="question-text">${q.id}. ${q.q}</div>
-                    ${optionsHTML}
-                </div>`;
+        // 2. READING SECTION 1 (Q26-30) - SPLIT PANE
+        contentArea.innerHTML += `<h2>Part 2: Reading Comprehension 1</h2>`;
+        contentArea.innerHTML += createSplitPane(TEXT_PASSAGE_1, MC_QUESTIONS.slice(25, 30));
+
+        // 3. READING SECTION 2 (Q31-40) - SPLIT PANE
+        contentArea.innerHTML += `<hr style="margin:40px 0; border:0; border-top:2px solid #ddd;"><h2>Part 3: Reading Comprehension 2</h2>`;
+        contentArea.innerHTML += createSplitPane(TEXT_PASSAGE_2, MC_QUESTIONS.slice(30, 40));
+    }
+
+    // Helper: Create HTML for a single question box
+    function createQuestionHTML(q) {
+        let optionsHTML = "";
+        q.opts.forEach(opt => {
+            const isChecked = (userAnswers[`Q${q.id}`] === opt) ? "checked" : "";
+            optionsHTML += `
+                <label class="mcq-label">
+                    <input type="radio" class="mcq-input" name="q_${q.id}" value="${opt}" ${isChecked} onchange="saveProgress('Q${q.id}', '${opt}')">
+                    <span>${opt}</span>
+                </label>`;
         });
+        return `
+            <div class="question-box">
+                <div class="question-text">${q.id}. ${q.q}</div>
+                ${optionsHTML}
+            </div>`;
+    }
+
+    // Helper: Create Split Pane HTML
+    function createSplitPane(text, questionsArray) {
+        let questionsHTML = "";
+        questionsArray.forEach(q => {
+            questionsHTML += createQuestionHTML(q);
+        });
+
+        return `
+            <div class="split-container">
+                <div class="reading-pane">${text}</div>
+                <div class="questions-pane">${questionsHTML}</div>
+            </div>
+        `;
     }
 
     // --- AUTO-SAVE ---
