@@ -21,10 +21,11 @@
         .question-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
         .analysis-text { font-style: italic; color: #7f8c8d; margin-bottom: 15px; font-size: 0.95rem; }
         
+        /* Prevent browser autocomplete popups which might steal focus */
         input[type="text"] { width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
         input[type="text"]:focus { border-color: var(--accent); outline: none; }
 
-        /* FEEDBACK (Hidden until submit) */
+        /* FEEDBACK */
         .feedback-container { display: none; margin-top: 15px; padding: 15px; border-radius: 6px; }
         .status-correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-wrong { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -37,13 +38,30 @@
         .btn-reset { background-color: #f39c12; display: none; }
         .btn-reset:hover { background-color: #d35400; }
 
+        /* --- CUSTOM MODAL (REPLACES ALERT/CONFIRM) --- */
+        #custom-modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 999999; 
+            justify-content: center; align-items: center; 
+        }
+        .modal-box { 
+            background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; 
+            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+        }
+        .modal-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+        .modal-text { color: #7f8c8d; margin-bottom: 25px; font-size: 1.1rem; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; min-width: 80px; }
+        .btn-yes { background: #27ae60; color: white; }
+        .btn-no { background: #95a5a6; color: white; }
+
         /* ANTI-CHEAT UI */
         #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 500; border: 1px solid #c0392b; }
         .cheat-counter { position: fixed; top: 15px; right: 15px; background: #fff; color: #c0392b; padding: 8px 15px; border-radius: 30px; font-size: 0.9rem; font-weight: bold; border: 2px solid #c0392b; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
         .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: #000; }
         
-        /* LIGHTBOX FOR IMAGES (FIXES TAB SWITCH ISSUE) */
+        /* LIGHTBOX */
         #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100000; justify-content: center; align-items: center; }
         #lightbox img { max-width: 90%; max-height: 90%; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         #lightbox-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; font-weight: bold; }
@@ -51,6 +69,10 @@
         /* LOGIN/WAITING */
         #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#ecf0f1; z-index:20000; display:flex; justify-content:center; align-items:center; }
         .login-box { background:white; padding:30px; border-radius:10px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:90%; max-width:400px; }
+        
+        /* WAITING ROOM */
+        #waiting-room { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -102,14 +124,13 @@
             <h2>Part 5: Vocabulary Enrichment</h2>
             <div class="material-card" style="border-left-color:#e67e22;">
                 <h3 style="color:#e67e22;">Reference Material</h3>
-                <p>Please refer to the image below. (Click to Zoom - Safe Mode)</p>
+                <p>Please refer to the image below. (Click to Zoom)</p>
                 <div style="text-align:center; background:#fff; padding:10px; border:1px solid #ddd; border-radius:8px;">
                     <img src="vocabxii.png" alt="Vocabulary Material" style="width:100%; max-width:600px; border-radius:4px; cursor:pointer;" onclick="openLightbox(this.src)">
                     <div style="font-size:0.8rem; color:#666; margin-top:5px;">(Tap image to zoom)</div>
                 </div>
             </div>
         </div>
-
     </section>
 
     <hr style="margin:50px 0; border:0; border-top:2px solid #ddd;">
@@ -120,8 +141,8 @@
         <div id="quiz-container"></div>
         
         <div class="btn-container">
-            <button id="submitBtn" class="btn" onclick="submitWork()">Submit Answers</button>
-            <button id="resetBtn" class="btn btn-reset" onclick="resetQuiz()">🔄 Try Again</button>
+            <button id="submitBtn" class="btn" onclick="triggerSubmit()">Submit Answers</button>
+            <button id="resetBtn" class="btn btn-reset" onclick="triggerReset()">🔄 Try Again</button>
         </div>
     </section>
 </div>
@@ -131,20 +152,28 @@
     <img id="lightbox-img" src="" onclick="event.stopPropagation()">
 </div>
 
-<div id="waiting-room" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+<div id="custom-modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title" id="modal-title">Title</div>
+        <div class="modal-text" id="modal-msg">Message</div>
+        <div class="modal-actions" id="modal-actions">
+            </div>
+    </div>
+</div>
+
+<div id="waiting-room">
     <div style="font-size:4rem;">🔒</div>
     <h1 style="color:#2c3e50; margin-bottom:10px;">Waiting for Teacher</h1>
     <p style="color:#7f8c8d; font-size:1.1rem;">Do not refresh. The lesson will start automatically.</p>
     <div style="margin-top:20px; width:50px; height:50px; border:5px solid #bdc3c7; border-top:5px solid #3498db; border-radius:50%; animation:spin 1s linear infinite;"></div>
 </div>
-<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 
 <div id="login-overlay" style="display:none;">
     <div class="login-box">
         <h2>Student Login</h2>
-        <input type="text" id="directName" placeholder="Full Name" style="margin-bottom:10px;">
-        <input type="text" id="directClass" placeholder="Class" style="margin-bottom:10px;">
-        <input type="number" id="directNo" placeholder="Number" style="margin-bottom:10px;">
+        <input type="text" id="directName" placeholder="Full Name" style="margin-bottom:10px;" autocomplete="off">
+        <input type="text" id="directClass" placeholder="Class" style="margin-bottom:10px;" autocomplete="off">
+        <input type="number" id="directNo" placeholder="Number" style="margin-bottom:10px;" autocomplete="off">
         <button class="btn" onclick="directLogin()">Start</button>
     </div>
 </div>
@@ -164,9 +193,42 @@
     let switchCount = 0;
     let sessionActive = false;
     let studentData = {};
-    let ignoreBlur = false; // SAFETY FLAG
+    
+    // --- MODAL SYSTEM (NO NATIVE ALERTS) ---
+    function showModal(title, msg, type, callback) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-msg').innerText = msg;
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = ""; // Clear buttons
 
-    // DATA QUESTIONS
+        if(type === 'confirm') {
+            const yesBtn = document.createElement('button');
+            yesBtn.className = 'modal-btn btn-yes';
+            yesBtn.innerText = "Yes";
+            yesBtn.onclick = function() { closeModal(); if(callback) callback(); };
+            
+            const noBtn = document.createElement('button');
+            noBtn.className = 'modal-btn btn-no';
+            noBtn.innerText = "No";
+            noBtn.onclick = closeModal;
+
+            actions.appendChild(yesBtn);
+            actions.appendChild(noBtn);
+        } else {
+            const okBtn = document.createElement('button');
+            okBtn.className = 'modal-btn btn-yes';
+            okBtn.innerText = "OK";
+            okBtn.onclick = closeModal;
+            actions.appendChild(okBtn);
+        }
+        document.getElementById('custom-modal-overlay').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('custom-modal-overlay').style.display = 'none';
+    }
+
+    // --- DATA QUESTIONS ---
     const questions = [
         {id: 1, ind: "Air mendidih pada suhu 100 derajat Celsius.", anal: "Fakta ilmiah.", tip: "Present Simple.", ans: "water boils at 100 degrees celsius"},
         {id: 2, ind: "Dengarkan! Seseorang sedang mengetuk pintu.", anal: "Sedang terjadi.", tip: "Present Continuous.", ans: "listen someone is knocking on the door"},
@@ -201,7 +263,7 @@
         23: ["look at those clouds its going to rain"]
     };
 
-    // --- LOCK SYSTEM & LOGIN ---
+    // --- LOCK & LOGIN ---
     (function() {
         const wm = document.getElementById('global-watermark');
         let html = ""; for(let i=0; i<40; i++) html += `<div class="watermark-text">LEARNING MODE<br>DO NOT CHEAT</div>`;
@@ -225,7 +287,7 @@
         const cls = document.getElementById('directClass').value;
         const no = document.getElementById('directNo').value;
         if(!name || !cls || !no) {
-            ignoreBlur = true; alert("Fill all fields"); ignoreBlur = false;
+            showModal("Error", "Fill all fields", "alert");
             return;
         }
         studentData = { name, class: cls, no };
@@ -249,16 +311,13 @@
         renderQuiz();
     }
 
-    // --- LIGHTBOX (FIX FOR IMAGE OPENING) ---
+    // --- LIGHTBOX ---
     function openLightbox(src) {
-        ignoreBlur = true; // Don't count clicking the image as a cheat
         document.getElementById('lightbox-img').src = src;
         document.getElementById('lightbox').style.display = 'flex';
     }
-
     function closeLightbox() {
         document.getElementById('lightbox').style.display = 'none';
-        setTimeout(() => { ignoreBlur = false; }, 500); // Re-enable anti-cheat after delay
     }
 
     // --- QUIZ LOGIC ---
@@ -283,14 +342,12 @@
 
     function clean(str) { return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim(); }
 
-    async function submitWork() {
-        ignoreBlur = true; // Stop cheat trigger on confirm box
-        if(!confirm("Submit answers? You cannot change them after this.")) {
-            ignoreBlur = false;
-            return;
-        }
-        
-        sessionActive = false; // Stop tracking cheats for now
+    function triggerSubmit() {
+        showModal("Submit Answers?", "You cannot change them after this.", "confirm", performSubmit);
+    }
+
+    async function performSubmit() {
+        sessionActive = false; // Stop cheat tracking
 
         let score = 0;
         let answersLog = {};
@@ -327,54 +384,42 @@
             }
         });
 
-        // Toggle Buttons
         document.getElementById('submitBtn').style.display = 'none';
         document.getElementById('resetBtn').style.display = 'block';
 
         const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
         await db.collection(COLLECTION_NAME).doc(docID).set({
-            name: studentData.name,
-            class: studentData.class,
-            number: studentData.no,
-            score: score,
-            total: questions.length,
-            cheat_count: switchCount,
-            answers: answersLog,
-            status: "COMPLETED",
-            finish_time: new Date().toLocaleString()
+            name: studentData.name, class: studentData.class, number: studentData.no,
+            score: score, total: questions.length, cheat_count: switchCount,
+            answers: answersLog, status: "COMPLETED", finish_time: new Date().toLocaleString()
         });
 
-        alert(`Submission Saved! You scored ${score}/${questions.length}.`);
+        showModal("Submission Saved!", `You scored ${score}/${questions.length}.`, "alert");
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
-        ignoreBlur = false;
     }
 
-    function resetQuiz() {
-        ignoreBlur = true;
-        if(!confirm("Clear all answers and try again?")) { ignoreBlur = false; return; }
-        
+    function triggerReset() {
+        showModal("Clear Answers?", "This will reset your score and allow you to try again.", "confirm", performReset);
+    }
+
+    function performReset() {
         questions.forEach(q => {
             const input = document.getElementById(`input-${q.id}`);
             const fb = document.getElementById(`feedback-${q.id}`);
-            
             input.value = "";
             input.disabled = false;
             fb.style.display = 'none';
             fb.className = "feedback-container"; 
         });
-        
         document.getElementById('submitBtn').style.display = 'block';
         document.getElementById('resetBtn').style.display = 'none';
         sessionActive = true; 
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
-        ignoreBlur = false;
     }
 
-    // --- AGGRESSIVE ANTI-CHEAT (With Safe Guard) ---
+    // --- AGGRESSIVE ANTI-CHEAT ---
     function recordCheat() {
         if (!sessionActive) return;
-        if (ignoreBlur) return; // SAFE GUARD ACTIVATED
-
         switchCount++;
         document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
         const alertBox = document.getElementById('cheat-alert');
