@@ -19,14 +19,12 @@
         .graph-img { width: 100%; max-width: 250px; border: 1px solid #ccc; margin: 5px; border-radius: 4px; display: inline-block; transition: transform 0.2s; }
         .graph-img:hover { transform: scale(1.5); border-color: var(--primary); z-index: 10; position: relative; }
 
-        /* VOCABULARY BOX (NEW) */
+        /* VOCABULARY BOX */
         .vocab-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px; font-size: 0.9rem; }
         .vocab-title { color: #1e40af; font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid #dbeafe; padding-bottom: 5px; }
         .vocab-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .vocab-item { line-height: 1.4; }
         .vocab-term { font-weight: bold; color: #1e3a8a; }
-        
-        /* MOBILE ADJUST FOR VOCAB */
         @media (max-width: 600px) { .vocab-list { grid-template-columns: 1fr; } }
 
         /* CAMERA */
@@ -143,6 +141,7 @@
     let sessionActive = false;
     let essayPages = [];
     let studentData = {};
+    let ignoreBlur = false; // FLAG TO PAUSE ANTI-CHEAT
 
     function initWatermark() {
         const wm = document.getElementById('global-watermark');
@@ -215,13 +214,25 @@
         document.documentElement.requestFullscreen().catch(e=>{});
     }
 
-    // --- CAMERA & LOGIC ---
+    // --- CAMERA & LOGIC (FIXED ANTI-CHEAT TRIGGER) ---
     function startCamera() {
+        ignoreBlur = true; // PAUSE CHEAT DETECTION
+        
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => document.getElementById('videoFeed').srcObject = s)
+            .then(s => {
+                document.getElementById('videoFeed').srcObject = s;
+                setTimeout(() => { ignoreBlur = false; }, 2000); // Resume detection
+            })
             .catch(e => {
                 navigator.mediaDevices.getUserMedia({ video: true })
-                .then(s => document.getElementById('videoFeed').srcObject = s);
+                .then(s => {
+                    document.getElementById('videoFeed').srcObject = s;
+                    setTimeout(() => { ignoreBlur = false; }, 2000); // Resume detection
+                })
+                .catch(err => {
+                    alert("Camera permission denied. You cannot take photos.");
+                    ignoreBlur = false;
+                });
             });
     }
 
@@ -250,15 +261,19 @@
     }
 
     function deletePhoto(index) {
-        if(!confirm("Delete this page?")) return;
+        ignoreBlur = true;
+        if(!confirm("Delete this page?")) { ignoreBlur = false; return; }
         essayPages.splice(index, 1);
         db.collection(COLLECTION_NAME).doc(currentDocID).update({ essay_pages: essayPages });
         renderGallery();
+        ignoreBlur = false;
     }
 
     async function submitFinal() {
-        if(essayPages.length === 0) return alert("Take at least one photo.");
-        if(!confirm(`Submit ${essayPages.length} pages?`)) return;
+        ignoreBlur = true;
+        if(essayPages.length === 0) { alert("Take at least one photo."); ignoreBlur = false; return; }
+        if(!confirm(`Submit ${essayPages.length} pages?`)) { ignoreBlur = false; return; }
+        
         sessionActive = false;
         await db.collection(COLLECTION_NAME).doc(currentDocID).update({ status: "COMPLETED", finish_time: new Date().toLocaleString(), final_cheat_count: switchCount });
         document.body.innerHTML = `<div class="container" style="text-align:center;"><h1 style="color:green;">Submitted!</h1><p>You may close this tab.</p></div>`;
@@ -267,6 +282,8 @@
     // --- AGGRESSIVE ANTI-CHEAT ---
     function recordCheat() {
         if (!sessionActive) return;
+        if (ignoreBlur) return; // CHECK SAFE GUARD
+
         switchCount++;
         document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
         const alertBox = document.getElementById('cheat-alert');
