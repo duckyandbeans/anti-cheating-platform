@@ -156,6 +156,15 @@
 </div>
 
 <script>
+    // Run this immediately when the page loads
+    window.onload = function() {
+    // 1. Check if the data exists in storage
+    var storedName = localStorage.getItem("xitp_student_name");
+    var storedClass = localStorage.getItem("xitp_student_class");
+
+    // 2. Security Check: If no name is found, kick them back to login
+    if (!storedName || !storedClass) {
+        alert("
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
