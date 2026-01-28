@@ -31,8 +31,12 @@
         .hint-text { display: block; margin-top: 5px; font-weight: bold; color: #856404; }
 
         /* BUTTONS */
-        .btn { display: block; width: 100%; padding: 15px; background-color: var(--accent); color: white; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 30px; }
+        .btn-container { margin-top: 30px; display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 15px; background-color: var(--accent); color: white; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .btn:hover { background-color: #2980b9; }
+        
+        .btn-reset { background-color: #f39c12; display: none; } /* Hidden initially */
+        .btn-reset:hover { background-color: #d35400; }
 
         /* ANTI-CHEAT UI */
         #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 500; border: 1px solid #c0392b; }
@@ -62,7 +66,6 @@
 
     <section id="materials">
         <h2>Part 1: Present Simple vs. Present Continuous</h2>
-        
         <div class="material-card">
             <h3>1. Routine / Habit</h3>
             <div class="example-box">
@@ -78,13 +81,11 @@
         <div class="material-card"><h3>3. Happening Now</h3><div class="example-box"><div><span class="label">Sentence:</span> "Diamlah, bayi itu sedang tidur."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Continuous</strong>.</div><div><span class="label">English:</span> "Be quiet, the baby is sleeping."</div></div></div>
         
         <h2>Part 2: Past Simple vs. Present Perfect</h2>
-        
         <div class="material-card"><h3>4. Indefinite Past</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah menonton film itu tiga kali."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have watched that movie three times."</div></div></div>
         <div class="material-card"><h3>5. Specific Past Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya menonton film itu tadi malam."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I watched that movie last night."</div></div></div>
         <div class="material-card"><h3>6. Unfinished Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah kehilangan kunci saya."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have lost my keys."</div></div></div>
 
         <h2>Part 3: Past Simple vs. Past Continuous</h2>
-        
         <div class="material-card"><h3>7. Completed Sequence</h3><div class="example-box"><div><span class="label">Sentence:</span> "Dia membuka pintu, lalu menyalakan lampu."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "He opened the door and turned on the light."</div></div></div>
         <div class="material-card"><h3>8. Interrupted Action</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sedang makan ketika telepon berbunyi."</div><div><span class="label">Tip:</span> <strong>Past Continuous</strong> + <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I was eating when the phone rang."</div></div></div>
 
@@ -111,7 +112,11 @@
         <h2>📝 Translation Exercises</h2>
         <p>Translate the sentences below. Hints are hidden until submission.</p>
         <div id="quiz-container"></div>
-        <button class="btn" onclick="submitWork()">Submit Answers</button>
+        
+        <div class="btn-container">
+            <button id="submitBtn" class="btn" onclick="submitWork()">Submit Answers</button>
+            <button id="resetBtn" class="btn btn-reset" onclick="resetQuiz()">🔄 Try Again</button>
+        </div>
     </section>
 </div>
 
@@ -290,6 +295,10 @@
             }
         });
 
+        // Toggle Buttons
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('resetBtn').style.display = 'block';
+
         // SAVE TO DATABASE
         const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
         await db.collection(COLLECTION_NAME).doc(docID).set({
@@ -305,6 +314,26 @@
         });
 
         alert(`Submission Saved! You scored ${score}/${questions.length}.`);
+        window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
+    }
+
+    // --- RESET FUNCTION (ANSWER AGAIN) ---
+    function resetQuiz() {
+        if(!confirm("Clear all answers and try again?")) return;
+        
+        questions.forEach(q => {
+            const input = document.getElementById(`input-${q.id}`);
+            const fb = document.getElementById(`feedback-${q.id}`);
+            
+            input.value = "";
+            input.disabled = false;
+            fb.style.display = 'none';
+            fb.className = "feedback-container"; // reset classes
+        });
+        
+        document.getElementById('submitBtn').style.display = 'block';
+        document.getElementById('resetBtn').style.display = 'none';
+        sessionActive = true; // Re-enable cheat tracking
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
     }
 
