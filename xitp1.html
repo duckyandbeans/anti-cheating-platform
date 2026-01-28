@@ -1,1 +1,267 @@
-p
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XI TP 1: Graph Analysis</title>
+    <style>
+        :root { --primary: #7c3aed; --bg: #f5f3ff; --text: #1f2937; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; color: var(--text); user-select: none; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+        .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem; }
+        .btn:hover { background: #6d28d9; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        input, select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; font-size: 1rem; }
+        
+        /* GRAPHS */
+        .graph-container { text-align: center; margin-bottom: 20px; padding: 10px; background: #fafafa; border: 1px solid #eee; border-radius: 8px; }
+        .graph-img { width: 100%; max-width: 250px; border: 1px solid #ccc; margin: 5px; border-radius: 4px; display: inline-block; transition: transform 0.2s; }
+        .graph-img:hover { transform: scale(1.5); border-color: var(--primary); z-index: 10; position: relative; }
+
+        /* CAMERA */
+        .camera-box { width: 100%; max-width: 500px; margin: 20px auto; background: black; border-radius: 8px; overflow: hidden; position: relative; }
+        video { width: 100%; display: block; }
+        
+        /* PHOTO GRID */
+        .photo-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .photo-card { position: relative; width: 150px; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
+        .photo-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .delete-btn { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(220, 38, 38, 0.9); color: white; border: none; padding: 5px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+
+        /* ALERTS */
+        #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; margin-bottom: 10px; border: 1px solid #f87171; position: sticky; top: 10px; z-index: 500; }
+        
+        .cheat-counter { position: fixed; top: 10px; right: 10px; background: #fee2e2; color: red; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; border: 2px solid red; display: none; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        #login-section, #system-check-section, #exam-section { display: none; }
+        #login-section { display: block; }
+        
+        /* WATERMARK */
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.05; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: black; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="global-watermark" class="watermark-overlay"></div>
+<div id="cheat-display" class="cheat-counter">OFFENSES: 0</div>
+
+<div class="container">
+    <div id="cheat-alert">⚠️ ALERT: YOU LEFT THE EXAM SCREEN!</div>
+
+    <div id="login-section">
+        <h1>XI TP 1: Graph Analysis</h1>
+        <p style="text-align:center; color:#6b7280; margin-bottom:20px;">Upload your handwritten essay.</p>
+        
+        <label>Class</label>
+        <select id="studentClass">
+            <option value="">Select Class...</option>
+            <option value="XI D">XI D</option>
+            <option value="XI E">XI E</option>
+            <option value="XI H">XI H</option>
+            <option value="XI I">XI I</option>
+        </select>
+        <label>Attendance No.</label>
+        <input type="number" id="studentNo" placeholder="e.g. 15">
+        <label>Full Name</label>
+        <input type="text" id="studentName" placeholder="Enter Full Name">
+        <button class="btn" onclick="verifyLogin()">Login / Resume</button>
+    </div>
+
+    <div id="system-check-section">
+        <h2>⚠️ Strict Exam Rules</h2>
+        <div style="background:#fff7ed; border:1px solid #fdba74; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <p>1. <strong>Strict Monitoring:</strong> Do not click outside this window. Do not open other apps.</p>
+            <p>2. <strong>Analyze Graphs:</strong> Look at the 3 images provided.</p>
+            <p>3. <strong>Scan:</strong> Use the camera below to take photos (Max 6).</p>
+        </div>
+        <div style="text-align: center;">
+            <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
+            <label for="rulesCheck" style="display:inline; margin-left:8px;">I understand that leaving this screen is cheating.</label>
+        </div>
+        <button class="btn" id="startBtn" onclick="startExam()" disabled>START EXAM</button>
+    </div>
+
+    <div id="exam-section">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; border-bottom:2px solid #e5e7eb; padding-bottom:10px;">
+            <span>XI TP 1: Essay</span>
+            <span style="color:var(--danger); animation: pulse 2s infinite;">● Live Monitoring</span>
+        </div>
+
+        <div class="graph-container">
+            <h3>Reference Material</h3>
+            <p style="font-size:0.9rem; color:#666;">(Hover/Tap to Zoom)</p>
+            <img src="1.png" class="graph-img" alt="Graph 1">
+            <img src="2.png" class="graph-img" alt="Graph 2">
+            <img src="3.png" class="graph-img" alt="Graph 3">
+        </div>
+
+        <hr style="margin:20px 0; border:0; border-top:1px solid #ddd;">
+
+        <h3>📷 Scan Your Work</h3>
+        <p style="text-align:center; margin-bottom:10px;">Ensure text is readable. Max 6 pages.</p>
+        
+        <div class="camera-box"><video id="videoFeed" autoplay playsinline></video></div>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <button class="btn" id="snapBtn" onclick="takeSnapshot()" style="background:#374151; width:auto; margin:10px auto;">📸 Capture Page</button>
+        <div id="photo-limit-msg" style="text-align:center; color:red; display:none; margin-top:10px;">Maximum 6 pages reached!</div>
+        <div class="photo-grid" id="photoGallery"></div>
+        <button class="btn" id="submitBtn" onclick="submitFinal()" style="background:green; margin-top:40px;">Submit All Pages</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "grade_xi_part1_essay";
+    let currentDocID = null;
+    let switchCount = 0;
+    let sessionActive = false;
+    let essayPages = []; 
+
+    function initWatermark() {
+        const wm = document.getElementById('global-watermark');
+        let html = "";
+        for(let i=0; i<40; i++) html += `<div class="watermark-text">ESSAY EXAM<br>DO NOT CHEAT</div>`;
+        wm.innerHTML = html;
+    }
+    initWatermark();
+
+    async function verifyLogin() {
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+        if(!cls || !no || !name) return alert("Fill all fields");
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        if(docSnap.exists && docSnap.data().status === "COMPLETED") {
+            alert("You have already submitted this exam.");
+            return;
+        }
+
+        document.getElementById('login-section').style.display='none';
+        document.getElementById('system-check-section').style.display='block';
+    }
+
+    async function startExam() {
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+        const docRef = db.collection(COLLECTION_NAME).doc(currentDocID);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            switchCount = data.cheat_count || 0;
+            if (data.essay_pages) { essayPages = data.essay_pages; renderGallery(); }
+        } else {
+            await docRef.set({
+                class: cls, number: no, name: name,
+                start_time: new Date().toLocaleString(),
+                status: "IN_PROGRESS",
+                cheat_count: 0,
+                essay_pages: []
+            });
+        }
+
+        document.getElementById('system-check-section').style.display='none';
+        document.getElementById('exam-section').style.display='block';
+        document.getElementById('cheat-display').style.display='block';
+        document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
+        
+        startCamera();
+        
+        // --- DELAYED ACTIVATION TO PREVENT INSTANT TRIGGER ---
+        setTimeout(() => { sessionActive = true; }, 2000);
+        
+        document.documentElement.requestFullscreen().catch(e=>{});
+    }
+
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(s => document.getElementById('videoFeed').srcObject = s)
+            .catch(e => {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                .then(s => document.getElementById('videoFeed').srcObject = s);
+            });
+    }
+
+    function takeSnapshot() {
+        if(essayPages.length >= 6) return;
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('canvas');
+        const scale = 800 / video.videoWidth;
+        canvas.width = 800;
+        canvas.height = video.videoHeight * scale;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        essayPages.push(canvas.toDataURL('image/jpeg', 0.6));
+        db.collection(COLLECTION_NAME).doc(currentDocID).update({ essay_pages: essayPages });
+        renderGallery();
+    }
+
+    function renderGallery() {
+        const gallery = document.getElementById('photoGallery');
+        gallery.innerHTML = "";
+        essayPages.forEach((src, idx) => {
+            gallery.innerHTML += `<div class="photo-card"><img src="${src}"><button class="delete-btn" onclick="deletePhoto(${idx})">🗑️ Delete Page ${idx+1}</button></div>`;
+        });
+        const snapBtn = document.getElementById('snapBtn');
+        const limitMsg = document.getElementById('photo-limit-msg');
+        if (essayPages.length >= 6) { snapBtn.disabled = true; snapBtn.style.background = "#ccc"; limitMsg.style.display = 'block'; }
+        else { snapBtn.disabled = false; snapBtn.style.background = "#374151"; limitMsg.style.display = 'none'; }
+    }
+
+    function deletePhoto(index) {
+        if(!confirm("Delete this page?")) return;
+        essayPages.splice(index, 1);
+        db.collection(COLLECTION_NAME).doc(currentDocID).update({ essay_pages: essayPages });
+        renderGallery();
+    }
+
+    async function submitFinal() {
+        if(essayPages.length === 0) return alert("Take at least one photo.");
+        if(!confirm(`Submit ${essayPages.length} pages?`)) return;
+        sessionActive = false;
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({ status: "COMPLETED", finish_time: new Date().toLocaleString(), final_cheat_count: switchCount });
+        document.body.innerHTML = `<div class="container" style="text-align:center;"><h1 style="color:green;">Submitted!</h1><p>You may close this tab.</p></div>`;
+    }
+
+    // --- AGGRESSIVE ANTI-CHEAT (BLUR + VISIBILITY) ---
+    function recordCheat() {
+        if (!sessionActive) return;
+        switchCount++;
+        document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
+        const alertBox = document.getElementById('cheat-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display='none', 3000);
+        db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: switchCount });
+    }
+
+    // 1. Tab Switch
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) recordCheat();
+    });
+
+    // 2. Window Blur (Clicking Taskbar, Notification, Alt+Tab)
+    window.addEventListener("blur", () => {
+        recordCheat();
+    });
+
+</script>
+</body>
+</html>
