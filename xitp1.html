@@ -19,6 +19,16 @@
         .graph-img { width: 100%; max-width: 250px; border: 1px solid #ccc; margin: 5px; border-radius: 4px; display: inline-block; transition: transform 0.2s; }
         .graph-img:hover { transform: scale(1.5); border-color: var(--primary); z-index: 10; position: relative; }
 
+        /* VOCABULARY BOX (NEW) */
+        .vocab-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 20px; font-size: 0.9rem; }
+        .vocab-title { color: #1e40af; font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; font-size: 0.85rem; border-bottom: 1px solid #dbeafe; padding-bottom: 5px; }
+        .vocab-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .vocab-item { line-height: 1.4; }
+        .vocab-term { font-weight: bold; color: #1e3a8a; }
+        
+        /* MOBILE ADJUST FOR VOCAB */
+        @media (max-width: 600px) { .vocab-list { grid-template-columns: 1fr; } }
+
         /* CAMERA */
         .camera-box { width: 100%; max-width: 500px; margin: 20px auto; background: black; border-radius: 8px; overflow: hidden; position: relative; }
         video { width: 100%; display: block; }
@@ -64,6 +74,27 @@
         <img src="1.png" class="graph-img" alt="Graph 1">
         <img src="2.png" class="graph-img" alt="Graph 2">
         <img src="3.png" class="graph-img" alt="Graph 3">
+    </div>
+
+    <div class="vocab-box">
+        <div class="vocab-title">💡 Vocabulary Hints</div>
+        <div class="vocab-list">
+            <div class="vocab-item"><span class="vocab-term">Pinjol:</span> Online loans / P2P lending.</div>
+            <div class="vocab-item"><span class="vocab-term">Paylater:</span> BNPL (Buy Now, Pay Later).</div>
+            <div class="vocab-item"><span class="vocab-term">Kredit Macet:</span> Bad debt / Non-performing loans.</div>
+            <div class="vocab-item"><span class="vocab-term">Bunga Pokok:</span> Principal interest.</div>
+            <div class="vocab-item"><span class="vocab-term">Denda:</span> Fines / Late fees / Penalties.</div>
+            <div class="vocab-item"><span class="vocab-term">Triliun Rp:</span> Trillion Rupiah.</div>
+            <div class="vocab-item"><span class="vocab-term">Outstanding Utang:</span> Outstanding debt (unpaid).</div>
+        </div>
+
+        <div class="vocab-title" style="margin-top:10px;">🔗 Linking Words (Flow)</div>
+        <div class="vocab-list">
+            <div class="vocab-item"><span class="vocab-term">Add Info:</span> Furthermore, Moreover.</div>
+            <div class="vocab-item"><span class="vocab-term">Contrast:</span> However, On the other hand.</div>
+            <div class="vocab-item"><span class="vocab-term">Cause/Effect:</span> Consequently, As a result.</div>
+            <div class="vocab-item"><span class="vocab-term">Conclusion:</span> Overall, In conclusion.</div>
+        </div>
     </div>
 
     <hr style="margin:20px 0; border:0; border-top:1px solid #ddd;">
@@ -130,7 +161,6 @@
 
         waitScreen.style.display = 'flex';
         
-        // Listen to the SPECIFIC code document
         db.collection('active_exam_codes').doc(examCode).onSnapshot(doc => {
             if (!doc.exists) {
                 statusText.style.background = "#fee2e2";
@@ -150,7 +180,6 @@
     })();
 
     async function initializeExam() {
-        // Retrieve credentials from Index
         const cls = sessionStorage.getItem('student_class');
         const no = sessionStorage.getItem('student_no');
         const name = sessionStorage.getItem('student_name');
@@ -158,7 +187,6 @@
         currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
         studentData = { class: cls, number: no, name: name };
 
-        // Check Previous Session
         const docRef = db.collection(COLLECTION_NAME).doc(currentDocID);
         const docSnap = await docRef.get();
 
