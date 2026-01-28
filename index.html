@@ -41,7 +41,26 @@
       appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
     };
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+function loginStudent() {
+    // 1. Get the values from your input fields
+    // (Make sure your HTML inputs have these IDs, e.g., id="studentName")
+    var name = document.getElementById("studentName").value;
+    var studentClass = document.getElementById("studentClass").value;
 
+    // 2. Validation: Make sure they actually typed something
+    if (name.trim() === "" || studentClass.trim() === "") {
+        alert("Please enter your name and class.");
+        return;
+    }
+
+    // 3. Save to Local Storage
+    // This stores the data in the browser indefinitely
+    localStorage.setItem("xitp_student_name", name);
+    localStorage.setItem("xitp_student_class", studentClass);
+
+    // 4. Redirect to the quiz selection or first quiz
+    window.location.href = "xitp1.html"; 
+}
     async function attemptLogin() {
         const cls = document.getElementById('sClass').value;
         const no = document.getElementById('sNo').value;
