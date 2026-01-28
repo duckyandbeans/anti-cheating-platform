@@ -5,50 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Exam Portal</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #1e293b; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: var(--text); }
-        
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { margin-bottom: 1.5rem; color: var(--primary); }
-        
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .code-input { letter-spacing: 5px; font-weight: bold; font-size: 1.2rem; text-align: center; border: 2px solid var(--primary); }
-        
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #1d4ed8; }
-        
-        .error { color: #ef4444; font-size: 0.9rem; margin-top: 10px; display: none; }
-        .loader { display: none; margin-top: 10px; color: #64748b; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .error { color: #ef4444; display: none; margin-top: 10px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
-
     <div class="login-card">
-        <h1>🔐 Student Login</h1>
-        
+        <h1>🔐 Exam Login</h1>
         <select id="sClass">
             <option value="">Select Class...</option>
             <option value="XI D">XI D</option>
             <option value="XI E">XI E</option>
             <option value="XI H">XI H</option>
             <option value="XI I">XI I</option>
-            <option value="XII H">XII H</option>
-            <option value="XII I">XII I</option>
         </select>
         <input type="number" id="sNo" placeholder="Attendance Number">
         <input type="text" id="sName" placeholder="Full Name">
-        
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
-        
-        <label style="display:block; margin-bottom:5px; font-weight:bold; color:#475569;">Enter Teacher's Code</label>
-        <input type="tel" id="accessCode" class="code-input" placeholder="0000" maxlength="4">
-        
-        <button onclick="attemptLogin()">Enter Exam</button>
-        
-        <div id="errorMsg" class="error">Invalid Code</div>
-        <div id="loader" class="loader">Verifying Code...</div>
+        <input type="tel" id="accessCode" placeholder="Teacher Code (4 Digits)" style="text-align:center; font-size:1.2rem; letter-spacing:3px;">
+        <button onclick="attemptLogin()">Enter</button>
+        <div id="errorMsg" class="error"></div>
     </div>
 
 <script>
@@ -67,59 +47,29 @@
         const no = document.getElementById('sNo').value;
         const name = document.getElementById('sName').value;
         const code = document.getElementById('accessCode').value;
-        const errorEl = document.getElementById('errorMsg');
-        const loader = document.getElementById('loader');
+        const err = document.getElementById('errorMsg');
 
-        if(!cls || !no || !name || !code) {
-            errorEl.innerText = "Please fill in all fields.";
-            errorEl.style.display = 'block';
-            return;
-        }
-
-        errorEl.style.display = 'none';
-        loader.style.display = 'block';
+        if(!cls || !no || !name || !code) return showErr("Fill all fields.");
 
         try {
-            // 1. CHECK CODE IN DATABASE
-            const docRef = db.collection('active_exam_codes').doc(code);
-            const doc = await docRef.get();
-
-            if (!doc.exists) {
-                throw new Error("Invalid Code.");
-            }
-
+            const doc = await db.collection('active_exam_codes').doc(code).get();
+            if (!doc.exists) return showErr("Invalid Code.");
+            
             const data = doc.data();
-            
-            // 2. CHECK EXPIRATION (1 HOUR = 3600000 ms)
-            const now = Date.now();
-            const timeDiff = now - data.timestamp;
-            
-            if (timeDiff > 3600000) {
-                throw new Error("This code has expired.");
-            }
+            if (Date.now() - data.timestamp > 3600000) return showErr("Code Expired.");
 
-            // 3. SUCCESS - SAVE DATA LOCALLY SO NEXT PAGE KNOWS
+            // SAVE DATA
             sessionStorage.setItem('student_class', cls);
             sessionStorage.setItem('student_no', no);
             sessionStorage.setItem('student_name', name);
-            sessionStorage.setItem('auth_token', 'valid'); // Simple check
+            sessionStorage.setItem('exam_code', code); // <--- CRITICAL: Save Code
 
-            // 4. REDIRECT TO CORRECT FILE
             window.location.href = data.targetFile;
 
-        } catch (err) {
-            loader.style.display = 'none';
-            errorEl.innerText = err.message;
-            errorEl.style.display = 'block';
-        }
+        } catch (e) { showErr(e.message); }
     }
     
-    // Auto-fill logic (Optional: If they come back)
-    if(sessionStorage.getItem('student_name')) {
-        document.getElementById('sName').value = sessionStorage.getItem('student_name');
-        document.getElementById('sClass').value = sessionStorage.getItem('student_class');
-        document.getElementById('sNo').value = sessionStorage.getItem('student_no');
-    }
+    function showErr(msg) { document.getElementById('errorMsg').innerText = msg; document.getElementById('errorMsg').style.display='block'; }
 </script>
 </body>
 </html>
