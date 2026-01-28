@@ -3,157 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade XII: English Grammar Mastery</title>
+    <title>Grade XII: Grammar Mastery</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --success: #2ecc71;
-            --error: #e74c3c;
-            --bg: #f4f6f7;
-        }
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --error: #c0392b; --bg: #ecf0f1; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: var(--bg); color: #2c3e50; user-select: none; }
+        
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h1, h2 { color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
+        
+        /* MATERIAL STYLES */
+        .material-card { background: #f8f9fa; border-left: 5px solid var(--accent); padding: 15px 20px; margin-bottom: 20px; }
+        .example-box { background: #e8f4fd; padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .label { font-weight: bold; color: var(--accent); display: inline-block; width: 80px; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg);
-            color: #333;
-        }
+        /* QUIZ STYLES */
+        .quiz-item { background: white; margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .question-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
+        .analysis-text { font-style: italic; color: #7f8c8d; margin-bottom: 15px; font-size: 0.95rem; }
+        
+        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: var(--accent); outline: none; }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+        /* FEEDBACK (Hidden until submit) */
+        .feedback-container { display: none; margin-top: 15px; padding: 15px; border-radius: 6px; }
+        .status-correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-wrong { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .hint-text { display: block; margin-top: 5px; font-weight: bold; color: #856404; }
 
-        h1, h2 {
-            color: var(--primary);
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-        }
+        /* BUTTONS */
+        .btn { display: block; width: 100%; padding: 15px; background-color: var(--accent); color: white; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 30px; }
+        .btn:hover { background-color: #2980b9; }
 
-        /* Material Cards */
-        .material-card {
-            background: #fff;
-            border-left: 5px solid var(--accent);
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .example-box {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .label {
-            font-weight: bold;
-            color: var(--accent);
-            display: block;
-            margin-bottom: 3px;
-        }
-
-        /* Quiz Styles */
-        .quiz-item {
-            margin-bottom: 25px;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .quiz-item.correct {
-            border-color: var(--success);
-            background-color: #f0fff4;
-        }
-
-        .quiz-item.wrong {
-            border-color: var(--error);
-            background-color: #fff5f5;
-        }
-
-        .question-text {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .analysis-text {
-            font-size: 0.9em;
-            color: #666;
-            font-style: italic;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--accent);
-            outline: none;
-        }
-
-        .feedback-msg {
-            margin-top: 10px;
-            font-weight: bold;
-            display: none;
-        }
-
-        .hint-box {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            color: #856404;
-            border-radius: 5px;
-            display: none; /* Hidden by default */
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent);
-            color: white;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 30px;
-        }
-
-        .btn:hover {
-            background-color: #2980b9;
-        }
-
-        .timeline-game {
-            background-color: #e8f4fd;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 2px dashed var(--accent);
-        }
+        /* ANTI-CHEAT UI */
+        #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 500; border: 1px solid #c0392b; }
+        .cheat-counter { position: fixed; top: 15px; right: 15px; background: #fff; color: #c0392b; padding: 8px 15px; border-radius: 30px; font-size: 0.9rem; font-weight: bold; border: 2px solid #c0392b; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: #000; }
+        
+        /* LOGIN/WAITING */
+        #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#ecf0f1; z-index:20000; display:flex; justify-content:center; align-items:center; }
+        .login-box { background:white; padding:30px; border-radius:10px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:90%; max-width:400px; }
     </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body oncontextmenu="return false;">
+
+<div id="global-watermark" class="watermark-overlay"></div>
+<div id="cheat-display" class="cheat-counter">OFFENSES: 0</div>
+<div id="cheat-alert">⚠️ ALERT: FOCUS LOST! INCIDENT RECORDED.</div>
 
 <div class="container">
-    <header>
-        <h1 style="text-align: center;">English Grammar Mastery</h1>
-        <p style="text-align: center;">Analyze the function, apply the rule, and translate accurately.</p>
+    <header style="text-align:center; margin-bottom:40px;">
+        <h1>🎓 English Grammar Mastery</h1>
+        <p>Study the materials below, then scroll down to test your knowledge.</p>
     </header>
 
     <section id="materials">
@@ -161,396 +65,262 @@
         
         <div class="material-card">
             <h3>1. Routine / Habit</h3>
-            <p><strong>Example:</strong> "Saya biasanya bangun jam 5 pagi."</p>
             <div class="example-box">
-                <span class="label">Analysis:</span> Kebiasaan atau rutinitas yang terjadi berulang-ulang.<br>
-                <span class="label">Tip:</span> Gunakan Present Simple (V1 / s / es).<br>
-                <span class="label">English:</span> "I usually wake up at 5 AM."
+                <div><span class="label">Sentence:</span> "Saya biasanya bangun jam 5 pagi."</div>
+                <div><span class="label">Analysis:</span> Kebiasaan atau rutinitas yang terjadi berulang-ulang.</div>
+                <div><span class="label">Tip:</span> Gunakan <strong>Present Simple</strong> (V1 / s / es).</div>
+                <div><span class="label">English:</span> "I usually wake up at 5 AM."</div>
             </div>
         </div>
-
-        <div class="material-card">
-            <h3>2. Fact / General Truth</h3>
-            <p><strong>Example:</strong> "Matahari terbit di timur."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Fakta ilmiah yang selalu benar.<br>
-                <span class="label">Tip:</span> Gunakan Present Simple.<br>
-                <span class="label">English:</span> "The sun rises in the east."
-            </div>
-        </div>
-
-        <div class="material-card">
-            <h3>3. Happening Now</h3>
-            <p><strong>Example:</strong> "Diamlah, bayi itu sedang tidur."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Aksi ini sedang terjadi tepat saat kita berbicara.<br>
-                <span class="label">Tip:</span> Gunakan Present Continuous (am/is/are + V-ing).<br>
-                <span class="label">English:</span> "Be quiet, the baby is sleeping."
-            </div>
-        </div>
-
+        
+        <div class="material-card"><h3>2. Fact / General Truth</h3><div class="example-box"><div><span class="label">Sentence:</span> "Matahari terbit di timur."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Simple</strong>.</div><div><span class="label">English:</span> "The sun rises in the east."</div></div></div>
+        
+        <div class="material-card"><h3>3. Happening Now</h3><div class="example-box"><div><span class="label">Sentence:</span> "Diamlah, bayi itu sedang tidur."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Continuous</strong>.</div><div><span class="label">English:</span> "Be quiet, the baby is sleeping."</div></div></div>
+        
         <h2>Part 2: Past Simple vs. Present Perfect</h2>
         
-        <div class="material-card">
-            <h3>4. Indefinite Past (Experience)</h3>
-            <p><strong>Example:</strong> "Saya sudah menonton film itu tiga kali."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Aksi sudah selesai, tapi waktunya tidak penting. Yang penting adalah pengalamannya.<br>
-                <span class="label">Tip:</span> Gunakan Present Perfect (have/has + V3).<br>
-                <span class="label">English:</span> "I have watched that movie three times."
-            </div>
-        </div>
-
-        <div class="material-card">
-            <h3>5. Specific Past Time</h3>
-            <p><strong>Example:</strong> "Saya menonton film itu tadi malam."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Aksi sudah selesai dan waktunya disebutkan secara spesifik ("tadi malam").<br>
-                <span class="label">Tip:</span> Gunakan Past Simple (V2).<br>
-                <span class="label">English:</span> "I watched that movie last night."
-            </div>
-        </div>
-
-        <div class="material-card">
-            <h3>6. Unfinished Time / Effect Continues</h3>
-            <p><strong>Example:</strong> "Saya sudah kehilangan kunci saya." (Dan sampai sekarang belum ketemu).</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Kejadian di masa lalu yang memiliki efek langsung di masa sekarang.<br>
-                <span class="label">Tip:</span> Gunakan Present Perfect.<br>
-                <span class="label">English:</span> "I have lost my keys."
-            </div>
-        </div>
+        <div class="material-card"><h3>4. Indefinite Past</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah menonton film itu tiga kali."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have watched that movie three times."</div></div></div>
+        <div class="material-card"><h3>5. Specific Past Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya menonton film itu tadi malam."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I watched that movie last night."</div></div></div>
+        <div class="material-card"><h3>6. Unfinished Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah kehilangan kunci saya."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have lost my keys."</div></div></div>
 
         <h2>Part 3: Past Simple vs. Past Continuous</h2>
         
-        <div class="material-card">
-            <h3>7. Completed Sequence</h3>
-            <p><strong>Example:</strong> "Dia membuka pintu, lalu menyalakan lampu."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Dua kejadian berurutan yang sudah selesai.<br>
-                <span class="label">Tip:</span> Gunakan Past Simple untuk keduanya.<br>
-                <span class="label">English:</span> "He opened the door and turned on the light."
-            </div>
-        </div>
-
-        <div class="material-card">
-            <h3>8. Interrupted Action</h3>
-            <p><strong>Example:</strong> "Saya sedang makan ketika telepon berbunyi."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Aksi panjang (makan) yang sedang berlangsung dipotong oleh aksi singkat (telepon).<br>
-                <span class="label">Tip:</span> Gunakan Past Continuous (panjang) + Past Simple (singkat).<br>
-                <span class="label">English:</span> "I was eating when the phone rang."
-            </div>
-        </div>
-
-        <div class="material-card">
-            <h3>9. Background Description</h3>
-            <p><strong>Example:</strong> "Matahari bersinar terang dan burung-burung bernyanyi pagi itu."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Ini menggambarkan suasana atau latar belakang cerita di masa lalu.<br>
-                <span class="label">Tip:</span> Gunakan Past Continuous.<br>
-                <span class="label">English:</span> "The sun was shining and the birds were singing that morning."
-            </div>
-        </div>
+        <div class="material-card"><h3>7. Completed Sequence</h3><div class="example-box"><div><span class="label">Sentence:</span> "Dia membuka pintu, lalu menyalakan lampu."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "He opened the door and turned on the light."</div></div></div>
+        <div class="material-card"><h3>8. Interrupted Action</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sedang makan ketika telepon berbunyi."</div><div><span class="label">Tip:</span> <strong>Past Continuous</strong> + <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I was eating when the phone rang."</div></div></div>
 
         <h2>Part 4: Stative Verbs</h2>
-        <div class="material-card">
-            <h3>10. Possession / State</h3>
-            <p><strong>Example:</strong> "Saya punya mobil baru."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Ini menunjukkan kepemilikan. Kata kerja kepemilikan tidak boleh pakai "-ing".<br>
-                <span class="label">Tip:</span> Gunakan Present Simple.<br>
-                <span class="label">English:</span> "I have a new car." (NOT: I am having...)
+        <div class="material-card"><h3>10. Possession / State</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya punya mobil baru."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Simple</strong>.</div><div><span class="label">English:</span> "I have a new car."</div></div></div>
+
+        <div class="material-group" style="margin-top:40px;">
+            <h2>Part 5: Vocabulary Enrichment</h2>
+            <div class="material-card" style="border-left-color:#e67e22;">
+                <h3 style="color:#e67e22;">Reference Material</h3>
+                <p>Please refer to the image below while answering the Vocabulary questions displayed on the classroom projector.</p>
+                <div style="text-align:center; background:#fff; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                    <img src="vocabxii.png" alt="Vocabulary Material" style="width:100%; max-width:600px; border-radius:4px; cursor:pointer;" onclick="window.open(this.src)">
+                    <div style="font-size:0.8rem; color:#666; margin-top:5px;">(Tap image to zoom)</div>
+                </div>
             </div>
         </div>
 
-        <div class="material-card">
-            <h3>11. Emotion / Mental State</h3>
-            <p><strong>Example:</strong> "Saya mengerti apa maksudmu sekarang."</p>
-            <div class="example-box">
-                <span class="label">Analysis:</span> Kata kerja mental (understand, know, like) jarang menggunakan bentuk continuous.<br>
-                <span class="label">Tip:</span> Gunakan Present Simple.<br>
-                <span class="label">English:</span> "I understand what you mean now."
-            </div>
-        </div>
-
-        <div class="timeline-game">
-            <h3>Teacher's Suggestion: "The Timeline Game"</h3>
-            <p>To make this interactive for your students, you can draw a timeline on the whiteboard.</p>
-            <ul>
-                <li>Mark "NOW" in the middle.</li>
-                <li>Give them a sentence card (e.g., "Saya sedang makan").</li>
-                <li>Ask them to place a magnet/sticky note on the timeline where that sentence belongs.</li>
-            </ul>
-        </div>
     </section>
 
-    <section id="exercises">
-        <h2 style="margin-top: 50px;">Translation Exercises</h2>
-        <p>Translate the sentences below into English. Pay attention to the Grammar Tip provided.</p>
-        
-        <div id="quiz-container"></div>
+    <hr style="margin:50px 0; border:0; border-top:2px solid #ddd;">
 
-        <button class="btn" onclick="checkAnswers()">Submit Answers</button>
+    <section id="exercises">
+        <h2>📝 Translation Exercises</h2>
+        <p>Translate the sentences below. Hints are hidden until submission.</p>
+        <div id="quiz-container"></div>
+        <button class="btn" onclick="submitWork()">Submit Answers</button>
     </section>
 </div>
 
+<div id="waiting-room" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+    <div style="font-size:4rem;">🔒</div>
+    <h1 style="color:#2c3e50; margin-bottom:10px;">Waiting for Teacher</h1>
+    <p style="color:#7f8c8d; font-size:1.1rem;">Do not refresh. The lesson will start automatically.</p>
+    <div style="margin-top:20px; width:50px; height:50px; border:5px solid #bdc3c7; border-top:5px solid #3498db; border-radius:50%; animation:spin 1s linear infinite;"></div>
+</div>
+<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+
+<div id="login-overlay" style="display:none;">
+    <div class="login-box">
+        <h2>Student Login</h2>
+        <input type="text" id="directName" placeholder="Full Name" style="margin-bottom:10px;">
+        <input type="text" id="directClass" placeholder="Class" style="margin-bottom:10px;">
+        <input type="number" id="directNo" placeholder="Number" style="margin-bottom:10px;">
+        <button class="btn" onclick="directLogin()">Start</button>
+    </div>
+</div>
+
 <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "grade_xii_learning_results";
+    let switchCount = 0;
+    let sessionActive = false;
+    let studentData = {};
+
+    // DATA QUESTIONS
     const questions = [
-        {
-            id: 1,
-            indonesian: "Air mendidih pada suhu 100 derajat Celsius.",
-            analysis: "Ini adalah fakta ilmiah yang selalu benar.",
-            tip: "Gunakan Present Simple.",
-            answer: "Water boils at 100 degrees Celsius"
-        },
-        {
-            id: 2,
-            indonesian: "Dengarkan! Seseorang sedang mengetuk pintu.",
-            analysis: "Aksi ini sedang terjadi tepat saat kita berbicara.",
-            tip: "Gunakan Present Continuous (am/is/are + V-ing).",
-            answer: "Listen Someone is knocking on the door"
-        },
-        {
-            id: 3,
-            indonesian: "Bumi mengelilingi matahari.",
-            analysis: "Ini adalah kebenaran umum (general truth).",
-            tip: "Gunakan Present Simple.",
-            answer: "The earth goes around the sun" // Logic handles variations below
-        },
-        {
-            id: 4,
-            indonesian: "Saya tidak minum kopi, saya lebih suka teh.",
-            analysis: "Ini menyatakan preferensi atau fakta tentang diri sendiri secara umum.",
-            tip: "Gunakan Present Simple (Negative).",
-            answer: "I do not drink coffee I prefer tea"
-        },
-        {
-            id: 5,
-            indonesian: "Kenapa kamu memakai mantel? Di luar tidak dingin.",
-            analysis: "Bertanya tentang aksi sementara yang sedang dilakukan sekarang.",
-            tip: "Gunakan Present Continuous.",
-            answer: "Why are you wearing a coat It is not cold outside"
-        },
-        {
-            id: 6,
-            indonesian: "Kereta berangkat setiap pagi jam 7.00.",
-            analysis: "Ini adalah jadwal tetap (timetable).",
-            tip: "Gunakan Present Simple untuk jadwal transportasi.",
-            answer: "The train leaves at 7:00 every morning"
-        },
-        {
-            id: 7,
-            indonesian: "Dia sedang tidak bekerja minggu ini, dia sedang liburan.",
-            analysis: "Situasi sementara (temporary situation) yang berbeda dari biasanya.",
-            tip: "Gunakan Present Continuous.",
-            answer: "He is not working this week he is on holiday"
-        },
-        {
-            id: 8,
-            indonesian: "Saya kehilangan dompet saya (dan saya belum menemukannya).",
-            analysis: "Kejadian masa lalu yang memiliki konsekuensi di masa sekarang.",
-            tip: "Gunakan Present Perfect.",
-            answer: "I have lost my wallet"
-        },
-        {
-            id: 9,
-            indonesian: "Saya kehilangan dompet saya kemarin.",
-            analysis: "Kejadian masa lalu dengan waktu yang spesifik ('kemarin').",
-            tip: "Gunakan Past Simple.",
-            answer: "I lost my wallet yesterday"
-        },
-        {
-            id: 10,
-            indonesian: "Apakah kamu pernah melihat hantu?",
-            analysis: "Bertanya tentang pengalaman hidup kapan saja (waktu tidak penting).",
-            tip: "Gunakan Present Perfect (Have you ever...?).",
-            answer: "Have you ever seen a ghost"
-        },
-        {
-            id: 11,
-            indonesian: "Shakespeare menulis banyak drama terkenal.",
-            analysis: "Fakta tentang orang yang sudah meninggal (aksi sudah selesai total).",
-            tip: "Gunakan Past Simple.",
-            answer: "Shakespeare wrote many famous plays"
-        },
-        {
-            id: 12,
-            indonesian: "J.K. Rowling sudah menulis banyak buku.",
-            analysis: "Fakta tentang orang yang masih hidup dan masih mungkin menulis lagi.",
-            tip: "Gunakan Present Perfect.",
-            answer: "J.K. Rowling has written many books"
-        },
-        {
-            id: 13,
-            indonesian: "Kami tinggal di sini selama 10 tahun (dan sekarang kami sudah pindah).",
-            analysis: "Durasi waktu di masa lalu yang sudah selesai/berakhir.",
-            tip: "Gunakan Past Simple.",
-            answer: "We lived here for 10 years"
-        },
-        {
-            id: 14,
-            indonesian: "Kami sudah tinggal di sini selama 10 tahun (dan masih tinggal di sini).",
-            analysis: "Aksi dimulai di masa lalu dan masih berlanjut sampai sekarang.",
-            tip: "Gunakan Present Perfect.",
-            answer: "We have lived here for 10 years"
-        },
-        {
-            id: 15,
-            indonesian: "Saya sedang mandi ketika lampu mati.",
-            analysis: "Aksi panjang yang terpotong oleh aksi singkat.",
-            tip: "Aksi panjang = Past Continuous, Aksi singkat = Past Simple.",
-            answer: "I was taking a shower when the lights went out"
-        },
-        {
-            id: 16,
-            indonesian: "Dia bangun, mencuci muka, dan berpakaian.",
-            analysis: "Urutan kejadian (cerita) di masa lalu.",
-            tip: "Gunakan Past Simple untuk semua aksi.",
-            answer: "He woke up washed his face and got dressed"
-        },
-        {
-            id: 17,
-            indonesian: "Jam 8 tadi malam, saya sedang menonton TV.",
-            analysis: "Aksi yang sedang berlangsung pada titik waktu tertentu di masa lalu.",
-            tip: "Gunakan Past Continuous.",
-            answer: "At 8 last night I was watching TV"
-        },
-        {
-            id: 18,
-            indonesian: "Sementara ibu memasak, ayah sedang membaca koran.",
-            analysis: "Dua aksi panjang yang terjadi bersamaan di masa lalu.",
-            tip: "Gunakan Past Continuous untuk keduanya.",
-            answer: "While mom was cooking dad was reading the newspaper"
-        },
-        {
-            id: 19,
-            indonesian: "Saya tidak mengerti pertanyaan ini sekarang.",
-            analysis: "Kata kerja mental/pikiran. Tidak boleh pakai 'ing'.",
-            tip: "Gunakan Present Simple (walau ada kata 'sekarang').",
-            answer: "I do not understand this question now"
-        },
-        {
-            id: 20,
-            indonesian: "Sup ini rasanya enak.",
-            analysis: "Indra perasa (Senses) sebagai fakta.",
-            tip: "Gunakan Present Simple.",
-            answer: "This soup tastes good"
-        },
-        {
-            id: 21,
-            indonesian: "Koki itu sedang mencicipi supnya.",
-            analysis: "Aksi fisik mencicipi (Action verb), bukan rasa supnya.",
-            tip: "Gunakan Present Continuous.",
-            answer: "The chef is tasting the soup"
-        },
-        {
-            id: 22,
-            indonesian: "Saya punya dua saudara laki-laki.",
-            analysis: "Kepemilikan (Possession). Tidak boleh pakai 'ing'.",
-            tip: "Gunakan Present Simple (Have).",
-            answer: "I have two brothers"
-        },
-        {
-            id: 23,
-            indonesian: "Lihat awan itu! Hujan akan turun.",
-            analysis: "Prediksi masa depan berdasarkan bukti fisik yang bisa dilihat sekarang.",
-            tip: "Gunakan Going to.",
-            answer: "Look at those clouds It is going to rain"
-        },
-        {
-            id: 24,
-            indonesian: "Saya rasa manusia akan tinggal di Mars suatu hari nanti.",
-            analysis: "Prediksi berdasarkan opini pribadi (I think/I believe).",
-            tip: "Gunakan Will.",
-            answer: "I think humans will live on Mars one day"
-        },
-        {
-            id: 25,
-            indonesian: "\"Telepon berbunyi.\" \"Saya yang akan mengangkatnya.\"",
-            analysis: "Keputusan spontan yang dibuat saat berbicara.",
-            tip: "Gunakan Will.",
-            answer: "The phone is ringing I will get it"
-        }
+        {id: 1, ind: "Air mendidih pada suhu 100 derajat Celsius.", anal: "Fakta ilmiah.", tip: "Present Simple.", ans: "water boils at 100 degrees celsius"},
+        {id: 2, ind: "Dengarkan! Seseorang sedang mengetuk pintu.", anal: "Sedang terjadi.", tip: "Present Continuous.", ans: "listen someone is knocking on the door"},
+        {id: 3, ind: "Bumi mengelilingi matahari.", anal: "Kebenaran umum.", tip: "Present Simple.", ans: "the earth goes around the sun"},
+        {id: 4, ind: "Saya tidak minum kopi, saya lebih suka teh.", anal: "Preferensi.", tip: "Present Simple (Negative).", ans: "i do not drink coffee i prefer tea"},
+        {id: 5, ind: "Kenapa kamu memakai mantel? Di luar tidak dingin.", anal: "Aksi sementara.", tip: "Present Continuous.", ans: "why are you wearing a coat it is not cold outside"},
+        {id: 6, ind: "Kereta berangkat setiap pagi jam 7.00.", anal: "Jadwal tetap.", tip: "Present Simple.", ans: "the train leaves at 700 every morning"},
+        {id: 7, ind: "Dia sedang tidak bekerja minggu ini, dia sedang liburan.", anal: "Situasi sementara.", tip: "Present Continuous.", ans: "he is not working this week he is on holiday"},
+        {id: 8, ind: "Saya kehilangan dompet saya (dan saya belum menemukannya).", anal: "Konsekuensi masa kini.", tip: "Present Perfect.", ans: "i have lost my wallet"},
+        {id: 9, ind: "Saya kehilangan dompet saya kemarin.", anal: "Waktu spesifik.", tip: "Past Simple.", ans: "i lost my wallet yesterday"},
+        {id: 10, ind: "Apakah kamu pernah melihat hantu?", anal: "Pengalaman hidup.", tip: "Present Perfect.", ans: "have you ever seen a ghost"},
+        {id: 11, ind: "Shakespeare menulis banyak drama terkenal.", anal: "Orang sudah meninggal.", tip: "Past Simple.", ans: "shakespeare wrote many famous plays"},
+        {id: 12, ind: "J.K. Rowling sudah menulis banyak buku.", anal: "Orang masih hidup.", tip: "Present Perfect.", ans: "jk rowling has written many books"},
+        {id: 13, ind: "Kami tinggal di sini selama 10 tahun (sudah pindah).", anal: "Durasi selesai.", tip: "Past Simple.", ans: "we lived here for 10 years"},
+        {id: 14, ind: "Kami sudah tinggal di sini selama 10 tahun (masih tinggal).", anal: "Durasi berlanjut.", tip: "Present Perfect.", ans: "we have lived here for 10 years"},
+        {id: 15, ind: "Saya sedang mandi ketika lampu mati.", anal: "Aksi terpotong.", tip: "Past Continuous + Past Simple.", ans: "i was taking a shower when the lights went out"},
+        {id: 16, ind: "Dia bangun, mencuci muka, dan berpakaian.", anal: "Urutan cerita.", tip: "Past Simple.", ans: "he woke up washed his face and got dressed"},
+        {id: 17, ind: "Jam 8 tadi malam, saya sedang menonton TV.", anal: "Waktu spesifik lampau.", tip: "Past Continuous.", ans: "at 8 last night i was watching tv"},
+        {id: 18, ind: "Sementara ibu memasak, ayah sedang membaca koran.", anal: "Dua aksi bersamaan.", tip: "Past Continuous + Past Continuous.", ans: "while mom was cooking dad was reading the newspaper"},
+        {id: 19, ind: "Saya tidak mengerti pertanyaan ini sekarang.", anal: "Kata kerja mental.", tip: "Present Simple.", ans: "i do not understand this question now"},
+        {id: 20, ind: "Sup ini rasanya enak.", anal: "Indra perasa.", tip: "Present Simple.", ans: "this soup tastes good"},
+        {id: 21, ind: "Koki itu sedang mencicipi supnya.", anal: "Aksi fisik.", tip: "Present Continuous.", ans: "the chef is tasting the soup"},
+        {id: 22, ind: "Saya punya dua saudara laki-laki.", anal: "Kepemilikan.", tip: "Present Simple.", ans: "i have two brothers"},
+        {id: 23, ind: "Lihat awan itu! Hujan akan turun.", anal: "Prediksi fisik.", tip: "Going to.", ans: "look at those clouds it is going to rain"},
+        {id: 24, ind: "Saya rasa manusia akan tinggal di Mars suatu hari nanti.", anal: "Opini.", tip: "Will.", ans: "i think humans will live on mars one day"},
+        {id: 25, ind: "Telepon berbunyi. Saya yang akan mengangkatnya.", anal: "Keputusan spontan.", tip: "Will.", ans: "the phone is ringing i will get it"}
     ];
 
-    // Additional accepted variations for specific questions
     const alternateAnswers = {
         3: ["the earth revolves around the sun"],
         5: ["why are you wearing a coat its not cold outside"],
         23: ["look at those clouds its going to rain"]
     };
 
+    // --- LOCK SYSTEM & LOGIN ---
+    (function() {
+        const wm = document.getElementById('global-watermark');
+        let html = ""; for(let i=0; i<40; i++) html += `<div class="watermark-text">LEARNING MODE<br>DO NOT CHEAT</div>`;
+        wm.innerHTML = html;
+
+        const examCode = sessionStorage.getItem('exam_code');
+        if(examCode) {
+            studentData = {
+                name: sessionStorage.getItem('student_name'),
+                class: sessionStorage.getItem('student_class'),
+                no: sessionStorage.getItem('student_no')
+            };
+            waitForUnlock(examCode);
+        } else {
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+    })();
+
+    function directLogin() {
+        const name = document.getElementById('directName').value;
+        const cls = document.getElementById('directClass').value;
+        const no = document.getElementById('directNo').value;
+        if(!name || !cls || !no) return alert("Fill all fields");
+        studentData = { name, class: cls, no };
+        document.getElementById('login-overlay').style.display='none';
+        startSession();
+    }
+
+    function waitForUnlock(code) {
+        document.getElementById('waiting-room').style.display = 'flex';
+        db.collection('active_exam_codes').doc(code).onSnapshot(doc => {
+            if(doc.exists && doc.data().status === "UNLOCKED") {
+                document.getElementById('waiting-room').style.display = 'none';
+                startSession();
+            }
+        });
+    }
+
+    function startSession() {
+        sessionActive = true;
+        document.getElementById('cheat-display').style.display = 'block';
+        renderQuiz();
+    }
+
+    // --- QUIZ LOGIC ---
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
+        let html = "";
         questions.forEach(q => {
-            const html = `
+            html += `
                 <div class="quiz-item" id="card-${q.id}">
-                    <div class="question-text">${q.id}. "${q.indonesian}"</div>
-                    <div class="analysis-text">[Analysis: ${q.analysis}]</div>
-                    <input type="text" id="input-${q.id}" placeholder="Type your translation here...">
-                    <div class="feedback-msg" id="feedback-${q.id}"></div>
-                    <div class="hint-box" id="hint-${q.id}">
-                        <strong>Hint:</strong> ${q.tip}
+                    <div class="question-header">${q.id}. "${q.ind}"</div>
+                    <div class="analysis-text">[Analysis: ${q.anal}]</div>
+                    <input type="text" id="input-${q.id}" placeholder="Type English translation..." autocomplete="off">
+                    <div class="feedback-container" id="feedback-${q.id}">
+                        <div id="status-${q.id}" style="font-weight:bold;"></div>
+                        <div class="hint-text" id="hint-${q.id}"></div>
                     </div>
                 </div>
             `;
-            container.innerHTML += html;
         });
+        container.innerHTML = html;
     }
 
-    function cleanString(str) {
-        // Lowercase, remove all periods, commas, question marks, exclamation marks, and extra spaces
-        return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim();
-    }
+    function clean(str) { return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim(); }
 
-    function checkAnswers() {
+    async function submitWork() {
+        if(!confirm("Submit answers? You cannot change them after this.")) return;
+        sessionActive = false; 
+
         let score = 0;
+        let answersLog = {};
 
         questions.forEach(q => {
             const inputEl = document.getElementById(`input-${q.id}`);
-            const cardEl = document.getElementById(`card-${q.id}`);
-            const feedbackEl = document.getElementById(`feedback-${q.id}`);
-            const hintEl = document.getElementById(`hint-${q.id}`);
+            const feedbackBox = document.getElementById(`feedback-${q.id}`);
+            const statusDiv = document.getElementById(`status-${q.id}`);
+            const hintDiv = document.getElementById(`hint-${q.id}`);
             
-            const userAns = cleanString(inputEl.value);
-            const correctAns = cleanString(q.answer);
+            const userAns = clean(inputEl.value);
+            const correctAns = clean(q.ans);
             
-            // Check main answer AND alternate answers if they exist
             let isCorrect = (userAns === correctAns);
-            
             if (!isCorrect && alternateAnswers[q.id]) {
-                alternateAnswers[q.id].forEach(alt => {
-                    if (userAns === cleanString(alt)) isCorrect = true;
-                });
+                if (alternateAnswers[q.id].map(a => clean(a)).includes(userAns)) isCorrect = true;
             }
 
-            // Remove previous classes
-            cardEl.classList.remove('correct', 'wrong');
+            answersLog[`Q${q.id}`] = inputEl.value;
+
+            feedbackBox.style.display = 'block';
+            inputEl.disabled = true;
 
             if (isCorrect) {
-                cardEl.classList.add('correct');
-                feedbackEl.style.color = '#2ecc71';
-                feedbackEl.textContent = "Correct!";
-                feedbackEl.style.display = 'block';
-                hintEl.style.display = 'none'; // Hide hint if they got it right
                 score++;
+                feedbackBox.className = "feedback-container status-correct";
+                statusDiv.innerHTML = "✅ Correct!";
+                hintDiv.style.display = 'none';
             } else {
-                cardEl.classList.add('wrong');
-                feedbackEl.style.color = '#e74c3c';
-                feedbackEl.textContent = "Incorrect. Try again!";
-                feedbackEl.style.display = 'block';
-                hintEl.style.display = 'block'; // Show hint on error
+                feedbackBox.className = "feedback-container status-wrong";
+                statusDiv.innerHTML = "❌ Incorrect.";
+                hintDiv.style.display = 'block';
+                hintDiv.innerHTML = `💡 Hint: ${q.tip}`;
             }
         });
 
-        alert(`You got ${score} out of ${questions.length} correct! Check the red boxes for hints.`);
+        // SAVE TO DATABASE
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        await db.collection(COLLECTION_NAME).doc(docID).set({
+            name: studentData.name,
+            class: studentData.class,
+            number: studentData.no,
+            score: score,
+            total: questions.length,
+            cheat_count: switchCount,
+            answers: answersLog,
+            status: "COMPLETED",
+            finish_time: new Date().toLocaleString()
+        });
+
+        alert(`Submission Saved! You scored ${score}/${questions.length}.`);
+        window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
     }
 
-    // Initialize
-    renderQuiz();
+    // --- AGGRESSIVE ANTI-CHEAT ---
+    function recordCheat() {
+        if (!sessionActive) return;
+        switchCount++;
+        document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
+        const alertBox = document.getElementById('cheat-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display='none', 3000);
+    }
+
+    document.addEventListener("visibilitychange", () => { if (document.hidden) recordCheat(); });
+    window.addEventListener("blur", () => { recordCheat(); });
 
 </script>
-
 </body>
 </html>
