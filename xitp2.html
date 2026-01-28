@@ -197,7 +197,15 @@
         {id:39, q:"The 'dip' in grades after 7 hours is attributed to:", opts:["Lack of interest.","Fatigue and less time to study.","Too many endorphins.","Poor coaching."], ans:"Fatigue and less time to study.", passage: TEXT_PASSAGE_2},
         {id:40, q:"What is the best title for Passage 2?", opts:["Why PE Should Be Banned.","The Dangers of Elite Sport.","The Link Between Physical Activity and Academic Success.","How to Train for a Marathon."], ans:"The Link Between Physical Activity and Academic Success.", passage: TEXT_PASSAGE_2}
     ];
+// Run this immediately when the page loads
+window.onload = function() {
+    // 1. Check if the data exists in storage
+    var storedName = localStorage.getItem("xitp_student_name");
+    var storedClass = localStorage.getItem("xitp_student_class");
 
+    // 2. Security Check: If no name is found, kick them back to login
+    if (!storedName || !storedClass) {
+        alert("
     function initWatermark() {
         const wm = document.getElementById('global-watermark');
         let html = "";
