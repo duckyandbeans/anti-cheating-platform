@@ -14,8 +14,6 @@
         .btn:hover { background: #6d28d9; }
         .btn:disabled { background: #ccc; cursor: not-allowed; }
         
-        input, select { width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; font-size: 1rem; }
-        
         /* GRAPHS */
         .graph-container { text-align: center; margin-bottom: 20px; padding: 10px; background: #fafafa; border: 1px solid #eee; border-radius: 8px; }
         .graph-img { width: 100%; max-width: 250px; border: 1px solid #ccc; margin: 5px; border-radius: 4px; display: inline-block; transition: transform 0.2s; }
@@ -31,140 +29,73 @@
         .photo-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
         .delete-btn { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(220, 38, 38, 0.9); color: white; border: none; padding: 5px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
 
-        /* ALERTS */
-        #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; margin-bottom: 10px; border: 1px solid #f87171; position: sticky; top: 10px; z-index: 500; }
-        
-        .cheat-counter { position: fixed; top: 10px; right: 10px; background: #fee2e2; color: red; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; border: 2px solid red; display: none; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* ANTI-CHEAT */
+        #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 500; border: 1px solid #c0392b; }
+        .cheat-counter { position: fixed; top: 15px; right: 15px; background: #fff; color: #c0392b; padding: 8px 15px; border-radius: 30px; font-size: 0.9rem; font-weight: bold; border: 2px solid #c0392b; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: #000; }
 
-        #login-section, #system-check-section, #exam-section { display: none; }
-        #login-section { display: block; }
-        
-        /* WATERMARK */
-        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.05; display: flex; flex-wrap: wrap; overflow: hidden; }
-        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: black; }
+        /* WAITING ROOM */
+        #waiting-room { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#f8fafc; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        .waiting-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 400px; width: 90%; }
+        .spinner { margin: 20px auto; width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top: 5px solid #7c3aed; border-radius: 50%; animation: spin 1s linear infinite; }
+        .status-badge { background: #fee2e2; color: #991b1b; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-top: 15px; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
     
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body oncontextmenu="return false;">
-<div id="waiting-room" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-    <div style="font-size:4rem;">🔒</div>
-    <h1 style="color:#1e293b; margin-bottom:10px;">Waiting for Teacher</h1>
-    <p style="color:#64748b; font-size:1.1rem;">Do not refresh. The exam will start automatically.</p>
-    <div style="margin-top:20px; width:50px; height:50px; border:5px solid #e2e8f0; border-top:5px solid #2563eb; border-radius:50%; animation:spin 1s linear infinite;"></div>
-</div>
-<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 
-<script>
-    // --- LOCK SYSTEM LOGIC ---
-    (function() {
-        const examCode = sessionStorage.getItem('exam_code');
-        
-        // If they didn't come from index.html (no code), send them back
-        if(!examCode) {
-            window.location.href = "index.html"; 
-            return;
-        }
-
-        const waitScreen = document.getElementById('waiting-room');
-        
-        // 1. Show waiting room immediately
-        waitScreen.style.display = 'flex';
-
-        // 2. Listen for Unlock
-        db.collection('active_exam_codes').doc(examCode).onSnapshot(doc => {
-            if(doc.exists && doc.data().status === "UNLOCKED") {
-                // UNLOCK!
-                waitScreen.style.display = 'none';
-                
-                // Optional: Auto-fill login if coming from index
-                if(document.getElementById('studentName') && !document.getElementById('studentName').value) {
-                    document.getElementById('studentName').value = sessionStorage.getItem('student_name') || "";
-                    document.getElementById('studentNo').value = sessionStorage.getItem('student_no') || "";
-                    document.getElementById('studentClass').value = sessionStorage.getItem('student_class') || "";
-                }
-            }
-        });
-    })();
-</script>
 <div id="global-watermark" class="watermark-overlay"></div>
 <div id="cheat-display" class="cheat-counter">OFFENSES: 0</div>
+<div id="cheat-alert">⚠️ ALERT: FOCUS LOST! INCIDENT RECORDED.</div>
 
 <div class="container">
-    <div id="cheat-alert">⚠️ ALERT: YOU LEFT THE EXAM SCREEN!</div>
-
-    <div id="login-section">
+    <div id="exam-header" style="text-align:center; margin-bottom:20px;">
         <h1>XI TP 1: Graph Analysis</h1>
-        <p style="text-align:center; color:#6b7280; margin-bottom:20px;">Upload your handwritten essay.</p>
-        
-        <label>Class</label>
-        <select id="studentClass">
-            <option value="">Select Class...</option>
-            <option value="XI D">XI D</option>
-            <option value="XI E">XI E</option>
-            <option value="XI H">XI H</option>
-            <option value="XI I">XI I</option>
-        </select>
-        <label>Attendance No.</label>
-        <input type="number" id="studentNo" placeholder="e.g. 15">
-        <label>Full Name</label>
-        <input type="text" id="studentName" placeholder="Enter Full Name">
-        <button class="btn" onclick="verifyLogin()">Login / Resume</button>
+        <p style="color:#6b7280;">Upload your handwritten essay.</p>
     </div>
 
-    <div id="system-check-section">
-        <h2>⚠️ Strict Exam Rules</h2>
-        <div style="background:#fff7ed; border:1px solid #fdba74; padding:15px; border-radius:8px; margin-bottom:20px;">
-            <p>1. <strong>Strict Monitoring:</strong> Do not click outside this window. Do not open other apps.</p>
-            <p>2. <strong>Analyze Graphs:</strong> Look at the 3 images provided.</p>
-            <p>3. <strong>Scan:</strong> Use the camera below to take photos (Max 6).</p>
-        </div>
-        <div style="text-align: center;">
-            <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
-            <label for="rulesCheck" style="display:inline; margin-left:8px;">I understand that leaving this screen is cheating.</label>
-        </div>
-        <button class="btn" id="startBtn" onclick="startExam()" disabled>START EXAM</button>
+    <div class="graph-container">
+        <h3>Reference Material</h3>
+        <p style="font-size:0.9rem; color:#666;">(Hover/Tap to Zoom)</p>
+        <img src="1.png" class="graph-img" alt="Graph 1">
+        <img src="2.png" class="graph-img" alt="Graph 2">
+        <img src="3.png" class="graph-img" alt="Graph 3">
     </div>
 
-    <div id="exam-section">
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:bold; border-bottom:2px solid #e5e7eb; padding-bottom:10px;">
-            <span>XI TP 1: Essay</span>
-            <span style="color:var(--danger); animation: pulse 2s infinite;">● Live Monitoring</span>
-        </div>
+    <hr style="margin:20px 0; border:0; border-top:1px solid #ddd;">
 
-        <div class="graph-container">
-            <h3>Reference Material</h3>
-            <p style="font-size:0.9rem; color:#666;">(Hover/Tap to Zoom)</p>
-            <img src="1.png" class="graph-img" alt="Graph 1">
-            <img src="2.png" class="graph-img" alt="Graph 2">
-            <img src="3.png" class="graph-img" alt="Graph 3">
-        </div>
+    <h3>📷 Scan Your Work</h3>
+    <p style="text-align:center; margin-bottom:10px;">Ensure text is readable. Max 6 pages.</p>
+    
+    <div class="camera-box"><video id="videoFeed" autoplay playsinline></video></div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    
+    <button class="btn" id="snapBtn" onclick="takeSnapshot()" style="background:#374151; width:auto; margin:10px auto;">📸 Capture Page</button>
+    <div id="photo-limit-msg" style="text-align:center; color:red; display:none; margin-top:10px;">Maximum 6 pages reached!</div>
+    
+    <div class="photo-grid" id="photoGallery"></div>
+    <button class="btn" id="submitBtn" onclick="submitFinal()" style="background:green; margin-top:40px;">Submit All Pages</button>
+</div>
 
-        <hr style="margin:20px 0; border:0; border-top:1px solid #ddd;">
-
-        <h3>📷 Scan Your Work</h3>
-        <p style="text-align:center; margin-bottom:10px;">Ensure text is readable. Max 6 pages.</p>
+<div id="waiting-room">
+    <div class="waiting-card">
+        <div style="font-size:3rem;">🔒</div>
+        <h2 style="color:#1f2937; margin-bottom:5px;">Exam Locked</h2>
+        <p style="color:#6b7280; margin-bottom:20px;">Waiting for teacher to start...</p>
         
-        <div class="camera-box"><video id="videoFeed" autoplay playsinline></video></div>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <button class="btn" id="snapBtn" onclick="takeSnapshot()" style="background:#374151; width:auto; margin:10px auto;">📸 Capture Page</button>
-        <div id="photo-limit-msg" style="text-align:center; color:red; display:none; margin-top:10px;">Maximum 6 pages reached!</div>
-        <div class="photo-grid" id="photoGallery"></div>
-        <button class="btn" id="submitBtn" onclick="submitFinal()" style="background:green; margin-top:40px;">Submit All Pages</button>
+        <div class="spinner"></div>
+        
+        <div id="statusText" class="status-badge" style="background:#fef3c7; color:#d97706;">Connecting...</div>
+        <div style="margin-top:20px; font-size:0.85rem; color:#9ca3af;">Do not refresh the page.</div>
+        <button onclick="window.location.href='index.html'" style="margin-top:20px; background:none; border:none; color:#7c3aed; text-decoration:underline; cursor:pointer;">Exit / Wrong Code</button>
     </div>
 </div>
 
 <script>
-    // Run this immediately when the page loads
-    window.onload = function() {
-    // 1. Check if the data exists in storage
-    var storedName = localStorage.getItem("xitp_student_name");
-    var storedClass = localStorage.getItem("xitp_student_class");
-
-    // 2. Security Check: If no name is found, kick them back to login
-    if (!storedName || !storedClass) {
-        alert("
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -179,42 +110,64 @@
     let currentDocID = null;
     let switchCount = 0;
     let sessionActive = false;
-    let essayPages = []; 
+    let essayPages = [];
+    let studentData = {};
 
     function initWatermark() {
         const wm = document.getElementById('global-watermark');
-        let html = "";
-        for(let i=0; i<40; i++) html += `<div class="watermark-text">ESSAY EXAM<br>DO NOT CHEAT</div>`;
+        let html = ""; for(let i=0; i<40; i++) html += `<div class="watermark-text">ESSAY EXAM<br>DO NOT CHEAT</div>`;
         wm.innerHTML = html;
     }
     initWatermark();
 
-    async function verifyLogin() {
-        const cls = document.getElementById('studentClass').value;
-        const no = document.getElementById('studentNo').value;
-        const name = document.getElementById('studentName').value;
-        if(!cls || !no || !name) return alert("Fill all fields");
-        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+    // --- LOCK SYSTEM ---
+    (function() {
+        const examCode = sessionStorage.getItem('exam_code');
+        const statusText = document.getElementById('statusText');
+        const waitScreen = document.getElementById('waiting-room');
+
+        if(!examCode) { window.location.href = 'index.html'; return; }
+
+        waitScreen.style.display = 'flex';
         
-        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
-        if(docSnap.exists && docSnap.data().status === "COMPLETED") {
-            alert("You have already submitted this exam.");
-            return;
-        }
+        // Listen to the SPECIFIC code document
+        db.collection('active_exam_codes').doc(examCode).onSnapshot(doc => {
+            if (!doc.exists) {
+                statusText.style.background = "#fee2e2";
+                statusText.style.color = "#dc2626";
+                statusText.innerText = "❌ Invalid / Expired Code";
+            } else if (doc.data().status === "UNLOCKED") {
+                waitScreen.style.display = 'none';
+                initializeExam();
+            } else {
+                statusText.style.background = "#dcfce7";
+                statusText.style.color = "#166534";
+                statusText.innerText = "✅ Connected to Room";
+            }
+        }, err => {
+            statusText.innerText = "⚠️ Connection Error";
+        });
+    })();
 
-        document.getElementById('login-section').style.display='none';
-        document.getElementById('system-check-section').style.display='block';
-    }
+    async function initializeExam() {
+        // Retrieve credentials from Index
+        const cls = sessionStorage.getItem('student_class');
+        const no = sessionStorage.getItem('student_no');
+        const name = sessionStorage.getItem('student_name');
+        
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        studentData = { class: cls, number: no, name: name };
 
-    async function startExam() {
-        const cls = document.getElementById('studentClass').value;
-        const no = document.getElementById('studentNo').value;
-        const name = document.getElementById('studentName').value;
+        // Check Previous Session
         const docRef = db.collection(COLLECTION_NAME).doc(currentDocID);
         const docSnap = await docRef.get();
 
         if (docSnap.exists) {
             const data = docSnap.data();
+            if(data.status === "COMPLETED") {
+                document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px;'>Exam Already Submitted</h1>";
+                return;
+            }
             switchCount = data.cheat_count || 0;
             if (data.essay_pages) { essayPages = data.essay_pages; renderGallery(); }
         } else {
@@ -227,19 +180,14 @@
             });
         }
 
-        document.getElementById('system-check-section').style.display='none';
-        document.getElementById('exam-section').style.display='block';
         document.getElementById('cheat-display').style.display='block';
         document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
-        
         startCamera();
-        
-        // --- DELAYED ACTIVATION TO PREVENT INSTANT TRIGGER ---
-        setTimeout(() => { sessionActive = true; }, 2000);
-        
+        sessionActive = true; 
         document.documentElement.requestFullscreen().catch(e=>{});
     }
 
+    // --- CAMERA & LOGIC ---
     function startCamera() {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
             .then(s => document.getElementById('videoFeed').srcObject = s)
@@ -254,8 +202,7 @@
         const video = document.getElementById('videoFeed');
         const canvas = document.getElementById('canvas');
         const scale = 800 / video.videoWidth;
-        canvas.width = 800;
-        canvas.height = video.videoHeight * scale;
+        canvas.width = 800; canvas.height = video.videoHeight * scale;
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
         essayPages.push(canvas.toDataURL('image/jpeg', 0.6));
         db.collection(COLLECTION_NAME).doc(currentDocID).update({ essay_pages: essayPages });
@@ -289,7 +236,7 @@
         document.body.innerHTML = `<div class="container" style="text-align:center;"><h1 style="color:green;">Submitted!</h1><p>You may close this tab.</p></div>`;
     }
 
-    // --- AGGRESSIVE ANTI-CHEAT (BLUR + VISIBILITY) ---
+    // --- AGGRESSIVE ANTI-CHEAT ---
     function recordCheat() {
         if (!sessionActive) return;
         switchCount++;
@@ -299,16 +246,8 @@
         setTimeout(() => alertBox.style.display='none', 3000);
         db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: switchCount });
     }
-
-    // 1. Tab Switch
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) recordCheat();
-    });
-
-    // 2. Window Blur (Clicking Taskbar, Notification, Alt+Tab)
-    window.addEventListener("blur", () => {
-        recordCheat();
-    });
+    document.addEventListener("visibilitychange", () => { if (document.hidden) recordCheat(); });
+    window.addEventListener("blur", () => { recordCheat(); });
 
 </script>
 </body>
