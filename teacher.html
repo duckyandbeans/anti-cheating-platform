@@ -3,36 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Teacher Dashboard (Live)</title>
+    <title>Teacher Dashboard</title>
     <style>
-        :root { --primary: #2563eb; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; }
+        :root { --primary: #4f46e5; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #334155; }
         
         #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: var(--dark); color: white; position: fixed; width: 100%; z-index: 2000; }
-        input { padding: 12px; font-size: 1.1rem; border-radius: 6px; border: none; margin-bottom: 10px; text-align: center; }
-        button { padding: 12px 24px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
+        input, select { padding: 12px; font-size: 1rem; border-radius: 6px; border: none; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
+        #login-screen input { width: auto; text-align: center; }
+        
+        button { padding: 12px 15px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; width:100%; }
         .btn-primary { background: var(--primary); color: white; }
         
         #dashboard { display: none; display: flex; height: 100vh; }
-        
         .sidebar { width: 350px; background: white; border-right: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; flex-shrink: 0; }
-        .control-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .btn-download { width: 100%; padding: 10px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
         
-        .feed-area { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
-        .notif-card { 
-            background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--success); 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; animation: slideIn 0.5s ease-out; display: flex; justify-content: space-between; align-items: center;
-        }
-        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .control-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-left: 5px solid #ccc; }
+        .control-card h3 { margin-top: 0; margin-bottom: 10px; color: #1e293b; font-size: 1rem; }
         
-        .notif-time { font-size: 0.8rem; color: #94a3b8; font-weight: bold; margin-top: 5px; }
-        .quiz-tag { background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase;}
+        /* CODE GENERATOR STYLES */
+        .generator-box { background: #e0e7ff; padding: 15px; border-radius: 8px; border: 2px dashed #6366f1; text-align: center; margin-bottom: 20px; }
+        .big-code { font-size: 2.5rem; font-weight: 900; color: #4338ca; letter-spacing: 5px; margin: 10px 0; background: white; display: block; padding: 10px; border-radius: 8px; }
         
-        /* ESSAY VIEWER */
-        #essay-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 90%; max-width: 1000px; height: 90%; border-radius: 12px; padding: 20px; overflow-y: auto; }
-        .essay-row { display: flex; gap: 20px; padding: 20px; border-bottom: 1px solid #eee; }
+        .feed-area { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .notif-card { background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--success); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -43,48 +37,61 @@
     <div id="login-screen">
         <h2>Teacher Portal</h2>
         <input type="password" id="passwordInput" placeholder="PIN (030)">
-        <button class="btn-primary" onclick="checkLogin()">Login</button>
+        <button class="btn-primary" onclick="checkLogin()" style="width:auto;">Login</button>
     </div>
 
     <div id="dashboard">
         <div class="sidebar">
-            <h2>📂 Exam Controls</h2>
             
-            <div class="control-card" style="border-left: 5px solid #7c3aed;">
-                <h3>XI Final Exam (New)</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xi_final', 'XI_Final_Results.csv')">📥 Excel Report</button>
-                <button class="btn-download" style="background:#6366f1;" onclick="openViewerModal('grade_xi_final')">📸 View Essays</button>
+            <div class="generator-box">
+                <h3 style="color:#4338ca; margin:0;">⚡ Session Manager</h3>
+                <p style="font-size:0.8rem; margin-bottom:10px;">Select quiz to activate (1 Hour Limit)</p>
+                
+                <select id="quizSelector" style="border:1px solid #a5b4fc;">
+                    <option value="xitp1.html">XI TP 1 (Essay)</option>
+                    <option value="xitp2.html">XI TP 2 (MCQ)</option>
+                    <option value="xii.html">XII Final</option>
+                </select>
+                
+                <button onclick="generateCode()" style="background:#4338ca; color:white;">Generate Code</button>
+                
+                <div id="activeCodeDisplay" style="display:none; margin-top:15px;">
+                    <span style="font-size:0.8rem; color:#666;">Active Code:</span>
+                    <span id="codeText" class="big-code">----</span>
+                    <span style="font-size:0.7rem; color:red;">Expires in 1 Hour</span>
+                </div>
             </div>
 
-            <div class="control-card">
-                <h3>XII Grammar</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xii_grammar_final', 'XII_Results.csv')">📥 Excel Report</button>
+            <h2 style="border-bottom:2px solid #e2e8f0; padding-bottom:10px;">📂 Reports</h2>
+
+            <div class="control-card" style="border-left-color: #7c3aed;">
+                <h3>XI TP 1 (Essay)</h3>
+                <button onclick="downloadCSV('grade_xi_part1_essay', 'XITP1_Essay.csv')" style="background:#10b981; color:white; margin-bottom:5px;">📥 Report</button>
+                <button onclick="openViewerModal('grade_xi_part1_essay')" style="background:#6366f1; color:white;">📸 Photos</button>
             </div>
-            
-            <div class="control-card">
-                <h3>C1 Advanced</h3>
-                <button class="btn-download" onclick="downloadCSV('c1_advanced_quiz_results', 'C1_Results.csv')">📥 Excel Report</button>
+
+            <div class="control-card" style="border-left-color: #2563eb;">
+                <h3>XI TP 2 (MCQ)</h3>
+                <button onclick="downloadCSV('grade_xi_part2_mcq', 'XITP2_MCQ.csv')" style="background:#10b981; color:white;">📥 Report</button>
             </div>
-            
-            <div class="control-card">
-                <h3>B2 Grammar</h3>
-                <button class="btn-download" onclick="downloadCSV('b2_grammar_quiz_results', 'B2_Results.csv')">📥 Excel Report</button>
+
+            <div class="control-card" style="border-left-color: #f59e0b;">
+                <h3>XII Final</h3>
+                <button onclick="downloadCSV('grade_xii_grammar_final', 'XII_Final.csv')" style="background:#10b981; color:white;">📥 Report</button>
             </div>
         </div>
 
         <div class="feed-area">
             <h1>🔴 Live Feed</h1>
-            <div id="live-feed-list">
-                <p style="text-align:center; color:#999; margin-top:50px;">Waiting for new submissions...</p>
-            </div>
+            <div id="live-feed-list"><p style="color:#999; text-align:center; margin-top:50px;">Waiting for activity...</p></div>
         </div>
     </div>
 
-    <div id="essay-modal">
-        <div class="modal-content">
-            <button onclick="document.getElementById('essay-modal').style.display='none'" style="float:right;">Close</button>
-            <h2 id="modal-title">Student Submissions</h2>
-            <div id="gallery-content">Loading...</div>
+    <div id="essay-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:3000;">
+        <div style="background:white; width:90%; height:90%; padding:20px; border-radius:12px; overflow-y:auto;">
+            <button onclick="document.getElementById('essay-modal').style.display='none'" style="float:right; background:red; color:white; width:auto;">Close</button>
+            <h2>Photo Gallery</h2>
+            <div id="gallery-content"></div>
         </div>
     </div>
 
@@ -98,7 +105,6 @@
       appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
     };
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
-
     const notifSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
     function checkLogin() {
@@ -109,25 +115,38 @@
         }
     }
 
-    const collections = [
-        { name: 'grade_xi_final', label: 'XI Final Exam' },
-        { name: 'grade_xii_grammar_final', label: 'XII Grammar' },
-        { name: 'c1_advanced_quiz_results', label: 'C1 Advanced' },
-        { name: 'b2_grammar_quiz_results', label: 'B2 Grammar' }
-    ];
+    // --- CODE GENERATOR ---
+    async function generateCode() {
+        const file = document.getElementById('quizSelector').value;
+        // Generate random 4-digit code
+        const code = Math.floor(1000 + Math.random() * 9000).toString();
+        
+        await db.collection('active_exam_codes').doc(code).set({
+            targetFile: file,
+            timestamp: Date.now(),
+            status: "ACTIVE"
+        });
 
+        document.getElementById('activeCodeDisplay').style.display = 'block';
+        document.getElementById('codeText').innerText = code;
+    }
+
+    // --- LIVE FEED & DOWNLOADS (Standard Logic) ---
+    const collections = [
+        {name:'grade_xi_part1_essay', label:'XI TP1'}, 
+        {name:'grade_xi_part2_mcq', label:'XI TP2'},
+        {name:'grade_xii_grammar_final', label:'XII Final'}
+    ];
     let isFirstLoad = true;
 
     function startListeners() {
         const feed = document.getElementById('live-feed-list');
-        
         collections.forEach(col => {
-            db.collection(col.name).onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
+            db.collection(col.name).onSnapshot(snap => {
+                snap.docChanges().forEach(change => {
                     const d = change.doc.data();
-                    if (d.status === "COMPLETED" && (change.type === 'modified' || change.type === 'added')) {
+                    if(d.status === "COMPLETED" && (change.type === 'modified' || change.type === 'added')) {
                         if(change.type === 'added' && isFirstLoad) return;
-                        
                         addNotification(col.label, d);
                         notifSound.play().catch(e=>{});
                     }
@@ -137,70 +156,46 @@
         setTimeout(() => { isFirstLoad = false; if(feed.innerText.includes("Waiting")) feed.innerHTML=""; }, 2000);
     }
 
-    function addNotification(quizName, d) {
+    function addNotification(label, d) {
         const feed = document.getElementById('live-feed-list');
         if(feed.innerText.includes("Waiting")) feed.innerHTML = "";
-
-        const score = d.final_score || d.score || d.mcq_score || 0;
-        const cheats = d.final_cheat_count || d.cheat_count || 0;
-        const cheatTag = cheats > 0 ? `<span style="background:#fee2e2; color:red; font-weight:bold; padding:2px 5px; border-radius:4px;">⚠️ ${cheats} Cheats</span>` : "";
-
-        const card = document.createElement('div');
-        card.className = 'notif-card';
-        card.innerHTML = `
-            <div>
-                <div style="font-weight:bold; font-size:1.1rem;">${d.name} <span style="font-weight:normal; font-size:0.9rem;">(${d.class})</span></div>
-                <div style="margin-top:5px;"><span class="quiz-tag">${quizName}</span> ${cheatTag}</div>
-                <div class="notif-time"> Submitted: ${new Date().toLocaleTimeString()} on ${new Date().toLocaleDateString()}</div>
-            </div>
-            <div style="font-size:1.2rem; font-weight:bold; color:green;">${score} pts</div>
-        `;
-        feed.prepend(card);
+        
+        let score = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length+" Pages" : "Done");
+        const div = document.createElement('div');
+        div.className = 'notif-card';
+        div.innerHTML = `<div><strong>${d.name}</strong> (${label})<br><small>${d.finish_time}</small></div><div style="color:green; font-weight:bold;">${score}</div>`;
+        feed.prepend(div);
     }
 
-    async function downloadCSV(colName, fileName) {
-        const snap = await db.collection(colName).get();
-        let csv = "data:text/csv;charset=utf-8,Class,No,Name,Score,Status,Cheats,FinishTime,RawData\n";
+    async function downloadCSV(col, name) {
+        const snap = await db.collection(col).get();
+        let csv = "Class,No,Name,Score,Status,Cheats,Time,Data\n";
         snap.forEach(doc => {
             const d = doc.data();
-            const score = d.final_score || d.score || d.mcq_score || 0;
-            const extra = JSON.stringify(d.temp_answers || d.all_answers || "").replace(/,/g,'|').replace(/"/g,"'");
-            csv += `${d.class},${d.number},"${d.name}",${score},${d.status},${d.cheat_count||0},"${d.finish_time}","${extra}"\n`;
+            let score = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length : 0);
+            let extra = JSON.stringify(d.temp_answers || d.all_answers || "").replace(/,/g,'|').replace(/"/g,"'");
+            csv += `${d.class},${d.number},"${d.name}",${score},${d.status},${d.cheat_count||d.final_cheat_count||0},"${d.finish_time}","${extra}"\n`;
         });
         const link = document.createElement("a");
-        link.href = encodeURI(csv);
-        link.download = fileName;
+        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+        link.download = name;
         document.body.appendChild(link);
         link.click();
     }
 
-    // View Essay Photos for XI Final
-    async function openViewerModal(colName) {
-        const modal = document.getElementById('essay-modal');
-        const content = document.getElementById('gallery-content');
-        modal.style.display = 'flex';
-        content.innerHTML = "Loading...";
-        
-        const snap = await db.collection(colName).orderBy('finish_time', 'desc').get();
-        content.innerHTML = "";
-        
+    async function openViewerModal(col) {
+        document.getElementById('essay-modal').style.display='flex';
+        const box = document.getElementById('gallery-content');
+        box.innerHTML = "Loading...";
+        const snap = await db.collection(col).get();
+        box.innerHTML = "";
         snap.forEach(doc => {
             const d = doc.data();
-            if(!d.essay_photo) return; // Skip if no photo
-            
-            const div = document.createElement('div');
-            div.className = 'essay-row';
-            div.innerHTML = `
-                <div style="width:200px;">
-                    <strong>${d.name}</strong><br>${d.class}
-                    <div style="font-size:0.8rem; color:grey;">${d.finish_time}</div>
-                </div>
-                <div>
-                    <img src="${d.essay_photo}" style="max-height:150px; border:1px solid #ccc; cursor:pointer;" onclick="window.open(this.src)">
-                    <br><small>Click to enlarge</small>
-                </div>
-            `;
-            content.appendChild(div);
+            if(d.essay_pages) {
+                let imgs = "";
+                d.essay_pages.forEach(src => imgs += `<img src="${src}" style="height:100px; margin:5px; border:1px solid #ccc;" onclick="window.open(this.src)">`);
+                box.innerHTML += `<div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;"><strong>${d.name}</strong><br>${imgs}</div>`;
+            }
         });
     }
 </script>
