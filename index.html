@@ -3,118 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade XII Assessment</title>
+    <title>Student Exam Portal</title>
     <style>
-        :root { --primary: #4f46e5; --danger: #ef4444; --bg: #f3f4f6; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--bg); 
-            padding: 20px; 
-            color: #1f2937;
-            -webkit-user-select: none; user-select: none; /* Anti-Copy */
-        }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #1e293b; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: var(--text); }
         
-        h1 { text-align: center; color: #111827; }
-        .btn { display: block; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem;}
-        .btn:hover { background: #4338ca; }
-        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
-        input, select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box;}
-
-        /* QUIZ STYLES */
-        .question-box { margin-bottom: 30px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; position: relative; }
-        .question-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; }
+        .login-card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { margin-bottom: 1.5rem; color: var(--primary); }
         
-        /* MCQ Options */
-        .mcq-label { display: block; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; background: white; }
-        .mcq-label:hover { background: #eff6ff; border-color: var(--primary); }
-        .mcq-input { margin-right: 10px; }
-        .mcq-input:checked + span { font-weight: bold; color: var(--primary); }
-
-        /* SENTENCE BUILDER STYLES */
-        .word-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; min-height: 40px; padding: 10px; background: #eee; border-radius: 6px; }
-        .answer-area { min-height: 50px; border-bottom: 2px dashed #4f46e5; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; align-items: center; background: #fff; }
-        .word-chip { background: white; border: 1px solid #ccc; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-weight: 500; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .word-chip:hover { background: #f3f4f6; transform: translateY(-1px); }
-        .word-chip.used { opacity: 0.3; pointer-events: none; background: #ddd; }
-        .word-chip-answer { background: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; }
-
-        /* SECURITY UI */
-        #cheat-alert { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 100; }
-        .camera-box { width: 100%; max-width: 300px; margin: 0 auto; background: black; border-radius: 8px; overflow: hidden; }
-        video { width: 100%; display: block; }
-        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
-        .watermark-text { transform: rotate(-30deg); margin: 50px; font-weight: 900; font-size: 20px; }
-
-        /* SECTIONS */
-        #login-section, #system-check-section, #quiz-section, #teacher-section { display: none; }
-        #login-section { display: block; } /* Initial State */
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .code-input { letter-spacing: 5px; font-weight: bold; font-size: 1.2rem; text-align: center; border: 2px solid var(--primary); }
+        
+        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #1d4ed8; }
+        
+        .error { color: #ef4444; font-size: 0.9rem; margin-top: 10px; display: none; }
+        .loader { display: none; margin-top: 10px; color: #64748b; }
     </style>
-    
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
-<div id="global-watermark" class="watermark-overlay"></div>
-
-<div class="container">
-    <div id="cheat-alert">⚠️ ALERT: Screen switch detected!</div>
-
-    <div id="login-section">
-        <h1>XII Assessment Login</h1>
-        <input type="text" id="studentName" placeholder="Full Name">
-        <select id="studentClass">
-            <option value="">Select Class</option>
-            <option value="XII IPA 1">XII IPA 1</option>
-            <option value="XII IPA 2">XII IPA 2</option>
-            <option value="XII IPS">XII IPS</option>
+    <div class="login-card">
+        <h1>🔐 Student Login</h1>
+        
+        <select id="sClass">
+            <option value="">Select Class...</option>
+            <option value="XI D">XI D</option>
+            <option value="XI E">XI E</option>
+            <option value="XI H">XI H</option>
+            <option value="XI I">XI I</option>
+            <option value="XII H">XII H</option>
+            <option value="XII I">XII I</option>
         </select>
-        <button class="btn" onclick="verifyLogin()">Next</button>
-        <p id="login-error" style="color:red; text-align:center; display:none;"></p>
-    </div>
-
-    <div id="system-check-section">
-        <h1>📸 Identity Verification</h1>
-        <p style="text-align:center;">Take a selfie to verify your identity.</p>
-        <div class="camera-box">
-            <video id="videoFeed" autoplay playsinline></video>
-        </div>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <div id="preview-area" style="text-align:center; display:none; margin-top:10px;">
-            <img id="photoPreview" style="width:150px; border-radius:8px; border:2px solid green;">
-        </div>
-        <button class="btn" id="snapBtn" onclick="takeSnapshot()">📷 Snap Photo</button>
+        <input type="number" id="sNo" placeholder="Attendance Number">
+        <input type="text" id="sName" placeholder="Full Name">
         
-        <div id="confirm-area" style="display:none; margin-top:20px;">
-            <input type="checkbox" id="rulesCheck" onchange="document.getElementById('startBtn').disabled = !this.checked">
-            <label>I understand that switching tabs is cheating.</label>
-            <button class="btn" id="startBtn" onclick="startQuiz()" disabled>START QUIZ</button>
-        </div>
-    </div>
-
-    <div id="quiz-section">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">English Test</h2>
-            <div style="color:red; font-weight:bold; font-size:0.9rem;">● REC</div>
-        </div>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
         
-        <form id="quiz-form">
-            <div id="quiz-container">Loading questions...</div>
-        </form>
-
-        <button class="btn" id="submitBtn" onclick="submitExam()">Submit Exam</button>
+        <label style="display:block; margin-bottom:5px; font-weight:bold; color:#475569;">Enter Teacher's Code</label>
+        <input type="tel" id="accessCode" class="code-input" placeholder="0000" maxlength="4">
+        
+        <button onclick="attemptLogin()">Enter Exam</button>
+        
+        <div id="errorMsg" class="error">Invalid Code</div>
+        <div id="loader" class="loader">Verifying Code...</div>
     </div>
-
-    <div id="teacher-section">
-        <h1>👩‍🏫 Teacher Dashboard</h1>
-        <button class="btn" onclick="downloadExcel()">📥 Download Report (.csv)</button>
-        <div id="student-list" style="margin-top:20px;"></div>
-    </div>
-</div>
 
 <script>
-    // --- FIREBASE CONFIG (USE YOURS) ---
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -125,229 +62,63 @@
     };
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
-    // --- VARIABLES ---
-    
-    // 🔴 NEW COLLECTION NAME IS HERE:
-    const COLLECTION_NAME = "grade_xii_grammar_final"; 
-    
-    let quizData = null;
-    let idPhoto = "";
-    let switchCount = 0;
-    let evidenceLogs = [];
-    let currentDocID = null;
-    let sessionActive = false;
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value;
+        const no = document.getElementById('sNo').value;
+        const name = document.getElementById('sName').value;
+        const code = document.getElementById('accessCode').value;
+        const errorEl = document.getElementById('errorMsg');
+        const loader = document.getElementById('loader');
 
-    // --- WATERMARK GENERATOR ---
-    function generateWatermark() {
-        const wm = document.getElementById('global-watermark');
-        let html = "";
-        for(let i=0; i<50; i++) html += `<div class="watermark-text">${i%2?"HONESTY":"INTEGRITY"}</div>`;
-        wm.innerHTML = html;
-    }
-    generateWatermark();
-
-    // --- 1. LOGIN ---
-    function verifyLogin() {
-        const name = document.getElementById('studentName').value;
-        const cls = document.getElementById('studentClass').value;
-        
-        // TEACHER BYPASS
-        if(name === "030" && cls === "") {
-            document.getElementById('login-section').style.display='none';
-            document.getElementById('teacher-section').style.display='block';
+        if(!cls || !no || !name || !code) {
+            errorEl.innerText = "Please fill in all fields.";
+            errorEl.style.display = 'block';
             return;
         }
 
-        if(!name || !cls) return alert("Fill all fields");
+        errorEl.style.display = 'none';
+        loader.style.display = 'block';
 
-        // CHECK DB
-        const id = `${cls}_${name.replace(/\s/g,'_')}`;
-        currentDocID = id;
-        
-        document.getElementById('login-section').style.display='none';
-        document.getElementById('system-check-section').style.display='block';
-        
-        // Start Camera
-        navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}})
-            .then(s => document.getElementById('videoFeed').srcObject = s);
-    }
-
-    // --- 2. CAMERA ---
-    function takeSnapshot() {
-        const video = document.getElementById('videoFeed');
-        const canvas = document.getElementById('canvas');
-        canvas.width = 300; canvas.height = 300 * (video.videoHeight/video.videoWidth);
-        canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-        idPhoto = canvas.toDataURL('image/jpeg', 0.5);
-        
-        document.getElementById('photoPreview').src = idPhoto;
-        document.getElementById('preview-area').style.display='block';
-        video.style.display='none';
-        document.getElementById('snapBtn').style.display='none';
-        document.getElementById('confirm-area').style.display='block';
-    }
-
-    // --- 3. START & LOAD JSON ---
-    async function startQuiz() {
-        // Create DB Entry
-        const name = document.getElementById('studentName').value;
-        const cls = document.getElementById('studentClass').value;
-        
-        // USES NEW COLLECTION
-        await db.collection(COLLECTION_NAME).doc(currentDocID).set({
-            name: name, class: cls, photo: idPhoto,
-            start_time: new Date().toLocaleString(),
-            status: "IN_PROGRESS", cheat_count: 0
-        });
-
-        // Load JSON
         try {
-            const res = await fetch('quiz.json');
-            quizData = await res.json();
-            renderQuiz();
+            // 1. CHECK CODE IN DATABASE
+            const docRef = db.collection('active_exam_codes').doc(code);
+            const doc = await docRef.get();
+
+            if (!doc.exists) {
+                throw new Error("Invalid Code.");
+            }
+
+            const data = doc.data();
             
-            document.getElementById('system-check-section').style.display='none';
-            document.getElementById('quiz-section').style.display='block';
-            document.documentElement.requestFullscreen().catch(e=>{});
-            sessionActive = true;
-        } catch(e) {
-            alert("Error loading quiz.json! Make sure you are using a Server/Firebase Hosting.");
+            // 2. CHECK EXPIRATION (1 HOUR = 3600000 ms)
+            const now = Date.now();
+            const timeDiff = now - data.timestamp;
+            
+            if (timeDiff > 3600000) {
+                throw new Error("This code has expired.");
+            }
+
+            // 3. SUCCESS - SAVE DATA LOCALLY SO NEXT PAGE KNOWS
+            sessionStorage.setItem('student_class', cls);
+            sessionStorage.setItem('student_no', no);
+            sessionStorage.setItem('student_name', name);
+            sessionStorage.setItem('auth_token', 'valid'); // Simple check
+
+            // 4. REDIRECT TO CORRECT FILE
+            window.location.href = data.targetFile;
+
+        } catch (err) {
+            loader.style.display = 'none';
+            errorEl.innerText = err.message;
+            errorEl.style.display = 'block';
         }
     }
-
-    // --- 4. RENDER ENGINE ---
-    function renderQuiz() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = "";
-
-        // A. MULTIPLE CHOICE
-        container.innerHTML += `<h3>Part A: Multiple Choice</h3>`;
-        quizData.multiple_choice.forEach((q, idx) => {
-            let optionsHTML = "";
-            q.options.forEach(opt => {
-                optionsHTML += `
-                    <label class="mcq-label">
-                        <input type="radio" class="mcq-input" name="mcq_${q.id}" value="${opt}">
-                        <span>${opt}</span>
-                    </label>
-                `;
-            });
-            container.innerHTML += `
-                <div class="question-box">
-                    <div class="question-text">${idx+1}. ${q.question}</div>
-                    ${optionsHTML}
-                </div>
-            `;
-        });
-
-        // B. SENTENCE BUILDING
-        container.innerHTML += `<h3>Part B: Arrange the Sentences</h3>`;
-        quizData.sentence_building.forEach((q, idx) => {
-            container.innerHTML += `
-                <div class="question-box" id="sb_container_${q.id}">
-                    <div class="question-text">${idx+1}. Arrange the words:</div>
-                    <div class="word-bank" id="bank_${q.id}">
-                        ${q.scrambled.map((word, wIdx) => 
-                            `<div class="word-chip" onclick="moveWord(${q.id}, '${word.replace(/'/g, "\\'")}', this)">${word}</div>`
-                        ).join('')}
-                    </div>
-                    <div class="question-text" style="font-size:0.9rem; color:#666;">Your Answer (Click to remove):</div>
-                    <div class="answer-area" id="ans_${q.id}"></div>
-                    <input type="hidden" name="sb_${q.id}" id="input_sb_${q.id}">
-                </div>
-            `;
-        });
-    }
-
-    // --- SENTENCE BUILDER LOGIC ---
-    window.moveWord = function(qId, word, element) {
-        if(element.classList.contains('used')) return; 
-        
-        element.classList.add('used');
-        const ansArea = document.getElementById(`ans_${qId}`);
-        const chip = document.createElement('div');
-        chip.className = 'word-chip-answer';
-        chip.innerText = word;
-        
-        chip.onclick = function() {
-            ansArea.removeChild(chip);
-            element.classList.remove('used');
-            updateHiddenInput(qId);
-        };
-
-        ansArea.appendChild(chip);
-        updateHiddenInput(qId);
-    }
-
-    function updateHiddenInput(qId) {
-        const ansArea = document.getElementById(`ans_${qId}`);
-        const words = Array.from(ansArea.children).map(c => c.innerText);
-        document.getElementById(`input_sb_${qId}`).value = words.join(" ");
-    }
-
-    // --- 5. SUBMISSION ---
-    async function submitExam() {
-        if(!confirm("Submit Exam?")) return;
-        sessionActive = false;
-        
-        let scoreMCQ = 0;
-        let totalMCQ = quizData.multiple_choice.length;
-        let answersLog = {};
-
-        // Grade MCQ
-        quizData.multiple_choice.forEach(q => {
-            const selected = document.querySelector(`input[name="mcq_${q.id}"]:checked`);
-            const val = selected ? selected.value : "";
-            answersLog[`Q${q.id}`] = val;
-            if(val === q.answer) scoreMCQ++;
-        });
-
-        // Collect Sentence Builder Answers
-        quizData.sentence_building.forEach(q => {
-            const val = document.getElementById(`input_sb_${q.id}`).value;
-            answersLog[`SB_${q.id}`] = val;
-            if(val === q.correct_order) scoreMCQ++;
-        });
-
-        // USES NEW COLLECTION
-        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
-            status: "COMPLETED",
-            finish_time: new Date().toLocaleString(),
-            mcq_score: scoreMCQ,
-            total_mcq: totalMCQ,
-            all_answers: answersLog,
-            final_cheat_count: switchCount
-        });
-
-        document.body.innerHTML = `<div class="container" style="text-align:center"><h1 style="color:green">Submitted!</h1><p>Score recorded.</p></div>`;
-    }
-
-    // --- 6. ANTI-CHEAT ---
-    document.addEventListener("visibilitychange", () => {
-        if(document.hidden && sessionActive) {
-            switchCount++;
-            document.getElementById('cheat-alert').style.display='block';
-            document.getElementById('cheat-alert').innerText = `⚠️ ALERT: Tab Switch #${switchCount}`;
-            // USES NEW COLLECTION
-            db.collection(COLLECTION_NAME).doc(currentDocID).update({cheat_count: switchCount});
-        }
-    });
-
-    // --- 7. TEACHER DOWNLOAD ---
-    async function downloadExcel() {
-        // USES NEW COLLECTION
-        const snap = await db.collection(COLLECTION_NAME).get();
-        let csv = "data:text/csv;charset=utf-8,Class,Name,Score,Cheats,Answers\n";
-        snap.forEach(doc => {
-            const d = doc.data();
-            const ansStr = JSON.stringify(d.all_answers || {}).replace(/,/g, '|');
-            csv += `${d.class},"${d.name}",${d.mcq_score},${d.cheat_count},${ansStr}\n`;
-        });
-        const link = document.createElement("a");
-        link.href = encodeURI(csv);
-        link.download = "XII_Quiz_Report.csv";
-        document.body.appendChild(link);
-        link.click();
+    
+    // Auto-fill logic (Optional: If they come back)
+    if(sessionStorage.getItem('student_name')) {
+        document.getElementById('sName').value = sessionStorage.getItem('student_name');
+        document.getElementById('sClass').value = sessionStorage.getItem('student_class');
+        document.getElementById('sNo').value = sessionStorage.getItem('student_no');
     }
 </script>
 </body>
