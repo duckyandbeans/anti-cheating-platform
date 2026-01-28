@@ -44,7 +44,46 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body oncontextmenu="return false;">
+<div id="waiting-room" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+    <div style="font-size:4rem;">🔒</div>
+    <h1 style="color:#1e293b; margin-bottom:10px;">Waiting for Teacher</h1>
+    <p style="color:#64748b; font-size:1.1rem;">Do not refresh. The exam will start automatically.</p>
+    <div style="margin-top:20px; width:50px; height:50px; border:5px solid #e2e8f0; border-top:5px solid #2563eb; border-radius:50%; animation:spin 1s linear infinite;"></div>
+</div>
+<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
 
+<script>
+    // --- LOCK SYSTEM LOGIC ---
+    (function() {
+        const examCode = sessionStorage.getItem('exam_code');
+        
+        // If they didn't come from index.html (no code), send them back
+        if(!examCode) {
+            window.location.href = "index.html"; 
+            return;
+        }
+
+        const waitScreen = document.getElementById('waiting-room');
+        
+        // 1. Show waiting room immediately
+        waitScreen.style.display = 'flex';
+
+        // 2. Listen for Unlock
+        db.collection('active_exam_codes').doc(examCode).onSnapshot(doc => {
+            if(doc.exists && doc.data().status === "UNLOCKED") {
+                // UNLOCK!
+                waitScreen.style.display = 'none';
+                
+                // Optional: Auto-fill login if coming from index
+                if(document.getElementById('studentName') && !document.getElementById('studentName').value) {
+                    document.getElementById('studentName').value = sessionStorage.getItem('student_name') || "";
+                    document.getElementById('studentNo').value = sessionStorage.getItem('student_no') || "";
+                    document.getElementById('studentClass').value = sessionStorage.getItem('student_class') || "";
+                }
+            }
+        });
+    })();
+</script>
 <div id="global-watermark" class="watermark-overlay"></div>
 <div id="cheat-display" class="cheat-counter">OFFENSES: 0</div>
 
