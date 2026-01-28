@@ -34,8 +34,7 @@
         .btn-container { margin-top: 30px; display: flex; gap: 10px; }
         .btn { flex: 1; padding: 15px; background-color: var(--accent); color: white; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .btn:hover { background-color: #2980b9; }
-        
-        .btn-reset { background-color: #f39c12; display: none; } /* Hidden initially */
+        .btn-reset { background-color: #f39c12; display: none; }
         .btn-reset:hover { background-color: #d35400; }
 
         /* ANTI-CHEAT UI */
@@ -44,6 +43,11 @@
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
         .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 20px; color: #000; }
         
+        /* LIGHTBOX FOR IMAGES (FIXES TAB SWITCH ISSUE) */
+        #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100000; justify-content: center; align-items: center; }
+        #lightbox img { max-width: 90%; max-height: 90%; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        #lightbox-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; font-weight: bold; }
+
         /* LOGIN/WAITING */
         #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#ecf0f1; z-index:20000; display:flex; justify-content:center; align-items:center; }
         .login-box { background:white; padding:30px; border-radius:10px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:90%; max-width:400px; }
@@ -66,6 +70,7 @@
 
     <section id="materials">
         <h2>Part 1: Present Simple vs. Present Continuous</h2>
+        
         <div class="material-card">
             <h3>1. Routine / Habit</h3>
             <div class="example-box">
@@ -77,15 +82,16 @@
         </div>
         
         <div class="material-card"><h3>2. Fact / General Truth</h3><div class="example-box"><div><span class="label">Sentence:</span> "Matahari terbit di timur."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Simple</strong>.</div><div><span class="label">English:</span> "The sun rises in the east."</div></div></div>
-        
         <div class="material-card"><h3>3. Happening Now</h3><div class="example-box"><div><span class="label">Sentence:</span> "Diamlah, bayi itu sedang tidur."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Continuous</strong>.</div><div><span class="label">English:</span> "Be quiet, the baby is sleeping."</div></div></div>
         
         <h2>Part 2: Past Simple vs. Present Perfect</h2>
+        
         <div class="material-card"><h3>4. Indefinite Past</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah menonton film itu tiga kali."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have watched that movie three times."</div></div></div>
         <div class="material-card"><h3>5. Specific Past Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya menonton film itu tadi malam."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I watched that movie last night."</div></div></div>
         <div class="material-card"><h3>6. Unfinished Time</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sudah kehilangan kunci saya."</div><div><span class="label">Tip:</span> Gunakan <strong>Present Perfect</strong>.</div><div><span class="label">English:</span> "I have lost my keys."</div></div></div>
 
         <h2>Part 3: Past Simple vs. Past Continuous</h2>
+        
         <div class="material-card"><h3>7. Completed Sequence</h3><div class="example-box"><div><span class="label">Sentence:</span> "Dia membuka pintu, lalu menyalakan lampu."</div><div><span class="label">Tip:</span> Gunakan <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "He opened the door and turned on the light."</div></div></div>
         <div class="material-card"><h3>8. Interrupted Action</h3><div class="example-box"><div><span class="label">Sentence:</span> "Saya sedang makan ketika telepon berbunyi."</div><div><span class="label">Tip:</span> <strong>Past Continuous</strong> + <strong>Past Simple</strong>.</div><div><span class="label">English:</span> "I was eating when the phone rang."</div></div></div>
 
@@ -96,9 +102,9 @@
             <h2>Part 5: Vocabulary Enrichment</h2>
             <div class="material-card" style="border-left-color:#e67e22;">
                 <h3 style="color:#e67e22;">Reference Material</h3>
-                <p>Please refer to the image below while answering the Vocabulary questions displayed on the classroom projector.</p>
+                <p>Please refer to the image below. (Click to Zoom - Safe Mode)</p>
                 <div style="text-align:center; background:#fff; padding:10px; border:1px solid #ddd; border-radius:8px;">
-                    <img src="vocabxii.png" alt="Vocabulary Material" style="width:100%; max-width:600px; border-radius:4px; cursor:pointer;" onclick="window.open(this.src)">
+                    <img src="vocabxii.png" alt="Vocabulary Material" style="width:100%; max-width:600px; border-radius:4px; cursor:pointer;" onclick="openLightbox(this.src)">
                     <div style="font-size:0.8rem; color:#666; margin-top:5px;">(Tap image to zoom)</div>
                 </div>
             </div>
@@ -118,6 +124,11 @@
             <button id="resetBtn" class="btn btn-reset" onclick="resetQuiz()">🔄 Try Again</button>
         </div>
     </section>
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+    <span id="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" onclick="event.stopPropagation()">
 </div>
 
 <div id="waiting-room" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
@@ -153,6 +164,7 @@
     let switchCount = 0;
     let sessionActive = false;
     let studentData = {};
+    let ignoreBlur = false; // SAFETY FLAG
 
     // DATA QUESTIONS
     const questions = [
@@ -212,7 +224,10 @@
         const name = document.getElementById('directName').value;
         const cls = document.getElementById('directClass').value;
         const no = document.getElementById('directNo').value;
-        if(!name || !cls || !no) return alert("Fill all fields");
+        if(!name || !cls || !no) {
+            ignoreBlur = true; alert("Fill all fields"); ignoreBlur = false;
+            return;
+        }
         studentData = { name, class: cls, no };
         document.getElementById('login-overlay').style.display='none';
         startSession();
@@ -232,6 +247,18 @@
         sessionActive = true;
         document.getElementById('cheat-display').style.display = 'block';
         renderQuiz();
+    }
+
+    // --- LIGHTBOX (FIX FOR IMAGE OPENING) ---
+    function openLightbox(src) {
+        ignoreBlur = true; // Don't count clicking the image as a cheat
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        setTimeout(() => { ignoreBlur = false; }, 500); // Re-enable anti-cheat after delay
     }
 
     // --- QUIZ LOGIC ---
@@ -257,8 +284,13 @@
     function clean(str) { return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim(); }
 
     async function submitWork() {
-        if(!confirm("Submit answers? You cannot change them after this.")) return;
-        sessionActive = false; 
+        ignoreBlur = true; // Stop cheat trigger on confirm box
+        if(!confirm("Submit answers? You cannot change them after this.")) {
+            ignoreBlur = false;
+            return;
+        }
+        
+        sessionActive = false; // Stop tracking cheats for now
 
         let score = 0;
         let answersLog = {};
@@ -299,7 +331,6 @@
         document.getElementById('submitBtn').style.display = 'none';
         document.getElementById('resetBtn').style.display = 'block';
 
-        // SAVE TO DATABASE
         const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
         await db.collection(COLLECTION_NAME).doc(docID).set({
             name: studentData.name,
@@ -315,11 +346,12 @@
 
         alert(`Submission Saved! You scored ${score}/${questions.length}.`);
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
+        ignoreBlur = false;
     }
 
-    // --- RESET FUNCTION (ANSWER AGAIN) ---
     function resetQuiz() {
-        if(!confirm("Clear all answers and try again?")) return;
+        ignoreBlur = true;
+        if(!confirm("Clear all answers and try again?")) { ignoreBlur = false; return; }
         
         questions.forEach(q => {
             const input = document.getElementById(`input-${q.id}`);
@@ -328,18 +360,21 @@
             input.value = "";
             input.disabled = false;
             fb.style.display = 'none';
-            fb.className = "feedback-container"; // reset classes
+            fb.className = "feedback-container"; 
         });
         
         document.getElementById('submitBtn').style.display = 'block';
         document.getElementById('resetBtn').style.display = 'none';
-        sessionActive = true; // Re-enable cheat tracking
+        sessionActive = true; 
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
+        ignoreBlur = false;
     }
 
-    // --- AGGRESSIVE ANTI-CHEAT ---
+    // --- AGGRESSIVE ANTI-CHEAT (With Safe Guard) ---
     function recordCheat() {
         if (!sessionActive) return;
+        if (ignoreBlur) return; // SAFE GUARD ACTIVATED
+
         switchCount++;
         document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
         const alertBox = document.getElementById('cheat-alert');
