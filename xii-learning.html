@@ -21,7 +21,6 @@
         .question-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; }
         .analysis-text { font-style: italic; color: #7f8c8d; margin-bottom: 15px; font-size: 0.95rem; }
         
-        /* Prevent browser autocomplete popups which might steal focus */
         input[type="text"] { width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
         input[type="text"]:focus { border-color: var(--accent); outline: none; }
 
@@ -38,16 +37,9 @@
         .btn-reset { background-color: #f39c12; display: none; }
         .btn-reset:hover { background-color: #d35400; }
 
-        /* --- CUSTOM MODAL (REPLACES ALERT/CONFIRM) --- */
-        #custom-modal-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.5); z-index: 999999; 
-            justify-content: center; align-items: center; 
-        }
-        .modal-box { 
-            background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; 
-            text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-        }
+        /* MODAL */
+        #custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999999; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
         .modal-text { color: #7f8c8d; margin-bottom: 25px; font-size: 1.1rem; }
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
@@ -55,7 +47,7 @@
         .btn-yes { background: #27ae60; color: white; }
         .btn-no { background: #95a5a6; color: white; }
 
-        /* ANTI-CHEAT UI */
+        /* ANTI-CHEAT */
         #cheat-alert { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; display: none; text-align: center; font-weight: bold; position: sticky; top: 10px; z-index: 500; border: 1px solid #c0392b; }
         .cheat-counter { position: fixed; top: 15px; right: 15px; background: #fff; color: #c0392b; padding: 8px 15px; border-radius: 30px; font-size: 0.9rem; font-weight: bold; border: 2px solid #c0392b; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; }
         .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.04; display: flex; flex-wrap: wrap; overflow: hidden; }
@@ -66,12 +58,10 @@
         #lightbox img { max-width: 90%; max-height: 90%; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         #lightbox-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer; font-weight: bold; }
 
-        /* LOGIN/WAITING */
+        /* WAITING & LOGIN */
+        #waiting-room { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
         #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#ecf0f1; z-index:20000; display:flex; justify-content:center; align-items:center; }
         .login-box { background:white; padding:30px; border-radius:10px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:90%; max-width:400px; }
-        
-        /* WAITING ROOM */
-        #waiting-room { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
     
@@ -97,7 +87,6 @@
             <h3>1. Routine / Habit</h3>
             <div class="example-box">
                 <div><span class="label">Sentence:</span> "Saya biasanya bangun jam 5 pagi."</div>
-                <div><span class="label">Analysis:</span> Kebiasaan atau rutinitas yang terjadi berulang-ulang.</div>
                 <div><span class="label">Tip:</span> Gunakan <strong>Present Simple</strong> (V1 / s / es).</div>
                 <div><span class="label">English:</span> "I usually wake up at 5 AM."</div>
             </div>
@@ -124,7 +113,7 @@
             <h2>Part 5: Vocabulary Enrichment</h2>
             <div class="material-card" style="border-left-color:#e67e22;">
                 <h3 style="color:#e67e22;">Reference Material</h3>
-                <p>Please refer to the image below. (Click to Zoom)</p>
+                <p>Refer to this image for the projector questions.</p>
                 <div style="text-align:center; background:#fff; padding:10px; border:1px solid #ddd; border-radius:8px;">
                     <img src="vocabxii.png" alt="Vocabulary Material" style="width:100%; max-width:600px; border-radius:4px; cursor:pointer;" onclick="openLightbox(this.src)">
                     <div style="font-size:0.8rem; color:#666; margin-top:5px;">(Tap image to zoom)</div>
@@ -137,7 +126,7 @@
 
     <section id="exercises">
         <h2>📝 Translation Exercises</h2>
-        <p>Translate the sentences below. Hints are hidden until submission.</p>
+        <p>Translate the sentences below. <strong>(Auto-Saving Enabled)</strong></p>
         <div id="quiz-container"></div>
         
         <div class="btn-container">
@@ -156,8 +145,7 @@
     <div class="modal-box">
         <div class="modal-title" id="modal-title">Title</div>
         <div class="modal-text" id="modal-msg">Message</div>
-        <div class="modal-actions" id="modal-actions">
-            </div>
+        <div class="modal-actions" id="modal-actions"></div>
     </div>
 </div>
 
@@ -190,45 +178,34 @@
     try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
     const COLLECTION_NAME = "grade_xii_learning_results";
-    let switchCount = 0;
+    
+    // RESTORE CHEAT COUNT ON RELOAD
+    let switchCount = parseInt(sessionStorage.getItem('cheat_count')) || 0;
     let sessionActive = false;
     let studentData = {};
-    
-    // --- MODAL SYSTEM (NO NATIVE ALERTS) ---
+    let ignoreBlur = false; 
+
+    // MODAL
     function showModal(title, msg, type, callback) {
         document.getElementById('modal-title').innerText = title;
         document.getElementById('modal-msg').innerText = msg;
         const actions = document.getElementById('modal-actions');
-        actions.innerHTML = ""; // Clear buttons
-
+        actions.innerHTML = ""; 
         if(type === 'confirm') {
-            const yesBtn = document.createElement('button');
-            yesBtn.className = 'modal-btn btn-yes';
-            yesBtn.innerText = "Yes";
+            const yesBtn = document.createElement('button'); yesBtn.className = 'modal-btn btn-yes'; yesBtn.innerText = "Yes";
             yesBtn.onclick = function() { closeModal(); if(callback) callback(); };
-            
-            const noBtn = document.createElement('button');
-            noBtn.className = 'modal-btn btn-no';
-            noBtn.innerText = "No";
+            const noBtn = document.createElement('button'); noBtn.className = 'modal-btn btn-no'; noBtn.innerText = "No";
             noBtn.onclick = closeModal;
-
-            actions.appendChild(yesBtn);
-            actions.appendChild(noBtn);
+            actions.appendChild(yesBtn); actions.appendChild(noBtn);
         } else {
-            const okBtn = document.createElement('button');
-            okBtn.className = 'modal-btn btn-yes';
-            okBtn.innerText = "OK";
-            okBtn.onclick = closeModal;
-            actions.appendChild(okBtn);
+            const okBtn = document.createElement('button'); okBtn.className = 'modal-btn btn-yes'; okBtn.innerText = "OK";
+            okBtn.onclick = closeModal; actions.appendChild(okBtn);
         }
         document.getElementById('custom-modal-overlay').style.display = 'flex';
     }
+    function closeModal() { document.getElementById('custom-modal-overlay').style.display = 'none'; }
 
-    function closeModal() {
-        document.getElementById('custom-modal-overlay').style.display = 'none';
-    }
-
-    // --- DATA QUESTIONS ---
+    // QUESTIONS
     const questions = [
         {id: 1, ind: "Air mendidih pada suhu 100 derajat Celsius.", anal: "Fakta ilmiah.", tip: "Present Simple.", ans: "water boils at 100 degrees celsius"},
         {id: 2, ind: "Dengarkan! Seseorang sedang mengetuk pintu.", anal: "Sedang terjadi.", tip: "Present Continuous.", ans: "listen someone is knocking on the door"},
@@ -256,11 +233,8 @@
         {id: 24, ind: "Saya rasa manusia akan tinggal di Mars suatu hari nanti.", anal: "Opini.", tip: "Will.", ans: "i think humans will live on mars one day"},
         {id: 25, ind: "Telepon berbunyi. Saya yang akan mengangkatnya.", anal: "Keputusan spontan.", tip: "Will.", ans: "the phone is ringing i will get it"}
     ];
-
     const alternateAnswers = {
-        3: ["the earth revolves around the sun"],
-        5: ["why are you wearing a coat its not cold outside"],
-        23: ["look at those clouds its going to rain"]
+        3: ["the earth revolves around the sun"], 5: ["why are you wearing a coat its not cold outside"], 23: ["look at those clouds its going to rain"]
     };
 
     // --- LOCK & LOGIN ---
@@ -271,11 +245,7 @@
 
         const examCode = sessionStorage.getItem('exam_code');
         if(examCode) {
-            studentData = {
-                name: sessionStorage.getItem('student_name'),
-                class: sessionStorage.getItem('student_class'),
-                no: sessionStorage.getItem('student_no')
-            };
+            studentData = { name: sessionStorage.getItem('student_name'), class: sessionStorage.getItem('student_class'), no: sessionStorage.getItem('student_no') };
             waitForUnlock(examCode);
         } else {
             document.getElementById('login-overlay').style.display = 'flex';
@@ -283,13 +253,8 @@
     })();
 
     function directLogin() {
-        const name = document.getElementById('directName').value;
-        const cls = document.getElementById('directClass').value;
-        const no = document.getElementById('directNo').value;
-        if(!name || !cls || !no) {
-            showModal("Error", "Fill all fields", "alert");
-            return;
-        }
+        const name = document.getElementById('directName').value; const cls = document.getElementById('directClass').value; const no = document.getElementById('directNo').value;
+        if(!name || !cls || !no) { showModal("Error", "Fill all fields", "alert"); return; }
         studentData = { name, class: cls, no };
         document.getElementById('login-overlay').style.display='none';
         startSession();
@@ -308,28 +273,33 @@
     function startSession() {
         sessionActive = true;
         document.getElementById('cheat-display').style.display = 'block';
+        document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
         renderQuiz();
     }
 
     // --- LIGHTBOX ---
-    function openLightbox(src) {
-        document.getElementById('lightbox-img').src = src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
-    function closeLightbox() {
-        document.getElementById('lightbox').style.display = 'none';
-    }
+    function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').style.display = 'flex'; }
+    function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
 
-    // --- QUIZ LOGIC ---
+    // --- QUIZ LOGIC (AUTO-SAVE ADDED) ---
     function renderQuiz() {
         const container = document.getElementById('quiz-container');
         let html = "";
         questions.forEach(q => {
+            // Restore from session storage if exists
+            const savedAns = sessionStorage.getItem(`ans_${q.id}`) || "";
+            
             html += `
                 <div class="quiz-item" id="card-${q.id}">
                     <div class="question-header">${q.id}. "${q.ind}"</div>
                     <div class="analysis-text">[Analysis: ${q.anal}]</div>
-                    <input type="text" id="input-${q.id}" placeholder="Type English translation..." autocomplete="off">
+                    
+                    <input type="text" id="input-${q.id}" 
+                           placeholder="Type English translation..." 
+                           autocomplete="off" 
+                           value="${savedAns}"
+                           oninput="saveInput(${q.id}, this.value)">
+                           
                     <div class="feedback-container" id="feedback-${q.id}">
                         <div id="status-${q.id}" style="font-weight:bold;"></div>
                         <div class="hint-text" id="hint-${q.id}"></div>
@@ -340,15 +310,16 @@
         container.innerHTML = html;
     }
 
-    function clean(str) { return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim(); }
-
-    function triggerSubmit() {
-        showModal("Submit Answers?", "You cannot change them after this.", "confirm", performSubmit);
+    function saveInput(id, val) {
+        sessionStorage.setItem(`ans_${id}`, val);
     }
 
-    async function performSubmit() {
-        sessionActive = false; // Stop cheat tracking
+    function clean(str) { return str.toLowerCase().replace(/[.,?!'"’]/g, '').replace(/\s+/g, ' ').trim(); }
 
+    function triggerSubmit() { showModal("Submit Answers?", "You cannot change them after this.", "confirm", performSubmit); }
+
+    async function performSubmit() {
+        sessionActive = false;
         let score = 0;
         let answersLog = {};
 
@@ -360,27 +331,16 @@
             
             const userAns = clean(inputEl.value);
             const correctAns = clean(q.ans);
-            
             let isCorrect = (userAns === correctAns);
-            if (!isCorrect && alternateAnswers[q.id]) {
-                if (alternateAnswers[q.id].map(a => clean(a)).includes(userAns)) isCorrect = true;
-            }
-
+            if (!isCorrect && alternateAnswers[q.id]) { if (alternateAnswers[q.id].map(a => clean(a)).includes(userAns)) isCorrect = true; }
             answersLog[`Q${q.id}`] = inputEl.value;
-
             feedbackBox.style.display = 'block';
             inputEl.disabled = true;
 
             if (isCorrect) {
-                score++;
-                feedbackBox.className = "feedback-container status-correct";
-                statusDiv.innerHTML = "✅ Correct!";
-                hintDiv.style.display = 'none';
+                score++; feedbackBox.className = "feedback-container status-correct"; statusDiv.innerHTML = "✅ Correct!"; hintDiv.style.display = 'none';
             } else {
-                feedbackBox.className = "feedback-container status-wrong";
-                statusDiv.innerHTML = "❌ Incorrect.";
-                hintDiv.style.display = 'block';
-                hintDiv.innerHTML = `💡 Hint: ${q.tip}`;
+                feedbackBox.className = "feedback-container status-wrong"; statusDiv.innerHTML = "❌ Incorrect."; hintDiv.style.display = 'block'; hintDiv.innerHTML = `💡 Hint: ${q.tip}`;
             }
         });
 
@@ -398,9 +358,7 @@
         window.scrollTo({ top: document.getElementById('exercises').offsetTop, behavior: 'smooth' });
     }
 
-    function triggerReset() {
-        showModal("Clear Answers?", "This will reset your score and allow you to try again.", "confirm", performReset);
-    }
+    function triggerReset() { showModal("Clear Answers?", "This will reset your score.", "confirm", performReset); }
 
     function performReset() {
         questions.forEach(q => {
@@ -410,6 +368,7 @@
             input.disabled = false;
             fb.style.display = 'none';
             fb.className = "feedback-container"; 
+            sessionStorage.removeItem(`ans_${q.id}`); // Clear auto-save
         });
         document.getElementById('submitBtn').style.display = 'block';
         document.getElementById('resetBtn').style.display = 'none';
@@ -420,13 +379,14 @@
     // --- AGGRESSIVE ANTI-CHEAT ---
     function recordCheat() {
         if (!sessionActive) return;
+        if (ignoreBlur) return;
         switchCount++;
+        sessionStorage.setItem('cheat_count', switchCount); // Save cheat count too
         document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
         const alertBox = document.getElementById('cheat-alert');
         alertBox.style.display = 'block';
         setTimeout(() => alertBox.style.display='none', 3000);
     }
-
     document.addEventListener("visibilitychange", () => { if (document.hidden) recordCheat(); });
     window.addEventListener("blur", () => { recordCheat(); });
 
