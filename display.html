@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 22: Visual Material</title>
+    <style>
+        :root { --primary: #0f172a; --accent: #3b82f6; --danger: #ef4444; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #334155; user-select: none; }
+        
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { color: var(--primary); text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
+
+        /* --- IMAGE GALLERY SECTION --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive Grid */
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .image-card {
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .image-card img:hover { transform: scale(1.02); }
+        
+        .caption { margin-top: 10px; font-weight: bold; color: #64748b; font-size: 0.9rem; }
+
+        /* --- LIGHTBOX (Safe Zoom) --- */
+        #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100000; justify-content: center; align-items: center; }
+        #lightbox img { max-width: 95%; max-height: 95%; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 3rem; cursor: pointer; font-weight: bold; }
+
+        /* --- UI ELEMENTS --- */
+        .btn { display: block; width: 100%; max-width: 300px; margin: 40px auto 0; padding: 15px; background: var(--accent); color: white; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: #2563eb; }
+
+        /* --- ANTI-CHEAT --- */
+        #cheat-display { position: fixed; top: 15px; right: 15px; background: white; color: var(--danger); padding: 8px 15px; border-radius: 30px; font-weight: bold; border: 2px solid var(--danger); box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000; display: none; }
+        #cheat-alert { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: #fee2e2; color: #991b1b; padding: 10px 20px; border-radius: 8px; font-weight: bold; border: 1px solid #f87171; display: none; z-index: 2000; }
+        
+        .watermark-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.03; display: flex; flex-wrap: wrap; overflow: hidden; }
+        .watermark-text { transform: rotate(-30deg); margin: 60px; font-weight: 900; font-size: 24px; color: #000; }
+
+        /* --- OVERLAYS --- */
+        #waiting-room, #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#f8fafc; z-index:50000; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        #waiting-room { display: none; background: white; }
+        #login-overlay { display: none; }
+        
+        .login-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        
+        /* CUSTOM MODAL */
+        #custom-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999999; justify-content:center; align-items:center; }
+        .modal-content { background:white; padding:30px; border-radius:12px; text-align:center; max-width:400px; width:90%; }
+        .modal-btn { padding:10px 20px; background:var(--accent); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-top:20px; }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="global-watermark" class="watermark-overlay"></div>
+<div id="cheat-display">OFFENSES: 0</div>
+<div id="cheat-alert">⚠️ ALERT: FOCUS LOST!</div>
+
+<div class="container">
+    <h1>Week 22 Materials</h1>
+    <p style="text-align:center; color:#64748b;">Please review the images below carefully.</p>
+
+    <div class="gallery-grid">
+        
+        <div class="image-card">
+            <img src="material1.png" alt="Material 1" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+1+Missing'">
+            <div class="caption">Figure 1</div>
+        </div>
+
+        <div class="image-card">
+            <img src="m1.png" alt="Material 1" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+2+Missing'">
+            <img src="m2.png" alt="Material 2" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+2+Missing'">
+            <img src="m3.png" alt="Material 3" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+2+Missing'">
+            <img src="m4.png" alt="Material 4" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+2+Missing'">
+            <img src="m5.png" alt="Material 5" onclick="openLightbox(this.src)" onerror="this.src='https://via.placeholder.com/400x300?text=Material+2+Missing'">
+        </div>
+
+        </div>
+
+    <button class="btn" onclick="finishSession()">Finish Viewing</button>
+</div>
+
+<div id="lightbox" onclick="closeLightbox()">
+    <span id="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" onclick="event.stopPropagation()">
+</div>
+
+<div id="custom-modal">
+    <div class="modal-content">
+        <h2 id="modal-title">Message</h2>
+        <p id="modal-msg">Text</p>
+        <button class="modal-btn" onclick="closeModal()">OK</button>
+    </div>
+</div>
+
+<div id="waiting-room">
+    <div style="font-size:4rem;">🔒</div>
+    <h2 style="color:#1e293b;">Waiting for Teacher</h2>
+    <p style="color:#64748b;">Do not refresh. Access will begin automatically.</p>
+</div>
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2>Student Login</h2>
+        <select id="directClass">
+            <option value="">Select Class...</option>
+            <option value="XI D">XI D</option>
+            <option value="XI E">XI E</option>
+            <option value="XI H">XI H</option>
+            <option value="XI I">XI I</option>
+        </select>
+        <input type="text" id="directName" placeholder="Full Name">
+        <input type="number" id="directNo" placeholder="Attendance Number">
+        <button class="btn" onclick="directLogin()" style="margin-top:10px;">Enter</button>
+    </div>
+</div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week22"; // As requested
+    let switchCount = 0;
+    let sessionActive = false;
+    let studentData = {};
+    let ignoreBlur = false; // Safety flag for modals/lightbox
+
+    // --- INITIALIZATION ---
+    (function() {
+        // Watermark
+        const wm = document.getElementById('global-watermark');
+        let html = ""; for(let i=0; i<40; i++) html += `<div class="watermark-text">WEEK 22<br>DO NOT CHEAT</div>`;
+        wm.innerHTML = html;
+
+        // Check Login Source
+        const examCode = sessionStorage.getItem('exam_code');
+        if(examCode) {
+            studentData = {
+                name: sessionStorage.getItem('student_name'),
+                class: sessionStorage.getItem('student_class'),
+                no: sessionStorage.getItem('student_no')
+            };
+            document.getElementById('login-overlay').style.display = 'none';
+            waitForUnlock(examCode);
+        } else {
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+    })();
+
+    // --- LOGIN LOGIC ---
+    function directLogin() {
+        const name = document.getElementById('directName').value;
+        const cls = document.getElementById('directClass').value;
+        const no = document.getElementById('directNo').value;
+        
+        if(!name || !cls || !no) {
+            alert("Please fill all fields"); // Using alert here is fine as cheat tracking isn't active yet
+            return;
+        }
+        
+        studentData = { name, class: cls, no };
+        document.getElementById('login-overlay').style.display = 'none';
+        startSession(); // Bypass lock for direct login, or add code check logic here if needed
+    }
+
+    // --- LOCK SYSTEM ---
+    function waitForUnlock(code) {
+        document.getElementById('waiting-room').style.display = 'flex';
+        db.collection('active_exam_codes').doc(code).onSnapshot(doc => {
+            if(doc.exists && doc.data().status === "UNLOCKED") {
+                document.getElementById('waiting-room').style.display = 'none';
+                startSession();
+            }
+        });
+    }
+
+    async function startSession() {
+        // Init Database Doc
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        
+        await db.collection(COLLECTION_NAME).doc(docID).set({
+            name: studentData.name,
+            class: studentData.class,
+            number: studentData.no,
+            start_time: new Date().toLocaleString(),
+            status: "VIEWING",
+            cheat_count: 0
+        }, { merge: true });
+
+        sessionActive = true;
+        document.getElementById('cheat-display').style.display = 'block';
+    }
+
+    // --- LIGHTBOX (Safe Image Viewer) ---
+    function openLightbox(src) {
+        ignoreBlur = true; // Pause Anti-Cheat
+        document.getElementById('lightbox-img').src = src;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        setTimeout(() => { ignoreBlur = false; }, 500); // Resume Anti-Cheat with delay
+    }
+
+    // --- FINISH BUTTON ---
+    async function finishSession() {
+        ignoreBlur = true; // Pause cheat for modal interaction
+        if(!confirm("Are you finished viewing the materials?")) {
+            ignoreBlur = false; return;
+        }
+        
+        sessionActive = false; // Stop tracking
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        
+        await db.collection(COLLECTION_NAME).doc(docID).update({
+            status: "COMPLETED",
+            finish_time: new Date().toLocaleString(),
+            final_cheat_count: switchCount
+        });
+
+        document.body.innerHTML = `
+            <div class="container" style="text-align:center;">
+                <h1 style="color:#10b981;">Session Complete</h1>
+                <p>You may close this tab.</p>
+            </div>
+        `;
+    }
+
+    // --- AGGRESSIVE ANTI-CHEAT ---
+    function recordCheat() {
+        if (!sessionActive) return;
+        if (ignoreBlur) return; // Ignore if safe flag is on
+
+        switchCount++;
+        document.getElementById('cheat-display').innerText = `OFFENSES: ${switchCount}`;
+        
+        // Show Alert Overlay
+        const alertBox = document.getElementById('cheat-alert');
+        alertBox.style.display = 'block';
+        setTimeout(() => alertBox.style.display='none', 3000);
+
+        // Save to DB (Optimized: Updates only on change)
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        db.collection(COLLECTION_NAME).doc(docID).update({ cheat_count: switchCount }).catch(()=>{});
+    }
+
+    document.addEventListener("visibilitychange", () => { if (document.hidden) recordCheat(); });
+    window.addEventListener("blur", () => { recordCheat(); });
+
+    // --- MODAL HELPERS ---
+    function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
+
+</script>
+</body>
+</html>
