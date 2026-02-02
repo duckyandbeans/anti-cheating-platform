@@ -51,7 +51,7 @@
 
     <div id="login-screen">
         <h2>Teacher Portal</h2>
-        <input type="password" id="passwordInput" placeholder="PIN (030)">
+        <input type="password" id="passwordInput" placeholder="PIN">
         <button class="btn-primary" onclick="checkLogin()">Login</button>
     </div>
 
@@ -238,20 +238,38 @@
         feed.prepend(div);
     }
 
+    // --- FIXED DOWNLOAD FUNCTION USING BLOB ---
     async function downloadCSV(col, name) {
         const snap = await db.collection(col).get();
         let csv = "Class,No,Name,Score,Cheats,Time,Data\n";
+        
         snap.forEach(doc => {
             const d = doc.data();
             let score = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length : 0);
-            let extra = JSON.stringify(d.answers || d.temp_answers || d.all_answers || "").replace(/,/g,'|').replace(/"/g,"'");
+            
+            // Safe JSON stringify that won't break CSV format
+            let extra = JSON.stringify(d.answers || d.temp_answers || d.all_answers || "")
+                .replace(/,/g,'|')  // Replace commas with pipes
+                .replace(/"/g,"'"); // Replace double quotes with single quotes
+            
             csv += `${d.class},${d.number},"${d.name}",${score},${d.cheat_count||d.final_cheat_count||0},"${d.finish_time}","${extra}"\n`;
         });
+
+        // USE BLOB TO HANDLE LARGE DATA
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
-        link.download = name;
-        document.body.appendChild(link);
-        link.click();
+        
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, name);
+        } else {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", name);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
 
     async function openViewerModal(col) {
