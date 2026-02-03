@@ -3,45 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard</title>
+    <title>Master Teacher Dashboard</title>
     <style>
-        :root { --primary: #4f46e5; --dark: #0f172a; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        :root { --primary: #1e293b; --accent: #3b82f6; --bg: #f1f5f9; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #334155; }
         
-        #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: var(--dark); color: white; position: fixed; width: 100%; z-index: 2000; }
+        /* LOGIN */
+        #login-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: var(--primary); color: white; position: fixed; width: 100%; z-index: 2000; }
         input { padding: 12px; font-size: 1.1rem; border-radius: 6px; border: none; margin-bottom: 10px; text-align: center; }
         button { padding: 12px 24px; font-size: 1rem; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition:0.2s; }
-        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary { background: var(--accent); color: white; }
         
+        /* LAYOUT */
         #dashboard { display: none; display: flex; height: 100vh; }
         .sidebar { width: 350px; background: white; border-right: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; flex-shrink: 0; }
         
-        /* GENERATOR BOX */
-        .generator-box { background: #e0e7ff; padding: 20px; border-radius: 12px; border: 2px solid #6366f1; text-align: center; margin-bottom: 20px; }
-        .big-code { font-size: 3rem; font-weight: 900; color: #4338ca; letter-spacing: 5px; margin: 10px 0; background: white; display: block; padding: 15px; border-radius: 8px; }
+        /* SESSION MANAGER */
+        .generator-box { background: #eff6ff; padding: 20px; border-radius: 12px; border: 2px solid #3b82f6; text-align: center; margin-bottom: 25px; }
+        .big-code { font-size: 2.5rem; font-weight: 900; color: #1e40af; letter-spacing: 5px; margin: 10px 0; background: white; display: block; padding: 10px; border-radius: 8px; }
         
         .status-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; }
         .status-locked { background: #fee2e2; color: #991b1b; }
         .status-live { background: #dcfce7; color: #166534; animation: pulse 2s infinite; }
         .status-ended { background: #e2e8f0; color: #64748b; }
         
-        /* CONTROL BUTTONS */
-        .ctrl-btn { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; display: none; }
+        .ctrl-btn { width: 100%; padding: 10px; font-size: 1rem; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; margin-top: 5px; display: none; }
         .btn-unlock { background: #10b981; color: white; }
-        .btn-unlock:hover { background: #059669; }
         .btn-lock { background: #ef4444; color: white; }
-        .btn-lock:hover { background: #b91c1c; }
 
-        /* REPORTS */
-        .control-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-left: 5px solid #ccc; }
-        .control-card h3 { margin: 0 0 10px 0; color: #1e293b; font-size: 1rem; }
-        .btn-download { width: 100%; padding: 10px; background: var(--success); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 5px; text-align: left; padding-left: 15px; }
-        .btn-view { width: 100%; padding: 10px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-align: left; padding-left: 15px; }
+        /* DOWNLOAD SECTION */
+        .section-title { font-size: 0.9rem; text-transform: uppercase; color: #94a3b8; font-weight: bold; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        
+        .control-card { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-left: 4px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+        .control-card h4 { margin: 0; font-size: 0.95rem; color: #334155; }
+        
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; color: white; margin-left: 5px; }
+        .btn-dl { background: #0f766e; } 
+        .btn-dl:hover { background: #115e59; }
+        .btn-dl:disabled { background: #cbd5e1; cursor: not-allowed; } /* Disabled state */
+        .btn-view { background: #6366f1; } 
+
+        /* FEED */
+        .feed-area { flex-grow: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
+        .notif-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--success); box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; display: flex; justify-content: space-between; }
+        
+        /* VIEWER MODAL */
+        #essay-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
+        .modal-content { background: white; width: 90%; max-width: 1100px; height: 90%; border-radius: 12px; padding: 20px; overflow-y: auto; }
+        .essay-row { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; gap: 20px; }
+        .essay-thumbs img { height: 120px; border: 1px solid #ddd; margin-right: 10px; cursor: pointer; transition: transform 0.2s; }
+        .essay-thumbs img:hover { transform: scale(1.5); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        
-        .feed-area { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .notif-card { background: white; padding: 20px; border-radius: 10px; border-left: 5px solid var(--success); box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -51,7 +64,7 @@
 
     <div id="login-screen">
         <h2>Teacher Portal</h2>
-        <input type="password" id="passwordInput" placeholder="PIN">
+        <input type="password" id="passwordInput" placeholder="PIN (030)">
         <button class="btn-primary" onclick="checkLogin()">Login</button>
     </div>
 
@@ -59,68 +72,103 @@
         <div class="sidebar">
             
             <div class="generator-box">
-                <h3 style="margin:0 0 10px 0; color:#4338ca;">⚡ Session Manager</h3>
-                
-                <select id="quizSelector" style="width:100%; padding:10px; margin-bottom:10px;">
+                <h3 style="margin:0 0 10px 0; color:#1e40af;">⚡ Session Manager</h3>
+                <select id="quizSelector" style="width:100%; padding:8px; margin-bottom:10px;">
                     <option value="xii-learning.html">XII Learning (Grammar)</option>
+                    <option value="display.html">Week 22 (Visuals)</option>
                     <option value="xitp1.html">XI TP 1 (Essay)</option>
                     <option value="xitp2.html">XI TP 2 (MCQ)</option>
                     <option value="xii.html">XII Final</option>
                 </select>
+                <button onclick="generateCode()" id="genBtn" style="background:#2563eb; color:white; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Generate Code</button>
                 
-                <button onclick="generateCode()" id="genBtn" style="background:#4338ca; color:white; width:100%; border:none; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer;">Generate Code</button>
-                
-                <div id="activeCodeDisplay" style="display:none; margin-top:20px;">
+                <div id="activeCodeDisplay" style="display:none; margin-top:15px;">
                     <div id="statusBadge" class="status-badge status-locked">🔒 LOCKED</div>
                     <span id="codeText" class="big-code">----</span>
-                    
-                    <button id="unlockBtn" class="ctrl-btn btn-unlock" onclick="updateStatus('UNLOCKED')">🔓 UNLOCK EXAM</button>
-                    <button id="lockBtn" class="ctrl-btn btn-lock" onclick="updateStatus('ENDED')">🛑 END EXAM</button>
-                    
-                    <div id="endMsg" style="color:#64748b; font-weight:bold; margin-top:10px; display:none;">⛔ Session Ended</div>
+                    <button id="unlockBtn" class="ctrl-btn btn-unlock" onclick="updateStatus('UNLOCKED')">🔓 UNLOCK</button>
+                    <button id="lockBtn" class="ctrl-btn btn-lock" onclick="updateStatus('ENDED')">🛑 END SESSION</button>
                 </div>
             </div>
+
+            <div class="section-title">Grade XI Assessments</div>
             
-            <h2 style="border-bottom:2px solid #e2e8f0; padding-bottom:10px;">📂 Reports</h2>
-
-            <div class="control-card" style="border-left-color: #3498db;">
-                <h3>XII Learning (Grammar)</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xii_learning_results', 'XII_Learning_Report.csv')">📥 Download Results</button>
-            </div>
-
             <div class="control-card" style="border-left-color: #7c3aed;">
-                <h3>XI TP 1 (Essay/Graphs)</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xi_part1_essay', 'XITP1_Essay_Report.csv')">📥 Download Report</button>
-                <button class="btn-view" style="margin-top:5px;" onclick="openViewerModal('grade_xi_part1_essay')">📸 View Photos</button>
+                <h4>XI TP 1 (Essay)</h4>
+                <div>
+                    <button class="btn-sm btn-view" onclick="openViewerModal('grade_xi_part1_essay')">View</button>
+                    <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'grade_xi_part1_essay', 'XI_TP1_Essay.csv')">CSV</button>
+                </div>
             </div>
 
             <div class="control-card" style="border-left-color: #2563eb;">
-                <h3>XI TP 2 (MCQ Final)</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xi_part2_mcq', 'XITP2_MCQ_Report.csv')">📥 Download Report</button>
+                <h4>XI TP 2 (MCQ)</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'grade_xi_part2_mcq', 'XI_TP2_MCQ.csv')">Download CSV</button>
             </div>
 
+            <div class="control-card" style="border-left-color: #64748b;">
+                <h4>XI Final (Archive)</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'grade_xi_final', 'XI_Final_Legacy.csv')">Download CSV</button>
+            </div>
+
+            <div class="section-title">Grade XII Assessments</div>
+
             <div class="control-card" style="border-left-color: #f59e0b;">
-                <h3>XII Final Assessment</h3>
-                <button class="btn-download" onclick="downloadCSV('grade_xii_grammar_final', 'XII_Final_Report.csv')">📥 Download Report</button>
+                <h4>XII Final Grammar</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'grade_xii_grammar_final', 'XII_Final.csv')">Download CSV</button>
+            </div>
+
+            <div class="control-card" style="border-left-color: #3b82f6;">
+                <h4>XII Learning</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'grade_xii_learning_results', 'XII_Learning.csv')">Download CSV</button>
+            </div>
+
+            <div class="control-card" style="border-left-color: #10b981;">
+                <h4>Week 22 (Visuals)</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'week22', 'Week22_Logs.csv')">Download CSV</button>
+            </div>
+
+            <div class="section-title">System & Archives</div>
+
+            <div class="control-card" style="border-left-color: #94a3b8;">
+                <h4>B2 Grammar</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'b2_grammar_quiz_results', 'B2_Results.csv')">CSV</button>
+            </div>
+
+            <div class="control-card" style="border-left-color: #94a3b8;">
+                <h4>C1 Advanced</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'c1_advanced_quiz_results', 'C1_Results.csv')">CSV</button>
+            </div>
+
+            <div class="control-card" style="border-left-color: #000;">
+                <h4>Active Codes</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'active_exam_codes', 'Active_Codes.csv')">CSV</button>
+            </div>
+
+            <div class="control-card" style="border-left-color: #000;">
+                <h4>Access Logs</h4>
+                <button class="btn-sm btn-dl" onclick="downloadCSV(this, 'exam_access_logs', 'Access_Logs.csv')">CSV</button>
             </div>
 
         </div>
 
         <div class="feed-area">
-            <h1>🔴 Live Feed</h1>
-            <div id="live-feed-list"><p style="color:#999; text-align:center; margin-top:50px;">Waiting for activity...</p></div>
+            <h2 style="margin-top:0;">🔴 Live Activity Feed</h2>
+            <div id="live-feed-list">
+                <p style="text-align:center; color:#999; margin-top:50px;">Waiting for new submissions...</p>
+            </div>
         </div>
     </div>
 
-    <div id="essay-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3000; justify-content:center; align-items:center;">
-        <div style="background:white; width:90%; height:90%; padding:20px; border-radius:12px; overflow-y:auto;">
-            <button onclick="document.getElementById('essay-modal').style.display='none'" style="float:right; background:#ef4444; color:white; border:none; padding:5px 10px; cursor:pointer;">Close</button>
-            <h2>Photo Gallery</h2>
-            <div id="gallery-content"></div>
+    <div id="essay-modal">
+        <div class="modal-content">
+            <button onclick="document.getElementById('essay-modal').style.display='none'" style="float:right; background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Close</button>
+            <h2>Submitted Photos</h2>
+            <div id="gallery-content">Loading...</div>
         </div>
     </div>
 
 <script>
+    // FIREBASE INIT
     const firebaseConfig = {
       apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
       authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
@@ -142,71 +190,51 @@
         }
     }
 
-    // --- LOCK SYSTEM ---
+    // --- SESSION MANAGER ---
     async function generateCode() {
         const file = document.getElementById('quizSelector').value;
         const code = Math.floor(1000 + Math.random() * 9000).toString();
         currentCode = code;
         
         await db.collection('active_exam_codes').doc(code).set({
-            targetFile: file,
-            timestamp: Date.now(),
-            status: "LOCKED"
+            targetFile: file, timestamp: Date.now(), status: "LOCKED"
         });
 
-        // UI Reset
         document.getElementById('activeCodeDisplay').style.display = 'block';
         document.getElementById('codeText').innerText = code;
         document.getElementById('genBtn').style.display = 'none';
         document.getElementById('quizSelector').disabled = true;
-        
-        // Show Unlock Button
         document.getElementById('unlockBtn').style.display = 'block';
         document.getElementById('lockBtn').style.display = 'none';
-        
-        // Reset Badge
-        const badge = document.getElementById('statusBadge');
-        badge.className = "status-badge status-locked";
-        badge.innerText = "🔒 LOCKED";
+        document.getElementById('statusBadge').className = "status-badge status-locked";
+        document.getElementById('statusBadge').innerText = "🔒 LOCKED";
     }
 
     async function updateStatus(newStatus) {
         if(!currentCode) return;
-        
-        const confirmMsg = newStatus === 'UNLOCKED' ? "Start Exam?" : "End Exam? Students will be blocked.";
-        if(!confirm(confirmMsg)) return;
+        if(!confirm(newStatus === 'UNLOCKED' ? "Start Session?" : "End Session?")) return;
 
         await db.collection('active_exam_codes').doc(currentCode).update({ status: newStatus });
         
-        const badge = document.getElementById('statusBadge');
         const unlockBtn = document.getElementById('unlockBtn');
         const lockBtn = document.getElementById('lockBtn');
-        const endMsg = document.getElementById('endMsg');
+        const badge = document.getElementById('statusBadge');
 
         if(newStatus === 'UNLOCKED') {
-            badge.className = "status-badge status-live";
-            badge.innerText = "🟢 LIVE";
-            unlockBtn.style.display = 'none';
-            lockBtn.style.display = 'block';
-        } else if(newStatus === 'ENDED') {
-            badge.className = "status-badge status-ended";
-            badge.innerText = "🛑 ENDED";
+            badge.className = "status-badge status-live"; badge.innerText = "🟢 LIVE";
+            unlockBtn.style.display = 'none'; lockBtn.style.display = 'block';
+        } else {
+            badge.className = "status-badge status-ended"; badge.innerText = "🛑 ENDED";
             lockBtn.style.display = 'none';
-            endMsg.style.display = 'block';
-            
-            // Allow generating new code
-            setTimeout(() => {
-                if(confirm("Session Ended. Generate a new code?")) location.reload();
-            }, 1000);
+            setTimeout(() => { if(confirm("Generate new?")) location.reload(); }, 1000);
         }
     }
 
-    // --- DATA HANDLING ---
+    // --- LIVE FEED ---
     const collections = [
-        {name:'grade_xi_part1_essay', label:'XI TP1'}, 
-        {name:'grade_xi_part2_mcq', label:'XI TP2'},
-        {name:'grade_xii_grammar_final', label:'XII Final'},
-        {name:'grade_xii_learning_results', label:'XII Learning'}
+        {name:'grade_xi_part1_essay', label:'XI TP1'}, {name:'grade_xi_part2_mcq', label:'XI TP2'},
+        {name:'grade_xii_grammar_final', label:'XII Final'}, {name:'grade_xii_learning_results', label:'XII Learning'},
+        {name:'week22', label:'Week 22'}
     ];
     let isFirstLoad = true;
 
@@ -231,59 +259,120 @@
         const feed = document.getElementById('live-feed-list');
         if(feed.innerText.includes("Waiting")) feed.innerHTML = "";
         
-        let score = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length+" Pages" : "Submitted");
+        let info = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length+" Pages" : "Completed");
         const div = document.createElement('div');
         div.className = 'notif-card';
-        div.innerHTML = `<div><strong>${d.name}</strong> (${label})<br><small>${d.finish_time}</small></div><div style="color:green; font-weight:bold;">${score}</div>`;
+        div.innerHTML = `
+            <div><strong>${d.name}</strong> <small>(${label})</small><br><span style="color:#64748b; font-size:0.8rem;">${d.finish_time}</span></div>
+            <div style="font-weight:bold; color:${d.cheat_count > 0 ? 'red' : 'green'};">${info}</div>
+        `;
         feed.prepend(div);
     }
 
-    // --- FIXED DOWNLOAD FUNCTION USING BLOB ---
-    async function downloadCSV(col, name) {
-        const snap = await db.collection(col).get();
-        let csv = "Class,No,Name,Score,Cheats,Time,Data\n";
-        
-        snap.forEach(doc => {
-            const d = doc.data();
-            let score = d.final_score || d.score || d.mcq_score || (d.essay_pages ? d.essay_pages.length : 0);
-            
-            // Safe JSON stringify that won't break CSV format
-            let extra = JSON.stringify(d.answers || d.temp_answers || d.all_answers || "")
-                .replace(/,/g,'|')  // Replace commas with pipes
-                .replace(/"/g,"'"); // Replace double quotes with single quotes
-            
-            csv += `${d.class},${d.number},"${d.name}",${score},${d.cheat_count||d.final_cheat_count||0},"${d.finish_time}","${extra}"\n`;
-        });
+    // --- ROBUST DOWNLOAD FUNCTION ---
+    async function downloadCSV(btn, colName, fileName) {
+        // 1. VISUAL FEEDBACK
+        const originalText = btn.innerText;
+        btn.innerText = "⏳ Preparing...";
+        btn.disabled = true;
+        btn.style.background = "#d97706"; // Amber color
 
-        // USE BLOB TO HANDLE LARGE DATA
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        
-        if (navigator.msSaveBlob) { // IE 10+
-            navigator.msSaveBlob(blob, name);
-        } else {
+        try {
+            // 2. FETCH DATA
+            const snap = await db.collection(colName).get();
+            
+            // 3. CHECK EMPTY
+            if (snap.empty) {
+                alert(`⚠️ Collection '${colName}' is empty. No data to download.`);
+                resetBtn(btn, originalText);
+                return;
+            }
+
+            // 4. GENERATE CSV CONTENT
+            let csv = "ID,Class,No,Name,Score/Info,Status,Cheats,Time,RawData\n";
+
+            snap.forEach(doc => {
+                const d = doc.data();
+                
+                // Safe Data Access (Handle missing fields)
+                const id = doc.id;
+                const cls = d.class || "N/A";
+                const no = d.number || "N/A";
+                const name = d.name ? `"${d.name}"` : "Unknown";
+                
+                // Normalize Score
+                let score = d.final_score ?? d.score ?? d.mcq_score ?? 0;
+                if(d.essay_pages) score = d.essay_pages.length + " Pages";
+                if(d.status === "VIEWING") score = "Viewing";
+
+                const status = d.status || "UNKNOWN";
+                const cheats = d.cheat_count ?? d.final_cheat_count ?? 0;
+                const time = d.finish_time || d.start_time || "N/A";
+                
+                // Safe JSON Stringify
+                let raw = "";
+                try {
+                    raw = JSON.stringify(d).replace(/,/g, '|').replace(/"/g, "'").replace(/\n/g, " ");
+                } catch(e) { raw = "Error parsing data"; }
+
+                csv += `${id},${cls},${no},${name},${score},${status},${cheats},"${time}","${raw}"\n`;
+            });
+
+            // 5. CREATE DOWNLOAD BLOB (Robust Method)
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
+            
             link.setAttribute("href", url);
-            link.setAttribute("download", name);
+            link.setAttribute("download", fileName);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            // Success Visual
+            btn.innerText = "✅ Done!";
+            setTimeout(() => resetBtn(btn, originalText), 2000);
+
+        } catch (error) {
+            console.error("Download Error:", error);
+            alert("❌ Error: " + error.message);
+            resetBtn(btn, originalText);
         }
     }
 
+    function resetBtn(btn, originalText) {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        btn.style.background = ""; // Revert to CSS default
+    }
+
+    // --- PHOTO VIEWER ---
     async function openViewerModal(col) {
         document.getElementById('essay-modal').style.display='flex';
         const box = document.getElementById('gallery-content');
         box.innerHTML = "Loading...";
-        const snap = await db.collection(col).get();
+        const snap = await db.collection(col).orderBy('finish_time', 'desc').get();
+        
         box.innerHTML = "";
+        if(snap.empty) box.innerHTML = "No photos found.";
+
         snap.forEach(doc => {
             const d = doc.data();
-            if(d.essay_pages) {
+            if(d.essay_pages && d.essay_pages.length > 0) {
                 let imgs = "";
-                d.essay_pages.forEach(src => imgs += `<img src="${src}" style="height:100px; margin:5px; border:1px solid #ccc; cursor:pointer;" onclick="window.open(this.src)">`);
-                box.innerHTML += `<div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:10px;"><strong>${d.name}</strong> (${d.class})<br>${imgs}</div>`;
+                d.essay_pages.forEach((src, i) => imgs += `<img src="${src}" title="Page ${i+1}" onclick="window.open(this.src)">`);
+                
+                const div = document.createElement('div');
+                div.className = 'essay-row';
+                div.innerHTML = `
+                    <div style="min-width:200px;">
+                        <strong>${d.name}</strong><br>${d.class} (#${d.number})<br>
+                        <span style="color:${d.cheat_count>0?'red':'green'}">${d.cheat_count||0} Cheats</span>
+                    </div>
+                    <div class="essay-thumbs">${imgs}</div>
+                `;
+                box.appendChild(div);
             }
         });
     }
