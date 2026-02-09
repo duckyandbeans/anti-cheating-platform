@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Reading Drill</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --text: #334155;
+            --bg: #f8fafc;
+            --paper: #ffffff;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif; /* Serif font for reading readability */
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            user-select: none; /* Prevent copying text */
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .login-box {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-box h2 { color: var(--primary); margin-bottom: 1.5rem; }
+        
+        select, input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button.btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button.btn-login:hover { background: #1d4ed8; }
+
+        /* --- MAIN CONTENT --- */
+        #main-content { display: none; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+
+        .article-header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
+        .article-header h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 10px; line-height: 1.2; }
+        .meta { color: #64748b; font-style: italic; font-family: 'Segoe UI', sans-serif; font-size: 0.9rem; }
+
+        .content-body { background: var(--paper); padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        
+        h3 { margin-top: 30px; color: var(--accent); border-left: 4px solid var(--accent); padding-left: 15px; }
+        p { margin-bottom: 20px; font-size: 1.1rem; text-align: justify; }
+
+        .image-placeholder {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            border: 2px dashed #cbd5e1;
+        }
+
+        /* --- INSTRUCTION BOX --- */
+        .instruction-box {
+            margin-top: 50px;
+            background: #fff7ed;
+            border: 2px solid #fdba74;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .instruction-box h2 { color: #c2410c; margin-top: 0; }
+        .notebook-title {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 1px solid #fdba74;
+            display: inline-block;
+            font-weight: bold;
+            color: #ea580c;
+            margin-top: 10px;
+        }
+
+        /* --- ANTI-CHEAT UI --- */
+        #cheat-alert {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.95);
+            color: white;
+            z-index: 20000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        #cheat-counter {
+            position: fixed; top: 10px; right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 9000;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <p>Please return to the article immediately.</p>
+        <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: red; font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+    </div>
+
+    <div id="cheat-counter">OFFENSES: 0</div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>🔐 Student Login</h2>
+            <select id="sClass">
+                <option value="">Select Class...</option>
+                <option value="XI D">XI D</option>
+                <option value="XI E">XI E</option>
+                <option value="XI H">XI H</option>
+                <option value="XI I">XI I</option>
+            </select>
+            <input type="number" id="sNo" placeholder="Attendance Number">
+            <input type="text" id="sName" placeholder="Full Name">
+            <button class="btn-login" onclick="attemptLogin()">Start Reading</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px; font-size: 0.9rem;">Please fill all fields.</p>
+        </div>
+    </div>
+
+    <div id="main-content">
+        
+        <header class="article-header">
+            <h1>Money Management in Professional Sports: Why Do Rich Athletes Go Broke?</h1>
+            <div class="meta">
+                Written by Theressa Jabbour<br>
+                Header & Thumbnail photo by Dave Adamson<br>
+                Date: April 8, 2024
+            </div>
+        </header>
+
+        <div class="content-body">
+            <p>Professional athletes often have very high salaries, especially when they are competing at the highest levels of sport. Whether through salary earnings or brand deals, sports such as basketball, football (soccer), American football and golf lead the figures in best paying disciplines.</p>
+            
+            <p>In 2023, <strong>Forbes</strong> reported that out of the 50 top earning athletes in the world, 15 were basketball players in the NBA, 12 were golfers, 10 were American football players in the NFL, 6 were football players, with auto racing, boxing and tennis having two players each, and baseball rounding out the list with one player. Portuguese football player Cristiano Ronaldo tops the list with 136m USD of total earnings last year, with former American football player Tom Brady claiming number 50 with 45.2m USD of total earnings.</p>
+            
+            <p>However, despite the greatness of these numbers, many professional players often find themselves in financial trouble at some point during or after their professional career. An <em>article by Sports Illustrated</em> in 2009 highlights the long-standing commonality of this occurrence in major sports. Within 2 years of retirement, a reported figure of 75% of NFL players find themselves in financial trouble. The numbers for NBA players are similar, with 60% of players going broke within 5 years of leaving the sport. In 2022, <em>Fox Business</em> reported that 78% of professional athletes lose their wealth after barely 3 years into their retirements.</p>
+
+            <div class="image-placeholder">
+                [Image Placeholder: Photo by Josh Appel on Unsplash]
+            </div>
+
+            <p>There are several reasons for this. <strong>One, is financial mismanagement.</strong> Professional athletes reach the big leagues at a relatively young age, leaving them with little to no opportunity to learn the best ways to manage their money. Some end up investing in dodgy companies or trusting the wrong financial advisors, which in extreme cases has led to bankruptcy. <strong>Two, is spending beyond their means.</strong> Many athletes feel attracted to living an extravagant lifestyle once they reach the most coveted jobs in sports. Their salaries are grand and their fame has skyrocketed, leaving them with no care in the world. Purchasing expensive items like cars and houses might seem like an attractive decision, but having a large drain on their accounts can prove unwise once the money stops flowing in. <strong>Finally three, is that professional athletic careers are usually short-lived.</strong> The average career length of an NFL player, for example, is less than 4 years. So, although the athletes are being paid millions of dollars, they have to try to live off the money they made in a few short years for the rest of their lives. Many are forced to retire early due to injuries sustained in games or from having their bodies simply give up after years of pushing past their limits.</p>
+
+            <h3>The Victims:</h3>
+            <p><strong>John Unitas</strong>, a former Colts quarterback, had to file for bankruptcy in 1991 after several failed investments, such as a restaurant, a bowling alley and real estate ventures. Although having played in the NFL for 18 seasons, he had debts of 3.5 million USD as a result.</p>
+            
+            <p>Former basketball player <strong>Kareem Abdul-Jabbar</strong> played in the NBA for 20 seasons, yet found himself in financial hot water in 1980. An untrustworthy agent had mishandled Abdul-Jabbar’s taxes, investments and paycheques.</p>
+            
+            <p><strong>Tony Gwynn</strong>, a former San Diego Padres MLB player, is a particularly interesting case because he filed for bankruptcy two years into a five year contract. Citing liabilities, unpaid taxes and debts, Gwynn blamed his agent for these bad financial decisions.</p>
+            
+            <p><strong>Mike Tyson</strong> is a particularly famous example of how rich athletes go broke. The boxer filed for bankruptcy in 2003, despite making 400 million USD from his career per fight. His overspending finally caught up to him, after having lived a lavish, partying lifestyle. He reportedly had a penchant for luxury cars, high-end houses and pet tigers, leaving him with a debt worth 23 million USD at the time of filing. Nevertheless, Tyson was able to rebuild his wealth despite the odds by taking movie roles and giving up drugs and alcohol.</p>
+
+            <div class="image-placeholder">
+                [Image Placeholder: Photo by Abhishek Chandra on Unsplash]
+            </div>
+
+            <h3>The Victors:</h3>
+            <p>On the other hand, many top athletes have proven that one can be successful and retain wealth after retirement. Basketball star <strong>Michael Jordan</strong> is the one to model for figuring out post-career money management. He made an estimated 94 million USD in his fifteen NBA seasons, with an additional 2.4 billion USD across his entire career through brand deals. Jordan has been sponsored by McDonalds, Coca-Cola, Gatorade, and, most famously, by Nike. This particular endorsement earned him 130 million USD in 2019. He has also invested his money wisely in multiple sports teams, such as the Charlotte Hornets, the Washington Capitals and the Washington Wizards. In 2023, his net worth was still growing, with Forbes estimating it to be around 3 billion USD.</p>
+            
+            <p><strong>Serena Williams</strong>, number forty eight on the 2023 list of highest paid athletes, is another example of proper wealth management. She made 45.3 million USD in 2023, the majority of which came from brand deals with companies such as Nike and Michelob Ultra. Since turning pro in 1995, she has made more than 470 million USD in total earnings. Her off-court investments include her firm Serena Ventures, a multimedia company, as well as a stake in the Miami Dolphins team. By managing her income smartly, Williams has ensured her financial stability for at least a while longer.</p>
+            
+            <p>While it is unfortunate to note the number of professional athletes who go broke due to a variety of financial decisions, some athletes have proven that wise money management is certainly possible. Good decisions are the key to a successful future, and there is always hope that one can overcome any financial obstacles with the right planning.</p>
+        </div>
+
+        <div class="instruction-box">
+            <h2>👀 Look at the Projector</h2>
+            <p>Please look at the screen at the front of the class to view the questions.</p>
+            <p>Answer in your exercise book.</p>
+            <hr style="border: 0; border-top: 1px solid #fdba74; margin: 20px 0;">
+            <p>Title your exercise book:</p>
+            <div class="notebook-title">Reading Drill 1: Why Most Athletes Go Broke in 3 years</div>
+        </div>
+
+    </div>
+
+    <script>
+        let cheatCount = 0;
+        let sessionActive = false;
+        let wakeLock = null;
+
+        // --- LOGIN LOGIC ---
+        async function attemptLogin() {
+            const cls = document.getElementById('sClass').value;
+            const no = document.getElementById('sNo').value;
+            const name = document.getElementById('sName').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            if (!cls || !no || !name) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // SUCCESS
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('cheat-counter').style.display = 'block';
+            
+            // Activate Systems
+            requestWakeLock();
+            setTimeout(() => { sessionActive = true; }, 2000); // Delay cheat tracking slightly
+            document.documentElement.requestFullscreen().catch(e => console.log(e));
+        }
+
+        // --- WAKE LOCK (PREVENT SCREEN SLEEP) ---
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Screen Wake Lock active');
+                
+                // Re-acquire lock if visibility changes (e.g. they switch tab and come back)
+                document.addEventListener('visibilitychange', async () => {
+                    if (wakeLock !== null && document.visibilityState === 'visible') {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                });
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+
+        // --- ANTI-CHEAT SYSTEM ---
+        function triggerCheat() {
+            if (!sessionActive) return;
+            
+            cheatCount++;
+            document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+            document.getElementById('cheat-alert').style.display = 'flex';
+        }
+
+        function dismissCheatAlert() {
+            document.getElementById('cheat-alert').style.display = 'none';
+        }
+
+        // 1. Tab Switch / Minimize
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') {
+                triggerCheat();
+            }
+        });
+
+        // 2. Window Blur (Clicking outside browser)
+        window.addEventListener("blur", () => {
+            triggerCheat();
+        });
+
+    </script>
+</body>
+</html>
