@@ -3,381 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Quiz: Money Management in Sports</title>
+    <title>Week 23: Grammar Dialogues (XII)</title>
     <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c878;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --past-color: #e67e22;
+            --present-color: #2980b9;
+            --advanced-color: #8e44ad; /* Purple for Advanced */
+            --danger: #ef4444;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f9;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 20px;
-        }
-
-        h1 {
-            color: #0056b3;
-        }
-
-        .reading-text {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-        }
-
-        .reading-text h2 {
-            font-size: 1.2em;
-            margin-top: 0;
-        }
-
-        .quiz-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .question-block {
-            margin-bottom: 30px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-
-        .question-text {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .options {
-            list-style-type: none;
+            margin: 0;
             padding: 0;
+            user-select: none;
         }
 
-        .options li {
-            margin-bottom: 10px;
+        /* --- LOGIN OVERLAY --- */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #2c3e50; z-index: 10000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
 
-        .option-label {
-            display: flex;
-            align-items: flex-start;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
-            border: 1px solid #e0e0e0;
+        .login-box {
+            background: white; padding: 40px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.2);
         }
 
-        .option-label:hover {
-            background-color: #f0f8ff;
+        .login-box h2 { color: #2c3e50; margin-bottom: 20px; }
+
+        select, input {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #bdc3c7; border-radius: 6px;
+            font-size: 1rem; box-sizing: border-box;
         }
 
-        .option-input {
-            margin-right: 10px;
-            margin-top: 5px;
+        button.btn-login {
+            width: 100%; padding: 12px; background: var(--primary-color); color: white;
+            border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+        }
+        button.btn-login:hover { background: #357abd; }
+
+        /* --- MAIN CONTAINER --- */
+        #main-content { display: none; padding: 20px; }
+
+        .container {
+            max-width: 800px; margin: 0 auto; background: white;
+            padding: 40px; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
-        .feedback {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-            font-size: 0.9em;
-        }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        p.intro { text-align: center; color: #7f8c8d; margin-bottom: 20px; }
 
-        .feedback.correct {
-            display: block;
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        /* ADVANCED MODE TOGGLE */
+        .mode-toggle-container { text-align: center; margin-bottom: 30px; }
+        .btn-advanced {
+            background: linear-gradient(135deg, #8e44ad, #c0392b);
+            color: white; border: none; padding: 10px 25px;
+            border-radius: 30px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s;
         }
+        .btn-advanced:hover { transform: scale(1.05); }
 
-        .feedback.incorrect {
-            display: block;
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        /* Tense Sections */
+        .tense-section { margin-bottom: 50px; border-top: 2px solid #eee; padding-top: 20px; }
+        .tense-header { font-size: 1.8em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid; display: inline-block; }
+        
+        .present-header { color: var(--present-color); border-color: var(--present-color); }
+        .past-header { color: var(--past-color); border-color: var(--past-color); }
+        .advanced-header { color: var(--advanced-color); border-color: var(--advanced-color); }
 
-        .btn-check {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            margin-top: 20px;
-        }
+        /* Dialogue Sets */
+        .dialogue-set { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 40px; overflow: hidden; }
+        .set-info { background-color: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #e0e0e0; }
+        .set-title { font-weight: bold; font-size: 1.2em; color: #2c3e50; margin: 0; }
+        .set-usage { font-size: 0.9em; color: #666; margin-top: 5px; font-style: italic; }
+        
+        .dialogue-content { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 
-        .btn-check:hover {
-            background-color: #004494;
-        }
+        /* Speech Bubbles */
+        .line { max-width: 80%; padding: 10px 15px; border-radius: 15px; position: relative; font-size: 0.95em; }
+        .speaker-a { align-self: flex-start; background-color: #e3f2fd; color: #0d47a1; border-bottom-left-radius: 2px; }
+        .speaker-a::before { content: "A"; position: absolute; top: -20px; left: 5px; font-size: 0.75em; font-weight: bold; color: #1976d2; }
+        .speaker-b { align-self: flex-end; background-color: #e8f5e9; color: #1b5e20; border-bottom-right-radius: 2px; text-align: right; }
+        .speaker-b::before { content: "B"; position: absolute; top: -20px; right: 5px; font-size: 0.75em; font-weight: bold; color: #388e3c; }
+        
+        strong { font-weight: 600; }
+        
+        /* Advanced Grammar Highlight */
+        .gl { color: var(--advanced-color); font-weight: 700; background: #f3e5f5; padding: 0 4px; border-radius: 4px; }
 
-        .score-display {
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #0056b3;
-            display: none;
+        /* --- ANTI-CHEAT UI --- */
+        #cheat-alert {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000;
+            display: none; justify-content: center; align-items: center;
+            flex-direction: column; text-align: center;
         }
+        #cheat-counter {
+            position: fixed; top: 10px; right: 10px;
+            background: rgba(255, 255, 255, 0.9); padding: 5px 15px;
+            border-radius: 20px; border: 2px solid var(--danger);
+            color: var(--danger); font-weight: bold; font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem; display: none; z-index: 9000;
+        }
+        .watermark {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5000; opacity: 0.03;
+            display: flex; flex-wrap: wrap; overflow: hidden;
+        }
+        .wm-text { transform: rotate(-30deg); margin: 50px; font-weight: 900; font-size: 24px; color: black; }
     </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-<header>
-    <h1>Reading Comprehension: Money in Sports</h1>
-    <p>Read the text below and answer the 12 multiple-choice questions.</p>
-</header>
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <p>Please return to the reading material.</p>
+        <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: red; font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+    </div>
+    <div id="cheat-counter">OFFENSES: 0</div>
+    <div class="watermark" id="watermark"></div>
 
-<div class="reading-text">
-    <h2>Money Management in Professional Sports: Why Do Rich Athletes Go Broke?</h2>
-    <p><em>Written by Theressa Jabbour</em></p>
-    <p>Professional athletes often have very high salaries, especially when they are competing at the highest levels of sport. Whether through salary earnings or brand deals, sports such as basketball, football (soccer), American football and golf lead the figures in best paying disciplines.</p>
-    <p>In 2023, Forbes reported that out of the 50 top earning athletes in the world, 15 were basketball players in the NBA, 12 were golfers, 10 were American football players in the NFL, 6 were football players, with auto racing, boxing and tennis having two players each, and baseball rounding out the list with one player. Portuguese football player Cristiano Ronaldo tops the list with 136m USD of total earnings last year, with former American football player Tom Brady claiming number 50 with 45.2m USD of total earnings.</p>
-    <p>However, despite the greatness of these numbers, many professional players often find themselves in financial trouble at some point during or after their professional career. An article by Sports Illustrated in 2009 highlights the long-standing commonality of this occurrence in major sports. Within 2 years of retirement, a reported figure of 75% of NFL players find themselves in financial trouble. The numbers for NBA players are similar, with 60% of players going broke within 5 years of leaving the sport. In 2022, Fox Business reported that 78% of professional athletes lose their wealth after barely 3 years into their retirements.</p>
-    <p>There are several reasons for this. One, is financial mismanagement. Professional athletes reach the big leagues at a relatively young age, leaving them with little to no opportunity to learn the best ways to manage their money. Some end up investing in dodgy companies or trusting the wrong financial advisors, which in extreme cases has led to bankruptcy. Two, is spending beyond their means. Many athletes feel attracted to living an extravagant lifestyle once they reach the most coveted jobs in sports. Their salaries are grand and their fame has skyrocketed, leaving them with no care in the world. Purchasing expensive items like cars and houses might seem like an attractive decision, but having a large drain on their accounts can prove unwise once the money stops flowing in. Finally three, is that professional athletic careers are usually short-lived. The average career length of an NFL player, for example, is less than 4 years. So, although the athletes are being paid millions of dollars, they have to try to live off the money they made in a few short years for the rest of their lives. Many are forced to retire early due to injuries sustained in games or from having their bodies simply give up after years of pushing past their limits. A lot of these sports are dangerous for the players, as touched upon in my previous article about Safety Standards in Sport, or require a high level of fitness that simply cannot be maintained over a lifetime. With aging bodies and a risk of injuries, athletes are forced to retire well before the average retirement age in their countries. While some may think that the amount of money they make is enough to set them up for life, read on to discover how some athletes lost their fortunes.</p>
-    <p><strong>The Victims:</strong><br>John Unitas, a former Colts quarterback, had to file for bankruptcy in 1991 after several failed investments, such as a restaurant, a bowling alley and real estate ventures. Although having played in the NFL for 18 seasons, he had debts of 3.5 million USD as a result.</p>
-    <p>Former basketball player Kareem Abdul-Jabbar played in the NBA for 20 seasons, yet found himself in financial hot water in 1980. An untrustworthy agent had mishandled Abdul-Jabbar’s taxes, investments and paycheques.</p>
-    <p>Tony Gwynn, a former San Diego Padres MLB player, is a particularly interesting case because he filed for bankruptcy two years into a five year contract. Citing liabilities, unpaid taxes and debts, Gwynn blamed his agent for these bad financial decisions.</p>
-    <p>Mike Tyson is a particularly famous example of how rich athletes go broke. The boxer filed for bankruptcy in 2003, despite making 400 million USD from his career per fight. His overspending finally caught up to him, after having lived a lavish, partying lifestyle. He reportedly had a penchant for luxury cars, high-end houses and pet tigers, leaving him with a debt worth 23 million USD at the time of filing. Nevertheless, Tyson was able to rebuild his wealth despite the odds by taking movie roles and giving up drugs and alcohol.</p>
-    <p><strong>The Victors:</strong><br>On the other hand, many top athletes have proven that one can be successful and retain wealth after retirement. Basketball star Michael Jordan is the one to model for figuring out post-career money management. He made an estimated 94 million USD in his fifteen NBA seasons, with an additional 2.4 billion USD across his entire career through brand deals. Jordan has been sponsored by McDonalds, Coca-Cola, Gatorade, and, most famously, by Nike. This particular endorsement earned him 130 million USD in 2019. He has also invested his money wisely in multiple sports teams, such as the Charlotte Hornets, the Washington Capitals and the Washington Wizards. In 2023, his net worth was still growing, with Forbes estimating it to be around 3 billion USD. Clearly, the lesson seems to be that the diversification of income and wise investment of wealth is a great way for athletes to maintain and grow their wealth after retirement.</p>
-    <p>Serena Williams, number forty eight on the 2023 list of highest paid athletes, is another example of proper wealth management. She made 45.3 million USD in 2023, the majority of which came from brand deals with companies such as Nike and Michelob Ultra. Since turning pro in 1995, she has made more than 470 million USD in total earnings. Her off-court investments include her firm Serena Ventures, a multimedia company, as well as a stake in the Miami Dolphins team. By managing her income smartly, Williams has ensured her financial stability for at least a while longer.</p>
-    <p>While it is unfortunate to note the number of professional athletes who go broke due to a variety of financial decisions, some athletes have proven that wise money management is certainly possible. Although short-lived careers may not be an expectation for athletes at the top of their game, the need for financial preparedness is clear throughout the decades in order for former players to live comfortably past retirement. Good decisions are the key to a successful future, and there is always hope that one can overcome any financial obstacles with the right planning. This advice can translate beyond the sports world too, and the examples of pro athletes can serve as a warning to think twice before making any important financial decisions.</p>
-</div>
-
-<div class="quiz-container">
-    <form id="quizForm">
-        <div class="question-block" id="q1">
-            <div class="question-text">1. According to the article, what distinction does the author make between the financial success of Cristiano Ronaldo and the broader list of top-earning athletes?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q1" value="A" class="option-input"> A) Ronaldo earns more from brand deals than any other athlete on the list.</label></li>
-                <li><label class="option-label"><input type="radio" name="q1" value="B" class="option-input"> B) Ronaldo is the only football player mentioned in the top 50 list.</label></li>
-                <li><label class="option-label"><input type="radio" name="q1" value="C" class="option-input"> C) Ronaldo holds the top spot for total earnings, despite basketball players being the most numerous group on the list.</label></li>
-                <li><label class="option-label"><input type="radio" name="q1" value="D" class="option-input"> D) Ronaldo's earnings are primarily from salary, whereas Tom Brady's are from endorsements.</label></li>
-                <li><label class="option-label"><input type="radio" name="q1" value="E" class="option-input"> E) Ronaldo retired with more wealth than Tom Brady.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q1"></div>
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>📚 Grammar Login</h2>
+            <select id="sClass">
+                <option value="">Select Class...</option>
+                <option value="XII D">XII D</option>
+                <option value="XII E">XII E</option>
+                <option value="XII H">XII H</option>
+                <option value="XII I">XII I</option>
+            </select>
+            <input type="number" id="sNo" placeholder="Attendance Number">
+            <input type="text" id="sName" placeholder="Full Name">
+            <button class="btn-login" onclick="attemptLogin()">Start Session</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px; font-size: 0.9rem;">Please fill all fields.</p>
         </div>
+    </div>
 
-        <div class="question-block" id="q2">
-            <div class="question-text">2. Which of the following creates a 'vicious cycle' for young athletes, as implied by the section on financial mismanagement?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q2" value="A" class="option-input"> A) They retire early due to injury and cannot find new jobs.</label></li>
-                <li><label class="option-label"><input type="radio" name="q2" value="B" class="option-input"> B) They enter the league young with no financial knowledge, making them vulnerable to bad advice.</label></li>
-                <li><label class="option-label"><input type="radio" name="q2" value="C" class="option-input"> C) They spend too much money on houses because they have large families to support.</label></li>
-                <li><label class="option-label"><input type="radio" name="q2" value="D" class="option-input"> D) They are paid less than older players, forcing them to make risky investments.</label></li>
-                <li><label class="option-label"><input type="radio" name="q2" value="E" class="option-input"> E) They prioritize fame over their actual performance in the sport.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q2"></div>
+    <div id="main-content">
+        <div class="container">
+            <h1>Context-Based Grammar</h1>
+            <p class="intro">Read the dialogues aloud. Use the button below to toggle difficulty.</p>
+
+            <div class="mode-toggle-container">
+                <button class="btn-advanced" onclick="toggleMode()">🔥 Toggle Advanced Mode</button>
+            </div>
+
+            <div id="standard-mode">
+                <div class="tense-section">
+                    <h2 class="tense-header present-header">Part 1: The Present Tenses</h2>
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 1: Simple Present Tense</h3>
+                            <div class="set-usage">Topic: Video Games & Free Time</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Do you play <em>Mobile Legends</em> every day?</div>
+                            <div class="line speaker-b">No, I usually play only on weekends.</div>
+                            <div class="line speaker-a">I play every single night, so I am always tired.</div>
+                            <div class="line speaker-b">That sounds unhealthy.</div>
+                        </div>
+                    </div>
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 2: Present Continuous</h3><div class="set-usage">Topic: Currently Busy</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Are you busy right now?</div>
+                            <div class="line speaker-b">Yes, I am jogging at the park.</div>
+                            <div class="line speaker-a">Oh, I am sitting at a cafe and drinking coffee.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tense-section">
+                    <h2 class="tense-header past-header">Part 2: The Past Tenses</h2>
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 5: Simple Past</h3><div class="set-usage">Topic: The Weekend Trip</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Where did you go last Saturday?</div>
+                            <div class="line speaker-b">I went to the beach with my cousins.</div>
+                            <div class="line speaker-a">Did you swim in the ocean?</div>
+                            <div class="line speaker-b">Yes, we swam for hours.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="advanced-mode" style="display: none;">
+                <div class="tense-section">
+                    <h2 class="tense-header advanced-header">Part 3: Advanced Grammar</h2>
+
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 9: Reported Speech</h3>
+                            <div class="set-usage"><strong>Usage:</strong> Telling someone what another person said (Backshifting tenses).<br><strong>Topic:</strong> Gossip & Messages</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Did you speak to the manager about the holiday?</div>
+                            <div class="line speaker-b">Yes. He said that <span class="gl">he was considering</span> our request.</div>
+                            <div class="line speaker-a">"Considering"? Yesterday he told me <span class="gl">he loved</span> the idea!</div>
+                            <div class="line speaker-b">Well, today he told me that <span class="gl">we had to finish</span> the project first.</div>
+                            <div class="line speaker-a">That's annoying. Did he say when the deadline was?</div>
+                            <div class="line speaker-b">He said that <span class="gl">it was</span> next Monday.</div>
+                            <div class="line speaker-a">I thought he said <span class="gl">we could submit</span> it on Tuesday!</div>
+                            <div class="line speaker-b">He changed his mind. He also asked <span class="gl">if we were working</span> overtime tonight.</div>
+                            <div class="line speaker-a">I told him <span class="gl">I couldn't stay</span> late.</div>
+                            <div class="line speaker-b">Good for you. He claimed that <span class="gl">everyone was staying</span>, but that's a lie.</div>
+                        </div>
+                    </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 10: Passive Voice</h3>
+                            <div class="set-usage"><strong>Usage:</strong> Focusing on the action or object, not the person doing it.<br><strong>Topic:</strong> Crime & Mystery</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Did you hear about the bank robbery?</div>
+                            <div class="line speaker-b">Yes! It <span class="gl">was robbed</span> late last night.</div>
+                            <div class="line speaker-a">That's crazy. <span class="gl">Was any money taken</span>?</div>
+                            <div class="line speaker-b">Millions <span class="gl">were stolen</span> from the vault.</div>
+                            <div class="line speaker-a">How did they get in? <span class="gl">Was the door broken</span>?</div>
+                            <div class="line speaker-b">No, the security system <span class="gl">had been hacked</span> remotely.</div>
+                            <div class="line speaker-a">Wow. <span class="gl">Have the thieves been caught</span> yet?</div>
+                            <div class="line speaker-b">Not yet. The evidence <span class="gl">is being analyzed</span> right now by the police.</div>
+                            <div class="line speaker-a">It sounds like a movie.</div>
+                            <div class="line speaker-b">It does. It <span class="gl">is believed</span> that it was an inside job.</div>
+                            <div class="line speaker-a">I hope the money <span class="gl">is recovered</span> soon.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <div class="question-block" id="q3">
-            <div class="question-text">3. Based on the text, what is the primary factor that distinguishes Mike Tyson's financial troubles from those of Kareem Abdul-Jabbar?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q3" value="A" class="option-input"> A) Tyson earned significantly less money during his career than Abdul-Jabbar.</label></li>
-                <li><label class="option-label"><input type="radio" name="q3" value="B" class="option-input"> B) Tyson's financial collapse was largely due to personal overspending, whereas Abdul-Jabbar was a victim of a dishonest agent.</label></li>
-                <li><label class="option-label"><input type="radio" name="q3" value="C" class="option-input"> C) Tyson failed to invest in real estate, while Abdul-Jabbar invested in failed restaurants.</label></li>
-                <li><label class="option-label"><input type="radio" name="q3" value="D" class="option-input"> D) Tyson filed for bankruptcy immediately after retirement, while Abdul-Jabbar filed during his career.</label></li>
-                <li><label class="option-label"><input type="radio" name="q3" value="E" class="option-input"> E) Tyson had a shorter career than Abdul-Jabbar.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q3"></div>
-        </div>
-
-        <div class="question-block" id="q4">
-            <div class="question-text">4. What evidence does the author provide to support the claim that "diversification of income" is key to maintaining wealth?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q4" value="A" class="option-input"> A) Statistics showing that golfers earn money from more diverse sources than football players.</label></li>
-                <li><label class="option-label"><input type="radio" name="q4" value="B" class="option-input"> B) The fact that Tom Brady earned 45.2 million USD implies he had multiple income streams.</label></li>
-                <li><label class="option-label"><input type="radio" name="q4" value="C" class="option-input"> C) Michael Jordan's investment in sports teams and varied brand endorsements resulted in a net worth of 3 billion USD.</label></li>
-                <li><label class="option-label"><input type="radio" name="q4" value="D" class="option-input"> D) Serena Williams' decision to continue playing tennis until 2023.</label></li>
-                <li><label class="option-label"><input type="radio" name="q4" value="E" class="option-input"> E) The 78% of athletes who lose their wealth did not have brand deals.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q4"></div>
-        </div>
-
-        <div class="question-block" id="q5">
-            <div class="question-text">5. Why is Tony Gwynn’s case described as "particularly interesting" compared to the other athletes mentioned?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q5" value="A" class="option-input"> A) He was the only baseball player mentioned in the text.</label></li>
-                <li><label class="option-label"><input type="radio" name="q5" value="B" class="option-input"> B) He filed for bankruptcy while he was still under a multi-year contract.</label></li>
-                <li><label class="option-label"><input type="radio" name="q5" value="C" class="option-input"> C) He had no debts but still filed for bankruptcy.</label></li>
-                <li><label class="option-label"><input type="radio" name="q5" value="D" class="option-input"> D) He was the only athlete to successfully sue his agent.</label></li>
-                <li><label class="option-label"><input type="radio" name="q5" value="E" class="option-input"> E) He managed to hide his financial troubles until after his death.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q5"></div>
-        </div>
-
-        <div class="question-block" id="q6">
-            <div class="question-text">6. What implied connection does the author make between "safety standards" and financial stability?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q6" value="A" class="option-input"> A) Improving safety standards would allow athletes to play longer, thereby earning money for more years.</label></li>
-                <li><label class="option-label"><input type="radio" name="q6" value="B" class="option-input"> B) Safety standards are expensive to maintain, costing athletes millions in fees.</label></li>
-                <li><label class="option-label"><input type="radio" name="q6" value="C" class="option-input"> C) Athletes who ignore safety standards are more likely to be reckless spenders.</label></li>
-                <li><label class="option-label"><input type="radio" name="q6" value="D" class="option-input"> D) Leagues with poor safety standards pay their athletes less.</label></li>
-                <li><label class="option-label"><input type="radio" name="q6" value="E" class="option-input"> E) Safety standards have no impact on financial stability.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q6"></div>
-        </div>
-
-        <div class="question-block" id="q7">
-            <div class="question-text">7. In the context of the sentence "having a large drain on their accounts can prove unwise", what does the phrase "drain on their accounts" refer to?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q7" value="A" class="option-input"> A) Fees paid to agents.</label></li>
-                <li><label class="option-label"><input type="radio" name="q7" value="B" class="option-input"> B) Taxes owed to the government.</label></li>
-                <li><label class="option-label"><input type="radio" name="q7" value="C" class="option-input"> C) Recurring high expenses from maintaining an extravagant lifestyle.</label></li>
-                <li><label class="option-label"><input type="radio" name="q7" value="D" class="option-input"> D) Bank fees for international transfers.</label></li>
-                <li><label class="option-label"><input type="radio" name="q7" value="E" class="option-input"> E) Losses from stock market crashes.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q7"></div>
-        </div>
-
-        <div class="question-block" id="q8">
-            <div class="question-text">8. Which statement best summarizes the author's advice in the conclusion?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q8" value="A" class="option-input"> A) Athletes should avoid retiring until they are at least 40 years old.</label></li>
-                <li><label class="option-label"><input type="radio" name="q8" value="B" class="option-input"> B) Financial preparedness and planning are essential because high earnings are often temporary.</label></li>
-                <li><label class="option-label"><input type="radio" name="q8" value="C" class="option-input"> C) Athletes should not trust agents and should manage their own finances.</label></li>
-                <li><label class="option-label"><input type="radio" name="q8" value="D" class="option-input"> D) Only athletes who win championships can secure their financial future.</label></li>
-                <li><label class="option-label"><input type="radio" name="q8" value="E" class="option-input"> E) Sports are too dangerous and should be avoided as a career path.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q8"></div>
-        </div>
-
-        <div class="question-block" id="q9">
-            <div class="question-text">9. What is the significance of John Unitas's story in the text?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q9" value="A" class="option-input"> A) It proves that even long careers (18 seasons) do not guarantee financial safety if investments fail.</label></li>
-                <li><label class="option-label"><input type="radio" name="q9" value="B" class="option-input"> B) It shows that restaurants are the worst investment for athletes.</label></li>
-                <li><label class="option-label"><input type="radio" name="q9" value="C" class="option-input"> C) It illustrates that football players are more likely to go broke than basketball players.</label></li>
-                <li><label class="option-label"><input type="radio" name="q9" value="D" class="option-input"> D) It highlights the dangers of gambling in bowling alleys.</label></li>
-                <li><label class="option-label"><input type="radio" name="q9" value="E" class="option-input"> E) It suggests that quarterbacks are more financially stable than other positions.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q9"></div>
-        </div>
-
-        <div class="question-block" id="q10">
-            <div class="question-text">10. According to the text, how did Mike Tyson attempt to recover from his financial collapse?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q10" value="A" class="option-input"> A) By winning more boxing matches.</label></li>
-                <li><label class="option-label"><input type="radio" name="q10" value="B" class="option-input"> B) By suing his former financial advisors.</label></li>
-                <li><label class="option-label"><input type="radio" name="q10" value="C" class="option-input"> C) By taking movie roles and changing his lifestyle habits.</label></li>
-                <li><label class="option-label"><input type="radio" name="q10" value="D" class="option-input"> D) By investing in tech startups.</label></li>
-                <li><label class="option-label"><input type="radio" name="q10" value="E" class="option-input"> E) By selling his pet tigers to a zoo.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q10"></div>
-        </div>
-
-        <div class="question-block" id="q11">
-            <div class="question-text">11. What can be inferred about the career lifespan of an NFL player compared to the general retirement age?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q11" value="A" class="option-input"> A) NFL players work longer than the average person.</label></li>
-                <li><label class="option-label"><input type="radio" name="q11" value="B" class="option-input"> B) NFL players retire decades earlier than the average worker, requiring their savings to last much longer.</label></li>
-                <li><label class="option-label"><input type="radio" name="q11" value="C" class="option-input"> C) NFL players usually retire at age 65 like everyone else.</label></li>
-                <li><label class="option-label"><input type="radio" name="q11" value="D" class="option-input"> D) NFL players transition immediately into coaching.</label></li>
-                <li><label class="option-label"><input type="radio" name="q11" value="E" class="option-input"> E) NFL careers are short, but pension plans cover all their needs.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q11"></div>
-        </div>
-
-        <div class="question-block" id="q12">
-            <div class="question-text">12. Which of the following best describes the organizational structure of the text?</div>
-            <ul class="options">
-                <li><label class="option-label"><input type="radio" name="q12" value="A" class="option-input"> A) Chronological history of sports salaries followed by predictions for the future.</label></li>
-                <li><label class="option-label"><input type="radio" name="q12" value="B" class="option-input"> B) A debate between two opposing viewpoints on whether athletes are overpaid.</label></li>
-                <li><label class="option-label"><input type="radio" name="q12" value="C" class="option-input"> C) A problem-solution structure presenting the issue of financial instability, its causes, case studies of failure, and examples of success.</label></li>
-                <li><label class="option-label"><input type="radio" name="q12" value="D" class="option-input"> D) A biography of Michael Jordan with comparisons to other athletes.</label></li>
-                <li><label class="option-label"><input type="radio" name="q12" value="E" class="option-input"> E) A guide on how to become a professional athlete.</label></li>
-            </ul>
-            <div class="feedback" id="feedback-q12"></div>
-        </div>
-
-        <button type="button" class="btn-check" onclick="checkAnswers()">Check Answers</button>
-        <div class="score-display" id="score"></div>
-    </form>
-</div>
-
-<script>
-    function checkAnswers() {
-        const answers = {
-            q1: 'C',
-            q2: 'B',
-            q3: 'B',
-            q4: 'C',
-            q5: 'B',
-            q6: 'A',
-            q7: 'C',
-            q8: 'B',
-            q9: 'A',
-            q10: 'C',
-            q11: 'B',
-            q12: 'C'
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+          authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+          projectId: "anti-cheating-remedial-quiz",
+          storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+          messagingSenderId: "979294386230",
+          appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
         };
+        try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
 
-        const rationales = {
-            q1: "Correct! The text states Ronaldo is #1, but NBA players are the most represented group (15 players) compared to football players (6).",
-            q2: "Correct! The text links young age with a lack of financial knowledge, leading to bad advice.",
-            q3: "Correct! The text highlights Tyson's lifestyle/spending vs Abdul-Jabbar's untrustworthy agent.",
-            q4: "Correct! Jordan's wealth is explicitly linked to endorsements (Nike) and owning teams (Hornets).",
-            q5: "Correct! The text notes he went bankrupt 2 years into a 5-year contract, which is unusual.",
-            q6: "Correct! Dangerous sports lead to injury/early retirement; implying safer standards would extend careers and earnings.",
-            q7: "Correct! The 'drain' refers to purchasing expensive items and the 'extravagant lifestyle' mentioned previously.",
-            q8: "Correct! The conclusion emphasizes financial preparedness and planning.",
-            q9: "Correct! Unitas played 18 seasons (a long time) but still failed financially, proving time isn't the only factor.",
-            q10: "Correct! Tyson rebuilt wealth by taking movie roles and giving up drugs/alcohol.",
-            q11: "Correct! A 4-year career ending in one's 20s means savings must last 50+ years.",
-            q12: "Correct! The text outlines the Problem, Causes, Victims (Failures), and Victors (Successes)."
-        };
+        const COLLECTION_NAME = "week23xii";
+        let cheatCount = 0;
+        let sessionActive = false;
+        let wakeLock = null;
+        let currentDocID = null;
 
-        let score = 0;
-        let total = 12;
+        // --- WATERMARK ---
+        (function() {
+            const wm = document.getElementById('watermark');
+            let html = ""; for(let i=0; i<40; i++) html += `<div class="wm-text">READING MODE</div>`;
+            wm.innerHTML = html;
+        })();
 
-        for (let i = 1; i <= total; i++) {
-            const qId = 'q' + i;
-            const selected = document.querySelector(`input[name="${qId}"]:checked`);
-            const feedbackDiv = document.getElementById(`feedback-${qId}`);
-
-            // Reset styles
-            feedbackDiv.className = 'feedback';
-            feedbackDiv.style.display = 'none';
-
-            if (selected) {
-                if (selected.value === answers[qId]) {
-                    score++;
-                    feedbackDiv.innerHTML = `<strong>Correct!</strong> ${rationales[qId]}`;
-                    feedbackDiv.classList.add('correct');
-                } else {
-                    feedbackDiv.innerHTML = `<strong>Incorrect.</strong> The correct answer was <strong>${answers[qId]}</strong>.`;
-                    feedbackDiv.classList.add('incorrect');
-                }
-                feedbackDiv.style.display = 'block';
+        // --- TOGGLE ADVANCED MODE ---
+        function toggleMode() {
+            const standard = document.getElementById('standard-mode');
+            const advanced = document.getElementById('advanced-mode');
+            
+            if (standard.style.display === 'none') {
+                standard.style.display = 'block';
+                advanced.style.display = 'none';
+            } else {
+                standard.style.display = 'none';
+                advanced.style.display = 'block';
             }
         }
 
-        const scoreDisplay = document.getElementById('score');
-        scoreDisplay.textContent = `You scored ${score} out of ${total}`;
-        scoreDisplay.style.display = 'block';
-        
-        // Scroll to bottom to see score
-        scoreDisplay.scrollIntoView({ behavior: 'smooth' });
-    }
-</script>
+        // --- LOGIN LOGIC ---
+        async function attemptLogin() {
+            const cls = document.getElementById('sClass').value;
+            const no = document.getElementById('sNo').value;
+            const name = document.getElementById('sName').value;
+            const errorMsg = document.getElementById('error-msg');
 
+            if (!cls || !no || !name) {
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Create Session in Database
+            currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+            
+            try {
+                await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                    name: name,
+                    class: cls,
+                    number: no,
+                    start_time: new Date().toLocaleString(),
+                    status: "READING_DIALOGUES",
+                    cheat_count: 0
+                }, { merge: true });
+            } catch(e) {
+                console.error("DB Error", e);
+            }
+
+            // SUCCESS UI UPDATE
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('cheat-counter').style.display = 'block';
+            
+            // Activate Systems
+            requestWakeLock();
+            setTimeout(() => { sessionActive = true; }, 2000); 
+            document.documentElement.requestFullscreen().catch(e => console.log(e));
+        }
+
+        // --- WAKE LOCK ---
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                document.addEventListener('visibilitychange', async () => {
+                    if (wakeLock !== null && document.visibilityState === 'visible') {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        // --- ANTI-CHEAT SYSTEM ---
+        function triggerCheat() {
+            if (!sessionActive) return;
+            
+            cheatCount++;
+            document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+            document.getElementById('cheat-alert').style.display = 'flex';
+
+            if(currentDocID) {
+                db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: cheatCount });
+            }
+        }
+
+        function dismissCheatAlert() {
+            document.getElementById('cheat-alert').style.display = 'none';
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') triggerCheat();
+        });
+
+        window.addEventListener("blur", () => {
+            triggerCheat();
+        });
+
+    </script>
 </body>
 </html>
