@@ -23,7 +23,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            user-select: none;
+            user-select: none; /* Prevent Copying */
         }
 
         /* --- LOGIN OVERLAY --- */
@@ -54,7 +54,7 @@
         }
         button.btn-login:hover { background: #357abd; }
 
-        /* --- MAIN CONTAINER --- */
+        /* --- MAIN CONTAINER (Hidden Initially) --- */
         #main-content { display: none; padding: 20px; }
 
         .container {
@@ -168,13 +168,12 @@
             </div>
 
             <div id="standard-mode">
+                
                 <div class="tense-section">
                     <h2 class="tense-header present-header">Part 1: The Present Tenses</h2>
+                    
                     <div class="dialogue-set">
-                        <div class="set-info">
-                            <h3 class="set-title">Set 1: Simple Present Tense</h3>
-                            <div class="set-usage">Topic: Video Games & Free Time</div>
-                        </div>
+                        <div class="set-info"><h3 class="set-title">Set 1: Simple Present</h3><div class="set-usage">Habits & Facts</div></div>
                         <div class="dialogue-content">
                             <div class="line speaker-a">Do you play <em>Mobile Legends</em> every day?</div>
                             <div class="line speaker-b">No, I usually play only on weekends.</div>
@@ -182,25 +181,68 @@
                             <div class="line speaker-b">That sounds unhealthy.</div>
                         </div>
                     </div>
+
                     <div class="dialogue-set">
-                        <div class="set-info"><h3 class="set-title">Set 2: Present Continuous</h3><div class="set-usage">Topic: Currently Busy</div></div>
+                        <div class="set-info"><h3 class="set-title">Set 2: Present Continuous</h3><div class="set-usage">Happening Now</div></div>
                         <div class="dialogue-content">
                             <div class="line speaker-a">Are you busy right now?</div>
                             <div class="line speaker-b">Yes, I am jogging at the park.</div>
                             <div class="line speaker-a">Oh, I am sitting at a cafe and drinking coffee.</div>
                         </div>
                     </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 3: Present Perfect</h3><div class="set-usage">Experience (Time Unspecified)</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Have you ever seen the new Marvel movie?</div>
+                            <div class="line speaker-b">No, I haven't seen it yet. Is it good?</div>
+                            <div class="line speaker-a">It is amazing. I have watched it three times already.</div>
+                        </div>
+                    </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 4: Present Perfect Continuous</h3><div class="set-usage">Duration from Past to Now</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">I have been waiting for you for thirty minutes!</div>
+                            <div class="line speaker-b">Sorry! I have been looking for my keys.</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="tense-section">
                     <h2 class="tense-header past-header">Part 2: The Past Tenses</h2>
+                    
                     <div class="dialogue-set">
-                        <div class="set-info"><h3 class="set-title">Set 5: Simple Past</h3><div class="set-usage">Topic: The Weekend Trip</div></div>
+                        <div class="set-info"><h3 class="set-title">Set 5: Simple Past</h3><div class="set-usage">Finished Past Action</div></div>
                         <div class="dialogue-content">
                             <div class="line speaker-a">Where did you go last Saturday?</div>
                             <div class="line speaker-b">I went to the beach with my cousins.</div>
                             <div class="line speaker-a">Did you swim in the ocean?</div>
                             <div class="line speaker-b">Yes, we swam for hours.</div>
+                        </div>
+                    </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 6: Past Continuous</h3><div class="set-usage">Interrupted Action</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Why didn't you answer my call?</div>
+                            <div class="line speaker-b">Sorry, I was sleeping when you called.</div>
+                        </div>
+                    </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 7: Past Perfect</h3><div class="set-usage">Before Another Past Event</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Did you catch the movie?</div>
+                            <div class="line speaker-b">No, by the time I arrived, it had already started.</div>
+                        </div>
+                    </div>
+
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 8: Past Perfect Continuous</h3><div class="set-usage">Duration Before Past Event</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Your eyes were so red yesterday.</div>
+                            <div class="line speaker-b">Yeah, I had been crying before you came in.</div>
                         </div>
                     </div>
                 </div>
@@ -213,39 +255,31 @@
                     <div class="dialogue-set">
                         <div class="set-info">
                             <h3 class="set-title">Set 9: Reported Speech</h3>
-                            <div class="set-usage"><strong>Usage:</strong> Telling someone what another person said (Backshifting tenses).<br><strong>Topic:</strong> Gossip & Messages</div>
+                            <div class="set-usage"><strong>Usage:</strong> Backshifting tenses to report words.<br><strong>Topic:</strong> Gossip</div>
                         </div>
                         <div class="dialogue-content">
-                            <div class="line speaker-a">Did you speak to the manager about the holiday?</div>
+                            <div class="line speaker-a">Did you speak to the manager?</div>
                             <div class="line speaker-b">Yes. He said that <span class="gl">he was considering</span> our request.</div>
-                            <div class="line speaker-a">"Considering"? Yesterday he told me <span class="gl">he loved</span> the idea!</div>
+                            <div class="line speaker-a">Really? Yesterday he told me <span class="gl">he loved</span> the idea!</div>
                             <div class="line speaker-b">Well, today he told me that <span class="gl">we had to finish</span> the project first.</div>
-                            <div class="line speaker-a">That's annoying. Did he say when the deadline was?</div>
-                            <div class="line speaker-b">He said that <span class="gl">it was</span> next Monday.</div>
-                            <div class="line speaker-a">I thought he said <span class="gl">we could submit</span> it on Tuesday!</div>
-                            <div class="line speaker-b">He changed his mind. He also asked <span class="gl">if we were working</span> overtime tonight.</div>
+                            <div class="line speaker-b">He also asked <span class="gl">if we were working</span> overtime.</div>
                             <div class="line speaker-a">I told him <span class="gl">I couldn't stay</span> late.</div>
-                            <div class="line speaker-b">Good for you. He claimed that <span class="gl">everyone was staying</span>, but that's a lie.</div>
                         </div>
                     </div>
 
                     <div class="dialogue-set">
                         <div class="set-info">
                             <h3 class="set-title">Set 10: Passive Voice</h3>
-                            <div class="set-usage"><strong>Usage:</strong> Focusing on the action or object, not the person doing it.<br><strong>Topic:</strong> Crime & Mystery</div>
+                            <div class="set-usage"><strong>Usage:</strong> Focus on the action/object.<br><strong>Topic:</strong> Crime</div>
                         </div>
                         <div class="dialogue-content">
                             <div class="line speaker-a">Did you hear about the bank robbery?</div>
                             <div class="line speaker-b">Yes! It <span class="gl">was robbed</span> late last night.</div>
                             <div class="line speaker-a">That's crazy. <span class="gl">Was any money taken</span>?</div>
                             <div class="line speaker-b">Millions <span class="gl">were stolen</span> from the vault.</div>
-                            <div class="line speaker-a">How did they get in? <span class="gl">Was the door broken</span>?</div>
-                            <div class="line speaker-b">No, the security system <span class="gl">had been hacked</span> remotely.</div>
-                            <div class="line speaker-a">Wow. <span class="gl">Have the thieves been caught</span> yet?</div>
-                            <div class="line speaker-b">Not yet. The evidence <span class="gl">is being analyzed</span> right now by the police.</div>
-                            <div class="line speaker-a">It sounds like a movie.</div>
-                            <div class="line speaker-b">It does. It <span class="gl">is believed</span> that it was an inside job.</div>
-                            <div class="line speaker-a">I hope the money <span class="gl">is recovered</span> soon.</div>
+                            <div class="line speaker-b">The security system <span class="gl">had been hacked</span> remotely.</div>
+                            <div class="line speaker-a">Wow. <span class="gl">Have the thieves been caught</span>?</div>
+                            <div class="line speaker-b">Not yet. The evidence <span class="gl">is being analyzed</span> right now.</div>
                         </div>
                     </div>
 
@@ -333,7 +367,7 @@
             document.documentElement.requestFullscreen().catch(e => console.log(e));
         }
 
-        // --- WAKE LOCK ---
+        // --- WAKE LOCK (ANTI-SLEEP) ---
         async function requestWakeLock() {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
@@ -342,7 +376,7 @@
                         wakeLock = await navigator.wakeLock.request('screen');
                     }
                 });
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Wake Lock Error:", err); }
         }
 
         // --- ANTI-CHEAT SYSTEM ---
