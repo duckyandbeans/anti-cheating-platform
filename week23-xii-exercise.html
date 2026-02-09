@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Tense Exercise</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #f3f4f6;
+            --text: #1f2937;
+            --bubble-a: #e0e7ff;
+            --bubble-b: #d1fae5;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+
+        /* --- LOGIN & UI --- */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #111827; z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .login-box {
+            background: white; padding: 30px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: center;
+        }
+
+        input, select {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #d1d5db; border-radius: 6px;
+            box-sizing: border-box; font-size: 1rem;
+        }
+
+        button.btn {
+            width: 100%; padding: 12px; background: var(--primary); color: white;
+            border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+            font-size: 1rem; transition: 0.2s;
+        }
+        button.btn:hover { background: #4338ca; }
+
+        /* --- MAIN EXERCISE --- */
+        #main-content { display: none; max-width: 800px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #3730a3; margin-bottom: 5px; }
+        
+        .dialogue-container {
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
+        /* Speech Bubbles */
+        .bubble {
+            padding: 15px; border-radius: 15px; max-width: 85%;
+            position: relative; line-height: 1.8;
+        }
+        .speaker-a { align-self: flex-start; background: var(--bubble-a); border-bottom-left-radius: 2px; }
+        .speaker-b { align-self: flex-end; background: var(--bubble-b); border-bottom-right-radius: 2px; }
+        
+        .speaker-label {
+            font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; display: block;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .label-a { color: #3730a3; }
+        .label-b { color: #065f46; text-align: right; }
+
+        /* Dropdowns in Text */
+        select.inline-select {
+            display: inline-block; width: auto; padding: 5px 10px;
+            margin: 0 5px; border: 2px solid #6366f1; border-radius: 4px;
+            font-weight: bold; background: white; cursor: pointer;
+        }
+        
+        /* Feedback Styles */
+        .correct-answer { border-color: var(--success) !important; background-color: #ecfdf5 !important; color: var(--success); }
+        .wrong-answer { border-color: var(--danger) !important; background-color: #fef2f2 !important; color: var(--danger); }
+
+        /* --- ANTI-CHEAT UI --- */
+        #cheat-alert {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000;
+            display: none; justify-content: center; align-items: center;
+            flex-direction: column; text-align: center;
+        }
+        #cheat-counter {
+            position: fixed; top: 10px; right: 10px;
+            background: rgba(255, 255, 255, 0.9); padding: 5px 15px;
+            border-radius: 20px; border: 2px solid var(--danger);
+            color: var(--danger); font-weight: bold; z-index: 9000; display: none;
+        }
+        .watermark {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 5000; opacity: 0.03;
+            display: flex; flex-wrap: wrap; overflow: hidden;
+        }
+        .wm-text { transform: rotate(-30deg); margin: 50px; font-weight: 900; font-size: 24px; color: black; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <button onclick="dismissCheatAlert()" class="btn" style="width:auto; margin-top:20px; background:white; color:red;">I'm Back</button>
+    </div>
+    <div id="cheat-counter">OFFENSES: 0</div>
+    <div class="watermark" id="watermark"></div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2>📝 Tense Exercise Login</h2>
+            <select id="sClass">
+                <option value="">Select Class...</option>
+                <option value="XII D">XII D</option>
+                <option value="XII E">XII E</option>
+                <option value="XII H">XII H</option>
+                <option value="XII I">XII I</option>
+            </select>
+            <input type="number" id="sNo" placeholder="Attendance Number">
+            <input type="text" id="sName" placeholder="Full Name">
+            <button class="btn" onclick="attemptLogin()">Start Exercise</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="header">
+            <h1>The Job Interview</h1>
+            <p style="color:#6b7280;">Fill in the blanks with the correct tense based on the context.</p>
+        </div>
+
+        <div class="dialogue-container">
+            
+            <div class="bubble speaker-a">
+                <span class="speaker-label label-a">Interviewer</span>
+                Welcome. It's nice to meet you. 
+                <select id="q1" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="did you find">Did you find</option>
+                    <option value="have you found">Have you found</option>
+                    <option value="are you finding">Are you finding</option>
+                </select> 
+                the office easily this morning?
+            </div>
+
+            <div class="bubble speaker-b">
+                <span class="speaker-label label-b">Candidate</span>
+                Yes, thank you. I 
+                <select id="q2" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="take">take</option>
+                    <option value="took">took</option>
+                    <option value="have taken">have taken</option>
+                </select> 
+                a taxi, so I wouldn't be late.
+            </div>
+
+            <div class="bubble speaker-a">
+                <span class="speaker-label label-a">Interviewer</span>
+                Good. I 
+                <select id="q3" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="read">read</option>
+                    <option value="have read">have read</option>
+                    <option value="was reading">was reading</option>
+                </select> 
+                your CV yesterday afternoon. It's very impressive.
+            </div>
+
+            <div class="bubble speaker-a">
+                <span class="speaker-label label-a">Interviewer</span>
+                It says here that you 
+                <select id="q4" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="work">work</option>
+                    <option value="worked">worked</option>
+                    <option value="are currently working">are currently working</option>
+                </select> 
+                at Google right now?
+            </div>
+
+            <div class="bubble speaker-b">
+                <span class="speaker-label label-b">Candidate</span>
+                Actually, no. I 
+                <select id="q5" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="have left">have left</option>
+                    <option value="left">left</option>
+                    <option value="leave">leave</option>
+                </select> 
+                that job two months ago.
+            </div>
+
+            <div class="bubble speaker-b">
+                <span class="speaker-label label-b">Candidate</span>
+                Since then, I 
+                <select id="q6" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="looked">looked</option>
+                    <option value="am looking">am looking</option>
+                    <option value="have been looking">have been looking</option>
+                </select> 
+                for a role that fits my skills better.
+            </div>
+
+            <div class="bubble speaker-a">
+                <span class="speaker-label label-a">Interviewer</span>
+                I see. Why 
+                <select id="q7" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="do you decide">do you decide</option>
+                    <option value="did you decide">did you decide</option>
+                    <option value="have you decided">have you decided</option>
+                </select> 
+                to quit such a prestigious company?
+            </div>
+
+            <div class="bubble speaker-b">
+                <span class="speaker-label label-b">Candidate</span>
+                Well, while I 
+                <select id="q8" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="was working">was working</option>
+                    <option value="worked">worked</option>
+                    <option value="have worked">have worked</option>
+                </select> 
+                there, I realized I wanted to lead my own team.
+            </div>
+
+            <div class="bubble speaker-a">
+                <span class="speaker-label label-a">Interviewer</span>
+                That makes sense. What 
+                <select id="q9" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="are you knowing">are you knowing</option>
+                    <option value="did you know">did you know</option>
+                    <option value="do you know">do you know</option>
+                </select> 
+                about our current projects?
+            </div>
+
+            <div class="bubble speaker-b">
+                <span class="speaker-label label-b">Candidate</span>
+                I know that you 
+                <select id="q10" class="inline-select">
+                    <option value="">(choose)</option>
+                    <option value="expand">expand</option>
+                    <option value="are expanding">are expanding</option>
+                    <option value="expanded">expanded</option>
+                </select> 
+                into the European market this year.
+            </div>
+
+        </div>
+
+        <button class="btn" style="margin-top: 30px;" id="submitBtn" onclick="submitAnswers()">Submit Answers</button>
+    </div>
+
+    <script>
+        // --- FIREBASE SETUP ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+          authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+          projectId: "anti-cheating-remedial-quiz",
+          storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+          messagingSenderId: "979294386230",
+          appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+        };
+        try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+        const COLLECTION_NAME = "week23xii_exercise";
+        
+        // --- ANSWER KEY ---
+        const answers = {
+            q1: "did you find",          // Past Simple (specific time: this morning)
+            q2: "took",                  // Past Simple (sequential action)
+            q3: "read",                  // Past Simple (specific time: yesterday)
+            q4: "are currently working", // Present Continuous (temporary state now)
+            q5: "left",                  // Past Simple (specific time: two months ago)
+            q6: "have been looking",     // Present Perfect Continuous (started past, continues now)
+            q7: "did you decide",        // Past Simple (asking about the specific past event)
+            q8: "was working",           // Past Continuous (background action)
+            q9: "do you know",           // Simple Present (Stative verb)
+            q10: "are expanding"         // Present Continuous (Current trend/action)
+        };
+
+        let cheatCount = 0;
+        let sessionActive = false;
+        let wakeLock = null;
+        let currentDocID = null;
+
+        // --- WATERMARK ---
+        (function() {
+            const wm = document.getElementById('watermark');
+            let html = ""; for(let i=0; i<40; i++) html += `<div class="wm-text">DO NOT CHEAT</div>`;
+            wm.innerHTML = html;
+        })();
+
+        // --- LOGIN LOGIC ---
+        async function attemptLogin() {
+            const cls = document.getElementById('sClass').value;
+            const no = document.getElementById('sNo').value;
+            const name = document.getElementById('sName').value;
+
+            if (!cls || !no || !name) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+            
+            // Create Session
+            await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                name: name, class: cls, number: no,
+                start_time: new Date().toLocaleString(),
+                status: "IN_PROGRESS", cheat_count: 0
+            }, { merge: true });
+
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('cheat-counter').style.display = 'block';
+            
+            requestWakeLock();
+            setTimeout(() => { sessionActive = true; }, 2000);
+            document.documentElement.requestFullscreen().catch(e=>{});
+        }
+
+        // --- SUBMIT LOGIC ---
+        async function submitAnswers() {
+            if(!confirm("Submit answers? You cannot change them after this.")) return;
+            sessionActive = false; // Stop cheat tracking
+
+            let score = 0;
+            let total = 10;
+            let userAnswers = {};
+
+            // Check Answers
+            for (let i = 1; i <= total; i++) {
+                const qId = 'q' + i;
+                const el = document.getElementById(qId);
+                const userVal = el.value;
+                userAnswers[qId] = userVal;
+
+                el.disabled = true; // Lock input
+
+                if (userVal === answers[qId]) {
+                    score++;
+                    el.classList.add('correct-answer');
+                } else {
+                    el.classList.add('wrong-answer');
+                }
+            }
+
+            // Save to DB
+            await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                status: "COMPLETED",
+                finish_time: new Date().toLocaleString(),
+                final_score: score,
+                answers: userAnswers,
+                final_cheat_count: cheatCount
+            });
+
+            document.getElementById('submitBtn').style.display = 'none';
+            alert(`You scored ${score} out of ${total}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- WAKE LOCK ---
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                document.addEventListener('visibilitychange', async () => {
+                    if (wakeLock !== null && document.visibilityState === 'visible') {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    }
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        // --- ANTI-CHEAT ---
+        function triggerCheat() {
+            if (!sessionActive) return;
+            cheatCount++;
+            document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+            document.getElementById('cheat-alert').style.display = 'flex';
+            
+            if(currentDocID) {
+                db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: cheatCount });
+            }
+        }
+
+        function dismissCheatAlert() {
+            document.getElementById('cheat-alert').style.display = 'none';
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'hidden') triggerCheat();
+        });
+
+        window.addEventListener("blur", () => {
+            triggerCheat();
+        });
+
+    </script>
+</body>
+</html>
