@@ -15,61 +15,41 @@
         }
 
         body {
-            font-family: 'Georgia', 'Times New Roman', serif; /* Serif font for reading readability */
+            font-family: 'Georgia', 'Times New Roman', serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 0;
             line-height: 1.8;
-            user-select: none; /* Prevent copying text */
+            user-select: none;
         }
 
         /* --- LOGIN SCREEN --- */
         #login-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--primary);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); z-index: 10000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
 
         .login-box {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
+            background: white; padding: 2.5rem; border-radius: 12px;
+            width: 90%; max-width: 400px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            font-family: 'Segoe UI', sans-serif;
+            text-align: center; font-family: 'Segoe UI', sans-serif;
         }
 
         .login-box h2 { color: var(--primary); margin-bottom: 1.5rem; }
         
         select, input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #cbd5e1; border-radius: 6px;
+            font-size: 1rem; box-sizing: border-box;
         }
 
         button.btn-login {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
+            width: 100%; padding: 12px; background: var(--accent); color: white;
+            border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: background 0.2s;
         }
         button.btn-login:hover { background: #1d4ed8; }
 
@@ -86,65 +66,41 @@
         p { margin-bottom: 20px; font-size: 1.1rem; text-align: justify; }
 
         .image-placeholder {
-            background: #e2e8f0;
-            color: #64748b;
-            padding: 40px;
-            text-align: center;
-            border-radius: 8px;
-            margin: 30px 0;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.9rem;
-            border: 2px dashed #cbd5e1;
+            background: #e2e8f0; color: #64748b; padding: 40px; text-align: center;
+            border-radius: 8px; margin: 30px 0; font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem; border: 2px dashed #cbd5e1;
         }
 
         /* --- INSTRUCTION BOX --- */
         .instruction-box {
-            margin-top: 50px;
-            background: #fff7ed;
-            border: 2px solid #fdba74;
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            font-family: 'Segoe UI', sans-serif;
+            margin-top: 50px; background: #fff7ed; border: 2px solid #fdba74;
+            padding: 30px; border-radius: 12px; text-align: center; font-family: 'Segoe UI', sans-serif;
         }
         .instruction-box h2 { color: #c2410c; margin-top: 0; }
         .notebook-title {
-            background: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            border: 1px solid #fdba74;
-            display: inline-block;
-            font-weight: bold;
-            color: #ea580c;
-            margin-top: 10px;
+            background: white; padding: 10px 20px; border-radius: 6px;
+            border: 1px solid #fdba74; display: inline-block;
+            font-weight: bold; color: #ea580c; margin-top: 10px;
         }
 
         /* --- ANTI-CHEAT UI --- */
         #cheat-alert {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(220, 38, 38, 0.95);
-            color: white;
-            z-index: 20000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
+            background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000;
+            display: none; justify-content: center; align-items: center;
+            flex-direction: column; text-align: center;
         }
         #cheat-counter {
             position: fixed; top: 10px; right: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 2px solid var(--danger);
-            color: var(--danger);
-            font-weight: bold;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 0.9rem;
-            display: none;
-            z-index: 9000;
+            background: rgba(255, 255, 255, 0.9); padding: 5px 15px;
+            border-radius: 20px; border: 2px solid var(--danger);
+            color: var(--danger); font-weight: bold; font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem; display: none; z-index: 9000;
         }
     </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body oncontextmenu="return false;">
 
@@ -192,9 +148,6 @@
             
             <p>However, despite the greatness of these numbers, many professional players often find themselves in financial trouble at some point during or after their professional career. An <em>article by Sports Illustrated</em> in 2009 highlights the long-standing commonality of this occurrence in major sports. Within 2 years of retirement, a reported figure of 75% of NFL players find themselves in financial trouble. The numbers for NBA players are similar, with 60% of players going broke within 5 years of leaving the sport. In 2022, <em>Fox Business</em> reported that 78% of professional athletes lose their wealth after barely 3 years into their retirements.</p>
 
-            <div class="image-placeholder">
-                [Image Placeholder: Photo by Josh Appel on Unsplash]
-            </div>
 
             <p>There are several reasons for this. <strong>One, is financial mismanagement.</strong> Professional athletes reach the big leagues at a relatively young age, leaving them with little to no opportunity to learn the best ways to manage their money. Some end up investing in dodgy companies or trusting the wrong financial advisors, which in extreme cases has led to bankruptcy. <strong>Two, is spending beyond their means.</strong> Many athletes feel attracted to living an extravagant lifestyle once they reach the most coveted jobs in sports. Their salaries are grand and their fame has skyrocketed, leaving them with no care in the world. Purchasing expensive items like cars and houses might seem like an attractive decision, but having a large drain on their accounts can prove unwise once the money stops flowing in. <strong>Finally three, is that professional athletic careers are usually short-lived.</strong> The average career length of an NFL player, for example, is less than 4 years. So, although the athletes are being paid millions of dollars, they have to try to live off the money they made in a few short years for the rest of their lives. Many are forced to retire early due to injuries sustained in games or from having their bodies simply give up after years of pushing past their limits.</p>
 
@@ -207,16 +160,14 @@
             
             <p><strong>Mike Tyson</strong> is a particularly famous example of how rich athletes go broke. The boxer filed for bankruptcy in 2003, despite making 400 million USD from his career per fight. His overspending finally caught up to him, after having lived a lavish, partying lifestyle. He reportedly had a penchant for luxury cars, high-end houses and pet tigers, leaving him with a debt worth 23 million USD at the time of filing. Nevertheless, Tyson was able to rebuild his wealth despite the odds by taking movie roles and giving up drugs and alcohol.</p>
 
-            <div class="image-placeholder">
-                [Image Placeholder: Photo by Abhishek Chandra on Unsplash]
-            </div>
+
 
             <h3>The Victors:</h3>
             <p>On the other hand, many top athletes have proven that one can be successful and retain wealth after retirement. Basketball star <strong>Michael Jordan</strong> is the one to model for figuring out post-career money management. He made an estimated 94 million USD in his fifteen NBA seasons, with an additional 2.4 billion USD across his entire career through brand deals. Jordan has been sponsored by McDonalds, Coca-Cola, Gatorade, and, most famously, by Nike. This particular endorsement earned him 130 million USD in 2019. He has also invested his money wisely in multiple sports teams, such as the Charlotte Hornets, the Washington Capitals and the Washington Wizards. In 2023, his net worth was still growing, with Forbes estimating it to be around 3 billion USD.</p>
             
             <p><strong>Serena Williams</strong>, number forty eight on the 2023 list of highest paid athletes, is another example of proper wealth management. She made 45.3 million USD in 2023, the majority of which came from brand deals with companies such as Nike and Michelob Ultra. Since turning pro in 1995, she has made more than 470 million USD in total earnings. Her off-court investments include her firm Serena Ventures, a multimedia company, as well as a stake in the Miami Dolphins team. By managing her income smartly, Williams has ensured her financial stability for at least a while longer.</p>
             
-            <p>While it is unfortunate to note the number of professional athletes who go broke due to a variety of financial decisions, some athletes have proven that wise money management is certainly possible. Good decisions are the key to a successful future, and there is always hope that one can overcome any financial obstacles with the right planning.</p>
+            <p>While it is unfortunate to note the number of professional athletes who go broke due to a variety of financial decisions, some athletes have proven that wise money management is certainly possible. Good decisions are the key to a successful future, and there is always hope that one can overcome any financial obstacles with the right planning. This advice can translate beyond the sports world too, and the examples of pro athletes can serve as a warning to think twice before making any important financial decisions.</p>
         </div>
 
         <div class="instruction-box">
@@ -231,9 +182,22 @@
     </div>
 
     <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+          authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+          projectId: "anti-cheating-remedial-quiz",
+          storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+          messagingSenderId: "979294386230",
+          appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+        };
+        try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+        const COLLECTION_NAME = "week23xi";
         let cheatCount = 0;
         let sessionActive = false;
         let wakeLock = null;
+        let currentDocID = null;
 
         // --- LOGIN LOGIC ---
         async function attemptLogin() {
@@ -247,14 +211,30 @@
                 return;
             }
 
-            // SUCCESS
+            // Create Session in Database
+            currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+            
+            try {
+                await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                    name: name,
+                    class: cls,
+                    number: no,
+                    start_time: new Date().toLocaleString(),
+                    status: "READING",
+                    cheat_count: 0
+                }, { merge: true }); // Merge to avoid overwriting if they reload
+            } catch(e) {
+                console.error("DB Error", e);
+            }
+
+            // SUCCESS UI UPDATE
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('cheat-counter').style.display = 'block';
             
             // Activate Systems
             requestWakeLock();
-            setTimeout(() => { sessionActive = true; }, 2000); // Delay cheat tracking slightly
+            setTimeout(() => { sessionActive = true; }, 2000); 
             document.documentElement.requestFullscreen().catch(e => console.log(e));
         }
 
@@ -264,7 +244,6 @@
                 wakeLock = await navigator.wakeLock.request('screen');
                 console.log('Screen Wake Lock active');
                 
-                // Re-acquire lock if visibility changes (e.g. they switch tab and come back)
                 document.addEventListener('visibilitychange', async () => {
                     if (wakeLock !== null && document.visibilityState === 'visible') {
                         wakeLock = await navigator.wakeLock.request('screen');
@@ -282,6 +261,13 @@
             cheatCount++;
             document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
             document.getElementById('cheat-alert').style.display = 'flex';
+
+            // Update Database
+            if(currentDocID) {
+                db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                    cheat_count: cheatCount
+                });
+            }
         }
 
         function dismissCheatAlert() {
