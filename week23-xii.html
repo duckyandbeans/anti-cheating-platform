@@ -12,6 +12,7 @@
             --text-color: #333;
             --past-color: #e67e22;
             --present-color: #2980b9;
+            --advanced-color: #8e44ad; /* Purple for Advanced */
             --danger: #ef4444;
         }
 
@@ -22,7 +23,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            user-select: none; /* Prevent Copying */
+            user-select: none;
         }
 
         /* --- LOGIN OVERLAY --- */
@@ -53,23 +54,36 @@
         }
         button.btn-login:hover { background: #357abd; }
 
-        /* --- MAIN CONTAINER (Hidden Initially) --- */
+        /* --- MAIN CONTAINER --- */
         #main-content { display: none; padding: 20px; }
 
         .container {
             max-width: 800px; margin: 0 auto; background: white;
             padding: 40px; border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
-        p.intro { text-align: center; color: #7f8c8d; margin-bottom: 40px; }
+        p.intro { text-align: center; color: #7f8c8d; margin-bottom: 20px; }
+
+        /* ADVANCED MODE TOGGLE */
+        .mode-toggle-container { text-align: center; margin-bottom: 30px; }
+        .btn-advanced {
+            background: linear-gradient(135deg, #8e44ad, #c0392b);
+            color: white; border: none; padding: 10px 25px;
+            border-radius: 30px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s;
+        }
+        .btn-advanced:hover { transform: scale(1.05); }
 
         /* Tense Sections */
         .tense-section { margin-bottom: 50px; border-top: 2px solid #eee; padding-top: 20px; }
         .tense-header { font-size: 1.8em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid; display: inline-block; }
+        
         .present-header { color: var(--present-color); border-color: var(--present-color); }
         .past-header { color: var(--past-color); border-color: var(--past-color); }
+        .advanced-header { color: var(--advanced-color); border-color: var(--advanced-color); }
 
         /* Dialogue Sets */
         .dialogue-set { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 40px; overflow: hidden; }
@@ -85,7 +99,11 @@
         .speaker-a::before { content: "A"; position: absolute; top: -20px; left: 5px; font-size: 0.75em; font-weight: bold; color: #1976d2; }
         .speaker-b { align-self: flex-end; background-color: #e8f5e9; color: #1b5e20; border-bottom-right-radius: 2px; text-align: right; }
         .speaker-b::before { content: "B"; position: absolute; top: -20px; right: 5px; font-size: 0.75em; font-weight: bold; color: #388e3c; }
+        
         strong { font-weight: 600; }
+        
+        /* Advanced Grammar Highlight */
+        .gl { color: var(--advanced-color); font-weight: 700; background: #f3e5f5; padding: 0 4px; border-radius: 4px; }
 
         /* --- ANTI-CHEAT UI --- */
         #cheat-alert {
@@ -120,9 +138,7 @@
         <p>Please return to the reading material.</p>
         <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: red; font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
     </div>
-
     <div id="cheat-counter">OFFENSES: 0</div>
-    
     <div class="watermark" id="watermark"></div>
 
     <div id="login-overlay">
@@ -144,248 +160,98 @@
 
     <div id="main-content">
         <div class="container">
-            <h1>Context-Based Grammar Learning</h1>
-            <p class="intro">Read the dialogues aloud with a partner to understand the grammar in context.</p>
+            <h1>Context-Based Grammar</h1>
+            <p class="intro">Read the dialogues aloud. Use the button below to toggle difficulty.</p>
 
-            <div class="tense-section">
-                <h2 class="tense-header present-header">Part 1: The Present Tenses</h2>
+            <div class="mode-toggle-container">
+                <button class="btn-advanced" onclick="toggleMode()">🔥 Toggle Advanced Mode</button>
+            </div>
 
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 1: Simple Present Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Habits, routines, and general facts.<br><strong>Topic:</strong> Video Games & Free Time</div>
+            <div id="standard-mode">
+                <div class="tense-section">
+                    <h2 class="tense-header present-header">Part 1: The Present Tenses</h2>
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 1: Simple Present Tense</h3>
+                            <div class="set-usage">Topic: Video Games & Free Time</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Do you play <em>Mobile Legends</em> every day?</div>
+                            <div class="line speaker-b">No, I usually play only on weekends.</div>
+                            <div class="line speaker-a">I play every single night, so I am always tired.</div>
+                            <div class="line speaker-b">That sounds unhealthy.</div>
+                        </div>
                     </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Do you play <em>Mobile Legends</em> every day?</div>
-                        <div class="line speaker-b">No, I usually play only on weekends because of homework.</div>
-                        <div class="line speaker-a">That’s smart. I play every single night, so I am always tired.</div>
-                        <div class="line speaker-b">That sounds unhealthy. What time do you go to sleep?</div>
-                        <div class="line speaker-a">I normally go to bed around 2 AM.</div>
-                        <div class="line speaker-b">Wow, that is way too late! Do your parents get angry?</div>
-                        <div class="line speaker-a">Sometimes, but they sleep early, so they don’t know.</div>
-                        <div class="line speaker-b">You need to change that habit before exams start.</div>
-                        <div class="line speaker-a">I know. My grades suffer when I don't sleep enough.</div>
-                        <div class="line speaker-b">Exactly. A fresh brain works better than a tired one.</div>
-                        <div class="line speaker-a">You are right. Do you study every evening?</div>
-                        <div class="line speaker-b">Yes, I study for one hour, then I relax.</div>
-                        <div class="line speaker-a">Maybe I should try your schedule starting tomorrow.</div>
-                        <div class="line speaker-b">You should. Consistency is the key to success.</div>
-                        <div class="line speaker-a">Thanks for the advice. I want to pass this year.</div>
-                        <div class="line speaker-b">No problem. We can study together if you want.</div>
-                        <div class="line speaker-a">That would be great. See you at the library?</div>
-                        <div class="line speaker-b">Sure, see you there after school.</div>
-                        <div class="line speaker-a">Okay, I promise not to play games tonight!</div>
-                        <div class="line speaker-b">Good! I believe you.</div>
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 2: Present Continuous</h3><div class="set-usage">Topic: Currently Busy</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Are you busy right now?</div>
+                            <div class="line speaker-b">Yes, I am jogging at the park.</div>
+                            <div class="line speaker-a">Oh, I am sitting at a cafe and drinking coffee.</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 2: Present Continuous Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Actions happening <em>right now</em> or temporary situations.<br><strong>Topic:</strong> A Phone Call While Busy</div>
-                    </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Hey, are you busy right now? You sound out of breath.</div>
-                        <div class="line speaker-b">Yes, I am actually jogging at the park.</div>
-                        <div class="line speaker-a">Oh, sorry! I am sitting at a cafe and I am bored.</div>
-                        <div class="line speaker-b">Why are you sitting alone? Where are the others?</div>
-                        <div class="line speaker-a">They are coming later. Sarah is still finishing her class.</div>
-                        <div class="line speaker-b">I see. Are you drinking coffee?</div>
-                        <div class="line speaker-a">Yes, I am drinking a latte and waiting for them.</div>
-                        <div class="line speaker-b">Nice. I am trying to get fit for the sports meet.</div>
-                        <div class="line speaker-a">That’s great. Is your brother running with you?</div>
-                        <div class="line speaker-b">No, he is not running today. He is studying for a quiz.</div>
-                        <div class="line speaker-a">Everyone is working hard today except me!</div>
-                        <div class="line speaker-b">Don't worry, you are relaxing. That is important too.</div>
-                        <div class="line speaker-a">True. Look, it is starting to rain here.</div>
-                        <div class="line speaker-b">Really? The sun is shining brightly on my side of town.</div>
-                        <div class="line speaker-a">The weather is changing so fast these days.</div>
-                        <div class="line speaker-b">Yeah. I am heading home now before I get wet.</div>
-                        <div class="line speaker-a">Okay, go home safely. Call me when you are free.</div>
-                        <div class="line speaker-b">I will text you later. Enjoy your coffee!</div>
-                        <div class="line speaker-a">Thanks, I am hanging up now. Bye!</div>
-                        <div class="line speaker-b">Bye!</div>
-                    </div>
-                </div>
-
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 3: Present Perfect Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Past experiences with no specific time.<br><strong>Topic:</strong> Movies and Travel</div>
-                    </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Have you ever seen the new Marvel movie?</div>
-                        <div class="line speaker-b">No, I haven't seen it yet. Is it good?</div>
-                        <div class="line speaker-a">It is amazing. I have watched it three times already.</div>
-                        <div class="line speaker-b">Three times? You must really like it.</div>
-                        <div class="line speaker-a">I do. The special effects have improved so much.</div>
-                        <div class="line speaker-b">I have heard mixed reviews about the ending, though.</div>
-                        <div class="line speaker-a">Don't listen to them. Have you bought your ticket?</div>
-                        <div class="line speaker-b">Not yet. I have been too busy with my part-time job.</div>
-                        <div class="line speaker-a">You have worked really hard this month.</div>
-                        <div class="line speaker-b">Yeah, I have saved enough money for a holiday finally.</div>
-                        <div class="line speaker-a">That is awesome. Where have you decided to go?</div>
-                        <div class="line speaker-b">I have chosen Bali. I have never been there before.</div>
-                        <div class="line speaker-a">Lucky you! I have visited Bali twice, and it is beautiful.</div>
-                        <div class="line speaker-b">Really? Have you tried surfing there?</div>
-                        <div class="line speaker-a">Yes, but I have fallen off the board many times.</div>
-                        <div class="line speaker-b">Haha! I haven't tried surfing, but I want to learn.</div>
-                        <div class="line speaker-a">You should try. It is an experience you won't forget.</div>
-                        <div class="line speaker-b">I have packed my bags already, actually.</div>
-                        <div class="line speaker-a">Wow, you are ready! When do you leave?</div>
-                        <div class="line speaker-b">Tomorrow morning!</div>
-                    </div>
-                </div>
-
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 4: Present Perfect Continuous</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Actions started in the past and still happening.<br><strong>Topic:</strong> Waiting and Hobbies</div>
-                    </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Hey! I have been waiting for you for thirty minutes!</div>
-                        <div class="line speaker-b">I am so sorry! I have been looking for my car keys.</div>
-                        <div class="line speaker-a">You look exhausted. What have you been doing?</div>
-                        <div class="line speaker-b">I have been cleaning the house since this morning.</div>
-                        <div class="line speaker-a">Since morning? You have been working all day!</div>
-                        <div class="line speaker-b">Yeah, my mom has been nagging me to clean my room.</div>
-                        <div class="line speaker-a">Well, relax now. I have been sitting here reading this book.</div>
-                        <div class="line speaker-b">Is it good? I have been thinking about reading more.</div>
-                        <div class="line speaker-a">It's great. I have been reading it for two weeks now.</div>
-                        <div class="line speaker-b">You read fast. I haven't been reading much lately.</div>
-                        <div class="line speaker-a">Why not? Too busy with school?</div>
-                        <div class="line speaker-b">Yes, and I have been practicing guitar a lot too.</div>
-                        <div class="line speaker-a">Oh right! How long have you been playing guitar?</div>
-                        <div class="line speaker-b">I have been playing for about five years.</div>
-                        <div class="line speaker-a">That's impressive. I have been trying to learn piano, but it's hard.</div>
-                        <div class="line speaker-b">Keep trying. You have been making progress, haven't you?</div>
-                        <div class="line speaker-a">A little bit. My fingers have been hurting from practice.</div>
-                        <div class="line speaker-b">That happens. We have been chatting for a while, let’s order.</div>
-                        <div class="line speaker-a">Good idea. I have been starving for an hour!</div>
-                        <div class="line speaker-b">Okay, lunch is on me today.</div>
+                <div class="tense-section">
+                    <h2 class="tense-header past-header">Part 2: The Past Tenses</h2>
+                    <div class="dialogue-set">
+                        <div class="set-info"><h3 class="set-title">Set 5: Simple Past</h3><div class="set-usage">Topic: The Weekend Trip</div></div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Where did you go last Saturday?</div>
+                            <div class="line speaker-b">I went to the beach with my cousins.</div>
+                            <div class="line speaker-a">Did you swim in the ocean?</div>
+                            <div class="line speaker-b">Yes, we swam for hours.</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="tense-section">
-                <h2 class="tense-header past-header">Part 2: The Past Tenses</h2>
+            <div id="advanced-mode" style="display: none;">
+                <div class="tense-section">
+                    <h2 class="tense-header advanced-header">Part 3: Advanced Grammar</h2>
 
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 5: Simple Past Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Actions completed at a specific time in the past.<br><strong>Topic:</strong> The Weekend Trip</div>
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 9: Reported Speech</h3>
+                            <div class="set-usage"><strong>Usage:</strong> Telling someone what another person said (Backshifting tenses).<br><strong>Topic:</strong> Gossip & Messages</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Did you speak to the manager about the holiday?</div>
+                            <div class="line speaker-b">Yes. He said that <span class="gl">he was considering</span> our request.</div>
+                            <div class="line speaker-a">"Considering"? Yesterday he told me <span class="gl">he loved</span> the idea!</div>
+                            <div class="line speaker-b">Well, today he told me that <span class="gl">we had to finish</span> the project first.</div>
+                            <div class="line speaker-a">That's annoying. Did he say when the deadline was?</div>
+                            <div class="line speaker-b">He said that <span class="gl">it was</span> next Monday.</div>
+                            <div class="line speaker-a">I thought he said <span class="gl">we could submit</span> it on Tuesday!</div>
+                            <div class="line speaker-b">He changed his mind. He also asked <span class="gl">if we were working</span> overtime tonight.</div>
+                            <div class="line speaker-a">I told him <span class="gl">I couldn't stay</span> late.</div>
+                            <div class="line speaker-b">Good for you. He claimed that <span class="gl">everyone was staying</span>, but that's a lie.</div>
+                        </div>
                     </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Where did you go last Saturday? I didn't see you.</div>
-                        <div class="line speaker-b">I went to the beach with my cousins.</div>
-                        <div class="line speaker-a">Did you swim in the ocean?</div>
-                        <div class="line speaker-b">Yes, we swam for hours and built a sandcastle.</div>
-                        <div class="line speaker-a">That sounds fun. What did you eat for lunch?</div>
-                        <div class="line speaker-b">We bought fresh seafood at a local warung. It was delicious.</div>
-                        <div class="line speaker-a">Did you stay there until night?</div>
-                        <div class="line speaker-b">No, we left around 5 PM because it started to rain.</div>
-                        <div class="line speaker-a">I stayed home and watched Netflix all weekend.</div>
-                        <div class="line speaker-b">Which series did you watch?</div>
-                        <div class="line speaker-a">I finished <em>Stranger Things</em>. It was so scary!</div>
-                        <div class="line speaker-b">I watched that last year. I loved the ending.</div>
-                        <div class="line speaker-a">Did you finish your English project yesterday too?</div>
-                        <div class="line speaker-b">Yes, I finished it before the trip. Did you?</div>
-                        <div class="line speaker-a">No, I forgot about it completely!</div>
-                        <div class="line speaker-b">Oh no! The teacher asked for it this morning.</div>
-                        <div class="line speaker-a">I panicked when she asked me.</div>
-                        <div class="line speaker-b">What did you tell her?</div>
-                        <div class="line speaker-a">I told her I left it at home.</div>
-                        <div class="line speaker-b">You lied! You better do it tonight.</div>
-                    </div>
-                </div>
 
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 6: Past Continuous Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Actions interrupted in the past.<br><strong>Topic:</strong> The Accident</div>
+                    <div class="dialogue-set">
+                        <div class="set-info">
+                            <h3 class="set-title">Set 10: Passive Voice</h3>
+                            <div class="set-usage"><strong>Usage:</strong> Focusing on the action or object, not the person doing it.<br><strong>Topic:</strong> Crime & Mystery</div>
+                        </div>
+                        <div class="dialogue-content">
+                            <div class="line speaker-a">Did you hear about the bank robbery?</div>
+                            <div class="line speaker-b">Yes! It <span class="gl">was robbed</span> late last night.</div>
+                            <div class="line speaker-a">That's crazy. <span class="gl">Was any money taken</span>?</div>
+                            <div class="line speaker-b">Millions <span class="gl">were stolen</span> from the vault.</div>
+                            <div class="line speaker-a">How did they get in? <span class="gl">Was the door broken</span>?</div>
+                            <div class="line speaker-b">No, the security system <span class="gl">had been hacked</span> remotely.</div>
+                            <div class="line speaker-a">Wow. <span class="gl">Have the thieves been caught</span> yet?</div>
+                            <div class="line speaker-b">Not yet. The evidence <span class="gl">is being analyzed</span> right now by the police.</div>
+                            <div class="line speaker-a">It sounds like a movie.</div>
+                            <div class="line speaker-b">It does. It <span class="gl">is believed</span> that it was an inside job.</div>
+                            <div class="line speaker-a">I hope the money <span class="gl">is recovered</span> soon.</div>
+                        </div>
                     </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Why didn't you answer my call last night?</div>
-                        <div class="line speaker-b">Sorry, I was sleeping when you called.</div>
-                        <div class="line speaker-a">At 8 PM? You were sleeping that early?</div>
-                        <div class="line speaker-b">No, I wasn't sleeping. Wait, I was taking a shower!</div>
-                        <div class="line speaker-a">Oh, okay. I was trying to tell you about the accident.</div>
-                        <div class="line speaker-b">What accident? What was happening?</div>
-                        <div class="line speaker-a">I was driving home when I saw a cat run into the road.</div>
-                        <div class="line speaker-b">Oh no! Were you driving fast?</div>
-                        <div class="line speaker-a">No, I was driving slowly, luckily.</div>
-                        <div class="line speaker-b">So, did you hit the cat?</div>
-                        <div class="line speaker-a">No. I was braking hard while the cat was running across.</div>
-                        <div class="line speaker-b">That is scary. Was anyone else watching?</div>
-                        <div class="line speaker-a">Yes, a police officer was standing nearby.</div>
-                        <div class="line speaker-b">Did he help you?</div>
-                        <div class="line speaker-a">He checked if I was okay while I was shaking with fear.</div>
-                        <div class="line speaker-b">At least you were safe. I was studying when I heard sirens.</div>
-                        <div class="line speaker-a">That might have been for me.</div>
-                        <div class="line speaker-b">I was wondering what that noise was.</div>
-                        <div class="line speaker-a">Yeah, it was a crazy night.</div>
-                        <div class="line speaker-b">I am glad you weren't hurt while you were driving.</div>
-                    </div>
-                </div>
 
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 7: Past Perfect Tense</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Action happened before another past action.<br><strong>Topic:</strong> Late for Cinema</div>
-                    </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">Did you catch the movie yesterday?</div>
-                        <div class="line speaker-b">No, by the time I arrived, the movie had already started.</div>
-                        <div class="line speaker-a">Why were you so late?</div>
-                        <div class="line speaker-b">My bus broke down. I had waited for 20 minutes before a taxi came.</div>
-                        <div class="line speaker-a">That is terrible. Had you bought your ticket online?</div>
-                        <div class="line speaker-b">Yes, I had paid for the VIP seat too!</div>
-                        <div class="line speaker-a">Oh, what a waste. Had you checked the bus schedule?</div>
-                        <div class="line speaker-b">I had checked it, but the engine trouble was unexpected.</div>
-                        <div class="line speaker-a">So what did you do after you missed the movie?</div>
-                        <div class="line speaker-b">I went to the cafe. Luckily, Sarah had not left yet.</div>
-                        <div class="line speaker-a">So you met Sarah? I thought she had gone home.</div>
-                        <div class="line speaker-b">She had planned to go, but she stayed to finish her coffee.</div>
-                        <div class="line speaker-a">At least the night wasn't a total disaster.</div>
-                        <div class="line speaker-b">True. I realized I had forgotten my wallet too!</div>
-                        <div class="line speaker-a">Oh no! Who paid for your coffee?</div>
-                        <div class="line speaker-b">Sarah paid. Fortunately, she had brought extra cash.</div>
-                        <div class="line speaker-a">You were really unlucky yesterday.</div>
-                        <div class="line speaker-b">I know. I had never had such a bad day before.</div>
-                        <div class="line speaker-a">Next time, I will pick you up.</div>
-                        <div class="line speaker-b">Thanks. I wish I had asked you earlier.</div>
-                    </div>
-                </div>
-
-                <div class="dialogue-set">
-                    <div class="set-info">
-                        <h3 class="set-title">Set 8: Past Perfect Continuous</h3>
-                        <div class="set-usage"><strong>Usage:</strong> Cause of a past problem.<br><strong>Topic:</strong> Exhaustion</div>
-                    </div>
-                    <div class="dialogue-content">
-                        <div class="line speaker-a">When I saw you yesterday, your eyes were so red.</div>
-                        <div class="line speaker-b">Yeah, I had been crying before you came in.</div>
-                        <div class="line speaker-a">Why? What happened?</div>
-                        <div class="line speaker-b">I had been arguing with my boyfriend for hours.</div>
-                        <div class="line speaker-a">I’m sorry. I didn't know you had been fighting.</div>
-                        <div class="line speaker-b">It’s okay. We had been having problems for a long time.</div>
-                        <div class="line speaker-a">Is that why you looked so tired in class?</div>
-                        <div class="line speaker-b">Yes, I hadn't been sleeping well for days.</div>
-                        <div class="line speaker-a">Also, your clothes were dirty. Had you been working?</div>
-                        <div class="line speaker-b">No, I had been gardening to clear my mind.</div>
-                        <div class="line speaker-a">Ah, that makes sense. It had been raining, right?</div>
-                        <div class="line speaker-b">Yes, the ground was wet. I had been kneeling in the mud.</div>
-                        <div class="line speaker-a">You really needed a break.</div>
-                        <div class="line speaker-b">I did. I had been stressing about everything too much.</div>
-                        <div class="line speaker-a">Well, you looked happier after we grabbed lunch.</div>
-                        <div class="line speaker-b">I felt better. I had been needing a friend to talk to.</div>
-                        <div class="line speaker-a">Any time. That's what friends are for.</div>
-                        <div class="line speaker-b">Thanks. I realized I had been ignoring my friends lately.</div>
-                        <div class="line speaker-a">Don't worry about it.</div>
-                        <div class="line speaker-b">I promise to relax more. I had been pushing myself too hard.</div>
-                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -413,6 +279,20 @@
             let html = ""; for(let i=0; i<40; i++) html += `<div class="wm-text">READING MODE</div>`;
             wm.innerHTML = html;
         })();
+
+        // --- TOGGLE ADVANCED MODE ---
+        function toggleMode() {
+            const standard = document.getElementById('standard-mode');
+            const advanced = document.getElementById('advanced-mode');
+            
+            if (standard.style.display === 'none') {
+                standard.style.display = 'block';
+                advanced.style.display = 'none';
+            } else {
+                standard.style.display = 'none';
+                advanced.style.display = 'block';
+            }
+        }
 
         // --- LOGIN LOGIC ---
         async function attemptLogin() {
@@ -453,20 +333,16 @@
             document.documentElement.requestFullscreen().catch(e => console.log(e));
         }
 
-        // --- WAKE LOCK (PREVENT SCREEN SLEEP) ---
+        // --- WAKE LOCK ---
         async function requestWakeLock() {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
-                console.log('Screen Wake Lock active');
-                
                 document.addEventListener('visibilitychange', async () => {
                     if (wakeLock !== null && document.visibilityState === 'visible') {
                         wakeLock = await navigator.wakeLock.request('screen');
                     }
                 });
-            } catch (err) {
-                console.error(`${err.name}, ${err.message}`);
-            }
+            } catch (err) { console.error(err); }
         }
 
         // --- ANTI-CHEAT SYSTEM ---
@@ -477,11 +353,8 @@
             document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
             document.getElementById('cheat-alert').style.display = 'flex';
 
-            // Update Database
             if(currentDocID) {
-                db.collection(COLLECTION_NAME).doc(currentDocID).update({
-                    cheat_count: cheatCount
-                });
+                db.collection(COLLECTION_NAME).doc(currentDocID).update({ cheat_count: cheatCount });
             }
         }
 
@@ -489,14 +362,10 @@
             document.getElementById('cheat-alert').style.display = 'none';
         }
 
-        // 1. Tab Switch / Minimize
         document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'hidden') {
-                triggerCheat();
-            }
+            if (document.visibilityState === 'hidden') triggerCheat();
         });
 
-        // 2. Window Blur (Clicking outside browser)
         window.addEventListener("blur", () => {
             triggerCheat();
         });
