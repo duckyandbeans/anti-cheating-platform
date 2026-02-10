@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Listening Exercise</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background-color: #f9f9f9; color: #333; margin: 0; padding: 20px; user-select: none; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
+        
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .instructions { background: #eef7ff; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 20px; }
+        
+        /* AUDIO SECTION */
+        .audio-section { background: #f0f0f0; padding: 20px; border-radius: 5px; text-align: center; margin-bottom: 30px; }
+        #playBtn { padding: 12px 25px; font-size: 16px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 4px; transition: 0.3s; }
+        #playBtn:disabled { background: #bdc3c7; cursor: not-allowed; }
+        
+        /* EXERCISE */
+        .exercise-text { font-size: 1.1em; line-height: 2; margin-bottom: 20px; }
+        input[type="text"] { border: none; border-bottom: 2px solid #3498db; padding: 5px; font-size: 1em; width: 200px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { background: #fbffdf; }
+        
+        .actions { margin-top: 30px; display: flex; gap: 10px; }
+        button.submit-btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button.retry-btn { padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; display: none; }
+
+        /* LOGIN SCREEN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .login-box input, .login-box select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: #3498db; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* ANTI-CHEAT */
+        #cheat-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(231, 76, 60, 0.95); color: white; z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        #cheat-counter { position: fixed; top: 10px; right: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid #e74c3c; color: #e74c3c; font-weight: bold; display: none; z-index: 9000; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="cheat-alert">
+    <div style="font-size: 5rem;">⚠️</div>
+    <h1>FOCUS LOST</h1>
+    <p>Please return to the exercise immediately.</p>
+    <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: #e74c3c; font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+</div>
+
+<div id="cheat-counter">OFFENSES: 0</div>
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="color:#2c3e50; margin-bottom:20px;">Listening Exercise Login</h2>
+        <select id="sClass">
+            <option value="">Select Class...</option>
+            <option value="XI D">XI D</option>
+            <option value="XI E">XI E</option>
+            <option value="XI H">XI H</option>
+            <option value="XI I">XI I</option>
+        </select>
+        <input type="number" id="sNo" placeholder="Attendance Number">
+        <input type="text" id="sName" placeholder="Full Name">
+        <button class="btn-login" onclick="attemptLogin()">Start Session</button>
+        <p id="error-msg" style="color: red; display: none; margin-top: 10px; font-size: 0.9rem;">Please fill all fields.</p>
+    </div>
+</div>
+
+<div class="container" id="main-content">
+    <h1>Listening Exercise: ITV News Report</h1>
+    
+    <div class="instructions">
+        <strong>Instructions:</strong> Listen carefully to the news report about school changes in Jersey. Fill in the missing words (1–5 words per blank) based on what the presenter says.
+    </div>
+
+    <div class="audio-section">
+        <button id="playBtn">Play Audio</button>
+        <p id="audioMsg">Remaining plays: 3/3</p>
+        <audio id="audioSource" src="audio23.mp3"></audio>
+    </div>
+
+    <div class="exercise-text">
+        Presenter: "Hello, good evening. Welcome to ITV News. Our main headline tonight: <br>
+        The school day in Jersey (1) <input type="text" id="ans1" placeholder="..."> from next term. 
+        Politicians have decided to add an extra hour of lessons Monday to Friday to (2) <input type="text" id="ans2" placeholder="..."> because of coronavirus. <br>
+        Classes (3) <input type="text" id="ans3" placeholder="..."> on Saturday mornings. 
+        Teachers are welcoming the decision, but some students (4) <input type="text" id="ans4" placeholder="..."> they will boycott the extra lessons and are considering staying away from school altogether. <br>
+        Claire Burton has our top story. These students will soon be spending longer in class after (5) <input type="text" id="ans5" placeholder="...">."
+    </div>
+
+    <div class="actions">
+        <button class="submit-btn" id="submitBtn">Check Answers</button>
+        <button class="retry-btn" id="retryBtn">Retry</button>
+    </div>
+    
+    <div id="results" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week23listening";
+    let studentData = {};
+    let cheatCount = 0;
+    let sessionActive = false;
+    let playCount = 0;
+
+    // --- LOGIN LOGIC ---
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value;
+        const no = document.getElementById('sNo').value;
+        const name = document.getElementById('sName').value;
+
+        if (!cls || !no || !name) {
+            document.getElementById('error-msg').style.display = 'block';
+            return;
+        }
+
+        studentData = { class: cls, no: no, name: name };
+        
+        // Init Database Doc
+        const docID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        await db.collection(COLLECTION_NAME).doc(docID).set({
+            name: name, class: cls, number: no,
+            start_time: new Date().toLocaleString(),
+            status: "LISTENING",
+            cheat_count: 0
+        }, { merge: true });
+
+        // Show Content
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('cheat-counter').style.display = 'block';
+        
+        setTimeout(() => { sessionActive = true; }, 2000); // Start anti-cheat
+    }
+
+    // --- AUDIO LOGIC ---
+    const playBtn = document.getElementById('playBtn');
+    const audio = document.getElementById('audioSource');
+    const audioMsg = document.getElementById('audioMsg');
+
+    playBtn.addEventListener('click', () => {
+        if (playCount < 3) {
+            audio.play();
+            playCount++;
+            audioMsg.innerText = `Remaining plays: ${3 - playCount}/3`;
+            if (playCount >= 3) {
+                playBtn.disabled = true;
+                playBtn.innerText = "No Plays Left";
+            }
+        }
+    });
+
+    // --- GRADING LOGIC ---
+    const correctAnswers = ["will be extended", "make up for time lost", "will also be held", "have told us", "the government announced it"];
+    const submitBtn = document.getElementById('submitBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const resultsDiv = document.getElementById('results');
+
+    submitBtn.addEventListener('click', async () => {
+        let score = 0;
+        let answers = {};
+
+        for (let i = 1; i <= 5; i++) {
+            const input = document.getElementById('ans' + i);
+            const userVal = input.value.trim().toLowerCase();
+            answers[`Q${i}`] = input.value; // Store raw answer
+
+            if (userVal === correctAnswers[i-1]) {
+                input.style.color = "#27ae60";
+                input.disabled = true;
+                score++;
+            } else {
+                input.style.color = "#e74c3c";
+                input.disabled = true;
+            }
+        }
+        
+        resultsDiv.innerHTML = `<strong>You got ${score} out of 5 correct!</strong>`;
+        submitBtn.style.display = "none";
+        retryBtn.style.display = "block";
+
+        // Save Score to DB
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        await db.collection(COLLECTION_NAME).doc(docID).update({
+            score: score,
+            answers: answers,
+            status: "COMPLETED",
+            finish_time: new Date().toLocaleString(),
+            final_cheat_count: cheatCount
+        });
+    });
+
+    retryBtn.addEventListener('click', () => {
+        for (let i = 1; i <= 5; i++) {
+            const input = document.getElementById('ans' + i);
+            if (input.style.color !== "rgb(39, 174, 96)") { 
+                input.value = "";
+                input.style.color = "#333";
+            }
+            input.disabled = false;
+        }
+        resultsDiv.innerHTML = "";
+        retryBtn.style.display = "none";
+        submitBtn.style.display = "block";
+    });
+
+    // --- ANTI-CHEAT SYSTEM ---
+    function triggerCheat() {
+        if (!sessionActive) return;
+        
+        cheatCount++;
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+
+        // Update Database
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        db.collection(COLLECTION_NAME).doc(docID).update({ cheat_count: cheatCount });
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+</script>
+</body>
+</html>
