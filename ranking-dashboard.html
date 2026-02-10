@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Leaderboard</title>
+    <style>
+        :root { --primary: #1e293b; --accent: #2563eb; --gold: #fbbf24; --silver: #94a3b8; --bronze: #b45309; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #334155; }
+        
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* HEADER */
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 5px; }
+        p { color: #64748b; font-size: 1.1rem; }
+
+        /* TABS */
+        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn {
+            padding: 10px 25px; border: none; background: white; border-radius: 20px;
+            font-weight: bold; cursor: pointer; color: #64748b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: 0.2s; font-size: 1rem;
+        }
+        .tab-btn.active { background: var(--accent); color: white; transform: scale(1.05); }
+
+        /* TABLE STYLES */
+        .ranking-card { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); overflow: hidden; display: none; }
+        .ranking-card.active { display: block; animation: fadeIn 0.5s; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 15px 20px; color: #475569; font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        td { padding: 15px 20px; border-bottom: 1px solid #e2e8f0; font-size: 1rem; }
+        
+        /* RANKING BADGES */
+        .rank-badge { display: inline-block; width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 50%; font-weight: bold; color: white; background: #cbd5e1; }
+        .rank-1 .rank-badge { background: var(--gold); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .rank-2 .rank-badge { background: var(--silver); }
+        .rank-3 .rank-badge { background: var(--bronze); }
+        
+        .rank-1 { background: #fffbeb; font-weight: bold; } /* Light Gold BG */
+        
+        .score-col { color: var(--accent); font-weight: bold; }
+        .time-col { color: #94a3b8; font-size: 0.9rem; font-family: monospace; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LOADING */
+        #loading { text-align: center; margin-top: 50px; font-size: 1.5rem; color: #cbd5e1; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🏆 Passive Voice Leaderboard</h1>
+        <p>Ranked by Accuracy (Score) & Speed (Time)</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('XI D')">XI D</button>
+        <button class="tab-btn" onclick="switchTab('XI E')">XI E</button>
+        <button class="tab-btn" onclick="switchTab('XI H')">XI H</button>
+        <button class="tab-btn" onclick="switchTab('XI I')">XI I</button>
+    </div>
+
+    <div id="loading">Loading Rankings...</div>
+
+    <div id="tables-container"></div>
+</div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week23passivevoiceexercise";
+    const CLASSES = ["XI D", "XI E", "XI H", "XI I"];
+    let allData = [];
+
+    // --- FETCH DATA ---
+    async function loadData() {
+        const snap = await db.collection(COLLECTION_NAME).get();
+        allData = []; // Reset
+        
+        snap.forEach(doc => {
+            const d = doc.data();
+            // Only include completed exams
+            if(d.status === "COMPLETED") {
+                allData.push(d);
+            }
+        });
+
+        renderTables();
+        document.getElementById('loading').style.display = 'none';
+    }
+
+    // --- RENDER TABLES ---
+    function renderTables() {
+        const container = document.getElementById('tables-container');
+        container.innerHTML = "";
+
+        CLASSES.forEach((cls, index) => {
+            // 1. Filter by Class
+            let classData = allData.filter(d => d.class === cls);
+
+            // 2. Sort Logic: 
+            //    Primary: Score (High to Low)
+            //    Secondary: Timestamp (Low to High - Fastest first)
+            classData.sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score; // Higher Score First
+                }
+                return (a.submittedAt_timestamp || 0) - (b.submittedAt_timestamp || 0); // Faster Time First
+            });
+
+            // 3. Build HTML
+            const isActive = index === 0 ? "active" : ""; // First tab active by default
+            let rows = "";
+            
+            if (classData.length === 0) {
+                rows = `<tr><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8;">No submissions yet.</td></tr>`;
+            } else {
+                classData.forEach((student, i) => {
+                    const rank = i + 1;
+                    const rankClass = rank <= 3 ? `rank-${rank}` : "";
+                    
+                    rows += `
+                        <tr class="${rankClass}">
+                            <td width="10%"><span class="rank-badge">${rank}</span></td>
+                            <td width="50%">
+                                <strong>${student.name}</strong><br>
+                                <span style="font-size:0.8rem; color:${student.cheat_count > 0 ? '#ef4444' : '#10b981'}">
+                                    ${student.cheat_count > 0 ? `⚠️ ${student.cheat_count} Flags` : '✅ Clean Record'}
+                                </span>
+                            </td>
+                            <td width="20%" class="score-col">${student.score} / 25</td>
+                            <td width="20%" class="time-col">${student.finish_time.split(',')[1] || student.finish_time}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            container.innerHTML += `
+                <div id="view-${cls.replace(/\s/g,'-')}" class="ranking-card ${isActive}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            `;
+        });
+    }
+
+    // --- TAB SWITCHER ---
+    window.switchTab = function(clsName) {
+        // 1. Update Buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText === clsName) btn.classList.add('active');
+        });
+
+        // 2. Show Table
+        document.querySelectorAll('.ranking-card').forEach(card => card.classList.remove('active'));
+        const targetId = `view-${clsName.replace(/\s/g,'-')}`;
+        document.getElementById(targetId).classList.add('active');
+    }
+
+    // Load immediately
+    loadData();
+
+    // Auto-refresh every 30 seconds (Optional)
+    setInterval(loadData, 30000);
+
+</script>
+</body>
+</html>
