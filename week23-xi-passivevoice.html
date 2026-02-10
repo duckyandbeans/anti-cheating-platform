@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Week 23: Passive Voice Exercise</title>
+    <title>Week 23: Passive Voice (Graded)</title>
     <style>
-        :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; --gold: #f59e0b; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; user-select: none; }
         
         .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
-        h1 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 30px; text-align: center; }
+        h1 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
         
+        /* BONUS BANNER */
+        .bonus-banner { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 0.95rem; text-align: center; }
+        .bonus-badge { background: var(--gold); color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; margin-right: 5px; }
+
         /* EXERCISE STYLES */
         .question-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
         .q-text { font-weight: 600; margin-bottom: 8px; display: block; }
@@ -37,6 +41,7 @@
         #cheat-counter { position: fixed; top: 10px; right: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--danger); color: var(--danger); font-weight: bold; font-family: sans-serif; display: none; z-index: 9000; }
         
         #result-summary { text-align: center; padding: 20px; background: #ecfdf5; border: 2px solid var(--success); border-radius: 8px; margin-bottom: 30px; display: none; }
+        .timestamp-receipt { font-family: monospace; color: #64748b; font-size: 0.9rem; margin-top: 10px; background: #f1f5f9; padding: 5px; border-radius: 4px; display: inline-block; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -47,7 +52,7 @@
     <div id="cheat-alert">
         <div style="font-size: 5rem;">⚠️</div>
         <h1>FOCUS LOST</h1>
-        <p>Return to the exercise immediately.</p>
+        <p>This incident has been permanently recorded.</p>
         <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
     </div>
 
@@ -72,6 +77,13 @@
 
     <div class="container" id="main-content">
         <h1>Week 23: Passive Voice</h1>
+        
+        <div class="bonus-banner">
+            <strong>🏆 SPEED BONUS:</strong><br>
+            <span class="bonus-badge">+5 Pts</span> First 5 students (100% Accuracy)<br>
+            <span class="bonus-badge">+3 Pts</span> Next 5 students (100% Accuracy)
+        </div>
+
         <p style="text-align:center; color:#64748b; margin-bottom:30px;">Change the following sentences into the <strong>Passive Voice</strong>.</p>
 
         <div id="result-summary"></div>
@@ -96,62 +108,31 @@
     let studentData = {};
     let cheatCount = 0;
     let sessionActive = false;
+    let currentDocID = null;
     let wakeLock = null;
 
     // --- DATA ---
     const questions = [
-        "The Browns have built the large house.",
-        "A jellyfish stung her while she was swimming.",
-        "They gave her a nice present.",
-        "Jane is singing the new song.",
-        "The storm destroyed the house.",
-        "People spent a lot of money on the first shopping Saturday.", // Corrected "Monday" to "money" contextually
-        "How do you write that word?",
-        "She watered the flowers every day.",
-        "The headmaster called his parents to the office.",
-        "Ben will direct the show.",
-        "The dog has broken the window pane.",
-        "You must pay the bill first.",
-        "They were interviewing her for the job.",
-        "The professor told him not to talk in class.",
-        "You shouldn’t speak to your neighbor.",
-        "Do not leave your bicycle in the hall.",
-        "Can you learn French easily?",
-        "Your impolite tone surprises me.",
-        "James will repair the car.",
-        "An unknown author wrote the book.",
-        "They forced him to steal the money out of his dad’s room.",
-        "Our neighbors have invited us to dinner.",
-        "Why are they tearing down the old theatre?",
-        "I will present my ideas at the conference tonight.",
+        "The Browns have built the large house.", "A jellyfish stung her while she was swimming.", "They gave her a nice present.",
+        "Jane is singing the new song.", "The storm destroyed the house.", "People spent a lot of money on the first shopping Saturday.",
+        "How do you write that word?", "She watered the flowers every day.", "The headmaster called his parents to the office.",
+        "Ben will direct the show.", "The dog has broken the window pane.", "You must pay the bill first.",
+        "They were interviewing her for the job.", "The professor told him not to talk in class.", "You shouldn’t speak to your neighbor.",
+        "Do not leave your bicycle in the hall.", "Can you learn French easily?", "Your impolite tone surprises me.",
+        "James will repair the car.", "An unknown author wrote the book.", "They forced him to steal the money out of his dad’s room.",
+        "Our neighbors have invited us to dinner.", "Why are they tearing down the old theatre?", "I will present my ideas at the conference tonight.",
         "She would have told you."
     ];
 
     const answers = [
-        "The large house has been built by the Browns",
-        "She was stung by a jellyfish while she was swimming",
-        "She was given a nice present",
-        "The new song is being sung by Jane",
-        "The house was destroyed by the storm",
-        "A lot of money was spent on the first shopping Saturday",
-        "How is that word written",
-        "The flowers were watered every day",
-        "His parents were called to the office by the headmaster",
-        "The show will be directed by Ben",
-        "The window pane has been broken by the dog",
-        "The bill must be paid first",
-        "She was being interviewed for the job",
-        "He was told not to talk in class by the professor",
-        "Your neighbor shouldn’t be spoken to",
-        "Bicycles must not be left in the hall",
-        "Can French be learned easily",
-        "I am surprised by your impolite tone",
-        "The car will be repaired by James",
-        "The book was written by an unknown author",
-        "He was forced to steal the money out of his dad’s room",
-        "We have been invited to dinner",
-        "Why is the old theatre being torn down",
-        "My ideas will be presented at the conference tonight",
+        "The large house has been built by the Browns", "She was stung by a jellyfish while she was swimming", "She was given a nice present",
+        "The new song is being sung by Jane", "The house was destroyed by the storm", "A lot of money was spent on the first shopping Saturday",
+        "How is that word written", "The flowers were watered every day", "His parents were called to the office by the headmaster",
+        "The show will be directed by Ben", "The window pane has been broken by the dog", "The bill must be paid first",
+        "She was being interviewed for the job", "He was told not to talk in class by the professor", "Your neighbor shouldn’t be spoken to",
+        "Bicycles must not be left in the hall", "Can French be learned easily", "I am surprised by your impolite tone",
+        "The car will be repaired by James", "The book was written by an unknown author", "He was forced to steal the money out of his dad’s room",
+        "We have been invited to dinner", "Why is the old theatre being torn down", "My ideas will be presented at the conference tonight",
         "You would have been told"
     ];
 
@@ -180,25 +161,43 @@
         }
 
         studentData = { class: cls, no: no, name: name };
-        const docID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
         
-        await db.collection(COLLECTION_NAME).doc(docID).set({
-            name: name, class: cls, number: no,
-            start_time: new Date().toLocaleString(),
-            status: "STARTED",
-            cheat_count: 0
-        }, { merge: true });
+        // 1. CHECK EXISTING SESSION (Anti-Reset Logic)
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        
+        if (docSnap.exists) {
+            // Restore previous cheat count
+            const data = docSnap.data();
+            cheatCount = data.cheat_count || 0;
+            
+            if (data.status === "COMPLETED") {
+                alert("You have already submitted this assignment.");
+                // Optional: You could show their score here if you wanted
+            }
+        } else {
+            // New Session
+            await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                name: name, class: cls, number: no,
+                start_time: new Date().toLocaleString(),
+                status: "STARTED",
+                cheat_count: 0
+            });
+        }
 
         document.getElementById('login-overlay').style.display = 'none';
         document.querySelector('.container').style.display = 'block';
+        
+        // Update Cheat Display
         document.getElementById('cheat-counter').style.display = 'block';
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
         
         requestWakeLock();
         setTimeout(() => { sessionActive = true; }, 2000);
         document.documentElement.requestFullscreen().catch(e=>{});
     }
 
-    // --- WAKE LOCK ---
+    // --- WAKE LOCK (Anti-Sleep) ---
     async function requestWakeLock() {
         try {
             wakeLock = await navigator.wakeLock.request('screen');
@@ -213,7 +212,7 @@
     // --- SUBMISSION LOGIC ---
     async function submitExam() {
         if(!confirm("Submit answers? This cannot be undone.")) return;
-        sessionActive = false; // Stop cheat tracking
+        sessionActive = false; 
 
         let score = 0;
         let userAnswers = {};
@@ -241,20 +240,26 @@
             }
         });
 
-        // Show Score
+        const finishTime = new Date().toLocaleString();
+
+        // Show Score & Receipt
         const summary = document.getElementById('result-summary');
-        summary.innerHTML = `<h2>Final Score: ${score} / 25</h2>`;
+        summary.innerHTML = `
+            <h2>Final Score: ${score} / 25</h2>
+            <p>Your result has been logged.</p>
+            <div class="timestamp-receipt">Time Logged: ${finishTime}</div>
+        `;
         summary.style.display = 'block';
         document.getElementById('submitBtn').style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         // Save to DB
-        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
-        await db.collection(COLLECTION_NAME).doc(docID).update({
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
             score: score,
             answers: userAnswers,
             status: "COMPLETED",
-            finish_time: new Date().toLocaleString(),
+            finish_time: finishTime,
+            submittedAt_timestamp: Date.now(), // Precise sorting for bonus
             final_cheat_count: cheatCount
         });
     }
@@ -263,21 +268,29 @@
         return str.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    // --- ANTI-CHEAT ---
+    // --- ANTI-CHEAT (Server-Side Sync) ---
     function triggerCheat() {
         if (!sessionActive) return;
+        
         cheatCount++;
+        
+        // UI Update
         document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
         document.getElementById('cheat-alert').style.display = 'flex';
         
-        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
-        db.collection(COLLECTION_NAME).doc(docID).update({ cheat_count: cheatCount });
+        // DB Update (Instant)
+        if(currentDocID) {
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                cheat_count: cheatCount // Direct update to ensure persistence
+            });
+        }
     }
 
     function dismissCheatAlert() {
         document.getElementById('cheat-alert').style.display = 'none';
     }
 
+    // Triggers
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === 'hidden') triggerCheat();
     });
