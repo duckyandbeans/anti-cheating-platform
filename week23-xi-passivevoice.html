@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Passive Voice Exercise</title>
+    <style>
+        :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; user-select: none; }
+        
+        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
+        h1 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 30px; text-align: center; }
+        
+        /* EXERCISE STYLES */
+        .question-card { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
+        .q-text { font-weight: 600; margin-bottom: 8px; display: block; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; box-sizing: border-box; transition: 0.2s; }
+        input[type="text"]:focus { border-color: var(--accent); outline: none; background: #eff6ff; }
+        
+        .feedback { margin-top: 5px; font-size: 0.9rem; font-weight: bold; display: none; }
+        .correct-ans { color: var(--success); }
+        .wrong-ans { color: var(--danger); }
+        .ref-ans { color: #64748b; font-size: 0.85rem; font-style: italic; margin-top: 3px; display: none; }
+
+        /* BUTTONS */
+        .btn-submit { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-submit:hover { background: #1d4ed8; }
+
+        /* LOGIN SCREEN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .login-box select, .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* ANTI-CHEAT UI */
+        #cheat-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        #cheat-counter { position: fixed; top: 10px; right: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--danger); color: var(--danger); font-weight: bold; font-family: sans-serif; display: none; z-index: 9000; }
+        
+        #result-summary { text-align: center; padding: 20px; background: #ecfdf5; border: 2px solid var(--success); border-radius: 8px; margin-bottom: 30px; display: none; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <p>Return to the exercise immediately.</p>
+        <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+    </div>
+
+    <div id="cheat-counter">OFFENSES: 0</div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--primary); margin-bottom:20px;">Passive Voice Exercise</h2>
+            <select id="sClass">
+                <option value="">Select Class...</option>
+                <option value="XI D">XI D</option>
+                <option value="XI E">XI E</option>
+                <option value="XI H">XI H</option>
+                <option value="XI I">XI I</option>
+            </select>
+            <input type="number" id="sNo" placeholder="Attendance Number">
+            <input type="text" id="sName" placeholder="Full Name">
+            <button class="btn-login" onclick="attemptLogin()">Start Exercise</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px;">Please fill all fields.</p>
+        </div>
+    </div>
+
+    <div class="container" id="main-content">
+        <h1>Week 23: Passive Voice</h1>
+        <p style="text-align:center; color:#64748b; margin-bottom:30px;">Change the following sentences into the <strong>Passive Voice</strong>.</p>
+
+        <div id="result-summary"></div>
+        <div id="quiz-area"></div>
+        
+        <button class="btn-submit" id="submitBtn" onclick="submitExam()">Submit Answers</button>
+    </div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week23passivevoiceexercise";
+    let studentData = {};
+    let cheatCount = 0;
+    let sessionActive = false;
+    let wakeLock = null;
+
+    // --- DATA ---
+    const questions = [
+        "The Browns have built the large house.",
+        "A jellyfish stung her while she was swimming.",
+        "They gave her a nice present.",
+        "Jane is singing the new song.",
+        "The storm destroyed the house.",
+        "People spent a lot of money on the first shopping Saturday.", // Corrected "Monday" to "money" contextually
+        "How do you write that word?",
+        "She watered the flowers every day.",
+        "The headmaster called his parents to the office.",
+        "Ben will direct the show.",
+        "The dog has broken the window pane.",
+        "You must pay the bill first.",
+        "They were interviewing her for the job.",
+        "The professor told him not to talk in class.",
+        "You shouldn’t speak to your neighbor.",
+        "Do not leave your bicycle in the hall.",
+        "Can you learn French easily?",
+        "Your impolite tone surprises me.",
+        "James will repair the car.",
+        "An unknown author wrote the book.",
+        "They forced him to steal the money out of his dad’s room.",
+        "Our neighbors have invited us to dinner.",
+        "Why are they tearing down the old theatre?",
+        "I will present my ideas at the conference tonight.",
+        "She would have told you."
+    ];
+
+    const answers = [
+        "The large house has been built by the Browns",
+        "She was stung by a jellyfish while she was swimming",
+        "She was given a nice present",
+        "The new song is being sung by Jane",
+        "The house was destroyed by the storm",
+        "A lot of money was spent on the first shopping Saturday",
+        "How is that word written",
+        "The flowers were watered every day",
+        "His parents were called to the office by the headmaster",
+        "The show will be directed by Ben",
+        "The window pane has been broken by the dog",
+        "The bill must be paid first",
+        "She was being interviewed for the job",
+        "He was told not to talk in class by the professor",
+        "Your neighbor shouldn’t be spoken to",
+        "Bicycles must not be left in the hall",
+        "Can French be learned easily",
+        "I am surprised by your impolite tone",
+        "The car will be repaired by James",
+        "The book was written by an unknown author",
+        "He was forced to steal the money out of his dad’s room",
+        "We have been invited to dinner",
+        "Why is the old theatre being torn down",
+        "My ideas will be presented at the conference tonight",
+        "You would have been told"
+    ];
+
+    // --- RENDER QUESTIONS ---
+    const quizArea = document.getElementById('quiz-area');
+    questions.forEach((q, i) => {
+        quizArea.innerHTML += `
+            <div class="question-card" id="card-${i}">
+                <label class="q-text">${i+1}. ${q}</label>
+                <input type="text" id="ans-${i}" placeholder="Type passive voice here..." autocomplete="off">
+                <div class="feedback" id="fb-${i}"></div>
+                <div class="ref-ans" id="ref-${i}">Correct: ${answers[i]}</div>
+            </div>
+        `;
+    });
+
+    // --- LOGIN LOGIC ---
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value;
+        const no = document.getElementById('sNo').value;
+        const name = document.getElementById('sName').value;
+
+        if (!cls || !no || !name) {
+            document.getElementById('error-msg').style.display = 'block';
+            return;
+        }
+
+        studentData = { class: cls, no: no, name: name };
+        const docID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        
+        await db.collection(COLLECTION_NAME).doc(docID).set({
+            name: name, class: cls, number: no,
+            start_time: new Date().toLocaleString(),
+            status: "STARTED",
+            cheat_count: 0
+        }, { merge: true });
+
+        document.getElementById('login-overlay').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+        document.getElementById('cheat-counter').style.display = 'block';
+        
+        requestWakeLock();
+        setTimeout(() => { sessionActive = true; }, 2000);
+        document.documentElement.requestFullscreen().catch(e=>{});
+    }
+
+    // --- WAKE LOCK ---
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+        } catch (err) { console.log(err); }
+    }
+
+    // --- SUBMISSION LOGIC ---
+    async function submitExam() {
+        if(!confirm("Submit answers? This cannot be undone.")) return;
+        sessionActive = false; // Stop cheat tracking
+
+        let score = 0;
+        let userAnswers = {};
+
+        questions.forEach((q, i) => {
+            const input = document.getElementById(`ans-${i}`);
+            const fb = document.getElementById(`fb-${i}`);
+            const ref = document.getElementById(`ref-${i}`);
+            
+            const userVal = cleanString(input.value);
+            const correctVal = cleanString(answers[i]);
+            
+            userAnswers[`Q${i+1}`] = input.value;
+            input.disabled = true;
+            fb.style.display = 'block';
+
+            if (userVal === correctVal) {
+                score++;
+                fb.className = "feedback correct-ans";
+                fb.innerText = "✅ Correct";
+            } else {
+                fb.className = "feedback wrong-ans";
+                fb.innerText = "❌ Incorrect";
+                ref.style.display = 'block';
+            }
+        });
+
+        // Show Score
+        const summary = document.getElementById('result-summary');
+        summary.innerHTML = `<h2>Final Score: ${score} / 25</h2>`;
+        summary.style.display = 'block';
+        document.getElementById('submitBtn').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Save to DB
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        await db.collection(COLLECTION_NAME).doc(docID).update({
+            score: score,
+            answers: userAnswers,
+            status: "COMPLETED",
+            finish_time: new Date().toLocaleString(),
+            final_cheat_count: cheatCount
+        });
+    }
+
+    function cleanString(str) {
+        return str.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    // --- ANTI-CHEAT ---
+    function triggerCheat() {
+        if (!sessionActive) return;
+        cheatCount++;
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+        
+        const docID = `${studentData.class.replace(/\s/g,'')}_${studentData.no}_${studentData.name.replace(/\s/g,'_')}`;
+        db.collection(COLLECTION_NAME).doc(docID).update({ cheat_count: cheatCount });
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+</script>
+</body>
+</html>
