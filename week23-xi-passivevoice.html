@@ -212,58 +212,56 @@
     // --- SUBMISSION LOGIC ---
     async function submitExam() {
         if(!confirm("Submit answers? This cannot be undone.")) return;
-        sessionActive = false; 
+        sessionActive = false; // Stop cheat tracking
 
         let score = 0;
         let userAnswers = {};
 
         questions.forEach((q, i) => {
             const input = document.getElementById(`ans-${i}`);
-            const fb = document.getElementById(`fb-${i}`);
-            const ref = document.getElementById(`ref-${i}`);
+            
+            // We still calculate the score for the Database, 
+            // but we DO NOT update the screen with feedback.
             
             const userVal = cleanString(input.value);
             const correctVal = cleanString(answers[i]);
             
             userAnswers[`Q${i+1}`] = input.value;
-            input.disabled = true;
-            fb.style.display = 'block';
+            input.disabled = true; // Lock the input so they can't change it
 
             if (userVal === correctVal) {
                 score++;
-                fb.className = "feedback correct-ans";
-                fb.innerText = "✅ Correct";
+                // REMOVED: Showing "Correct" text
             } else {
-                fb.className = "feedback wrong-ans";
-                fb.innerText = "❌ Incorrect";
-                ref.style.display = 'block';
+                // REMOVED: Showing "Incorrect" text
+                // REMOVED: Showing the correct answer (ref.style.display)
             }
         });
 
         const finishTime = new Date().toLocaleString();
 
-        // Show Score & Receipt
+        // UPDATE UI: Show a receipt instead of the Score/Answers
         const summary = document.getElementById('result-summary');
         summary.innerHTML = `
-            <h2>Final Score: ${score} / 25</h2>
-            <p>Your result has been logged.</p>
+            <h2 style="color:#2563eb">Submission Received</h2>
+            <p>Your answers have been stored securely.</p>
+            <p>Please wait for the teacher to reveal the results.</p>
             <div class="timestamp-receipt">Time Logged: ${finishTime}</div>
         `;
         summary.style.display = 'block';
         document.getElementById('submitBtn').style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Save to DB
+        // SAVE TO DATABASE (The teacher still sees the score!)
         await db.collection(COLLECTION_NAME).doc(currentDocID).update({
             score: score,
             answers: userAnswers,
             status: "COMPLETED",
             finish_time: finishTime,
-            submittedAt_timestamp: Date.now(), // Precise sorting for bonus
+            submittedAt_timestamp: Date.now(),
             final_cheat_count: cheatCount
         });
     }
-
     function cleanString(str) {
         return str.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ').trim();
     }
