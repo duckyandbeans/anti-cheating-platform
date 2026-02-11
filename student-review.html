@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 23: Performance Review</title>
+    <style>
+        :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #334155; }
+        
+        .container { max-width: 800px; margin: 0 auto; display: none; }
+        
+        /* LOGIN SCREEN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        select, input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+
+        /* HEADER */
+        header { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); text-align: center; margin-bottom: 30px; }
+        h1 { margin: 0 0 10px 0; color: var(--primary); }
+        .score-badge { font-size: 2.5rem; font-weight: 800; color: var(--accent); }
+        .meta-info { color: #64748b; font-size: 0.9rem; margin-top: 5px; }
+
+        /* REVIEW CARDS */
+        .review-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .review-card.correct { border-left-color: var(--success); background: #f0fdf4; }
+        .review-card.wrong { border-left-color: var(--danger); background: #fef2f2; }
+
+        .q-title { font-weight: bold; margin-bottom: 10px; display: block; color: #1e293b; }
+        .ans-row { margin-top: 5px; font-size: 0.95rem; }
+        .label { font-weight: bold; font-size: 0.8rem; text-transform: uppercase; display: inline-block; width: 80px; }
+        
+        .user-ans { color: #334155; }
+        .correct-ans { color: var(--success); font-weight: bold; }
+        .wrong-ans-text { color: var(--danger); text-decoration: line-through; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--primary); margin-bottom:20px;">Check Your Results</h2>
+            <select id="sClass" onchange="loadStudents()">
+                <option value="">Select Class...</option>
+                <option value="XI D">XI D</option>
+                <option value="XI E">XI E</option>
+                <option value="XI H">XI H</option>
+                <option value="XI I">XI I</option>
+            </select>
+            
+            <input type="text" id="sNameInput" list="student-list" placeholder="Search your name..." disabled>
+            <datalist id="student-list"></datalist>
+
+            <button onclick="fetchResults()">View Report</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px;">Please fill all fields.</p>
+        </div>
+    </div>
+
+    <div class="container" id="report-container">
+        <header>
+            <h1>Passive Voice Review</h1>
+            <div id="student-details" class="meta-info"></div>
+            <div class="score-badge" id="final-score">--/25</div>
+            <div id="time-taken" class="meta-info"></div>
+        </header>
+
+        <div id="review-list"></div>
+        
+        <button onclick="location.reload()" style="background: #64748b; margin-top: 20px;">Back to Login</button>
+    </div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week23passivevoiceexercise";
+
+    // --- STUDENT DB (Same as Index/Week23) ---
+    const studentDB = {
+        "XI D": [
+            {n:1, name:"Annita"}, {n:2, name:"Arshavince Zenji Milano"}, {n:3, name:"Ashwini Dewan"}, {n:4, name:"Carissa Evelynna Susanto"}, {n:5, name:"Carlin Fayola"},
+            {n:6, name:"Celine Elaine Cen"}, {n:7, name:"Celine Siera Winnata"}, {n:8, name:"Derick Ferdinand"}, {n:9, name:"Ella"}, {n:10, name:"Erich Novaro"},
+            {n:11, name:"Felix Fernando Ang"}, {n:12, name:"Filbert Suciokto"}, {n:13, name:"Fiona Yozuki"}, {n:14, name:"Fleishia Allyce Ng"}, {n:15, name:"Florencia Melanie Nauli"},
+            {n:16, name:"Gabriella Callista Lokman"}, {n:17, name:"Giselle Lee"}, {n:18, name:"Givon"}, {n:19, name:"Goldy Pacific Sun"}, {n:20, name:"Grace Kelly Ignacia"},
+            {n:21, name:"Idellia Antoneta"}, {n:22, name:"James Willard Chen"}, {n:23, name:"Janice Giselle Lim"}, {n:24, name:"Javier Chiuman"}, {n:25, name:"Jessica Sachi"},
+            {n:26, name:"Jessica Tanji"}, {n:27, name:"Jocelyn Princess Yangklyn"}, {n:28, name:"Joe Kusanagi"}, {n:29, name:"Joice Kwan"}, {n:30, name:"Jose Ferguson Tjong"},
+            {n:31, name:"Justin Kwok"}, {n:32, name:"Kendrick Wiliston"}, {n:33, name:"Kenrick Ciuanta"}, {n:34, name:"Kusumo Wijaya"}, {n:35, name:"Lorenzo Alvaro"},
+            {n:36, name:"Luis Fernando Gober"}, {n:37, name:"Marcus Hubert Tandyan"}, {n:38, name:"Michelle Patricia Susanto"}, {n:39, name:"Nico Wiman"}, {n:40, name:"Reegan Gunawan"},
+            {n:41, name:"Richard Ansle"}, {n:42, name:"Roschella Teisha Widalkho"}, {n:43, name:"Stella Keyne"}, {n:44, name:"Valencia Khosasih"}, {n:45, name:"Wendy Salim"},
+            {n:46, name:"Louis Chow"}, {n:47, name:"Valerian Lieandro"}
+        ],
+        "XI E": [
+            {n:1, name:"Angela Sudargo"}, {n:2, name:"Aurellia Fidelya"}, {n:3, name:"Beltiana Lie"}, {n:4, name:"Calvin Khangriawan Tony"}, {n:5, name:"Cathryna Audree Livi"},
+            {n:6, name:"Chen Jian Ping"}, {n:7, name:"Cheryl Quinn Mc Cane"}, {n:8, name:"Christopher Lionel Richie"}, {n:9, name:"Cindy Tanaka"}, {n:10, name:"Clairine Vanessa"},
+            {n:11, name:"Clara Fiorentina"}, {n:12, name:"Clarise Vincella Tho"}, {n:13, name:"Cynthia Kwan"}, {n:14, name:"Darren Alexius Wijaya"}, {n:15, name:"Ethan Chainito"},
+            {n:16, name:"Eunice Yueen"}, {n:17, name:"Evellyn Viorene Khoo"}, {n:18, name:"Evelyn Serenity Tandy"}, {n:19, name:"Federico Oswald"}, {n:20, name:"Filberth Wu"},
+            {n:21, name:"Hans Goldhy"}, {n:22, name:"Joyce Dominique"}, {n:23, name:"Joylynn Devanie Conrad"}, {n:24, name:"Justin Adelio Sunvier"}, {n:25, name:"Lolyson Deevan"},
+            {n:26, name:"Nicholas Sebastian Tandiono"}, {n:27, name:"Nicole Violetta Tjeong"}, {n:28, name:"Revalyn"}, {n:29, name:"Rogelio Carrick Ang"}, {n:30, name:"Sava Tania"},
+            {n:31, name:"Shane Marvin Halim"}, {n:32, name:"Shareen Theodora"}, {n:33, name:"Sherlince Starlene Chandra"}, {n:34, name:"Sophie Aurelia Joycelin"}, {n:35, name:"Stevany Yulia Pratama"},
+            {n:36, name:"Sunrio Adinugroho"}, {n:37, name:"Sutanto Owen Liem"}, {n:38, name:"Thesha Bellina Vicjy"}, {n:39, name:"Torres Yang"}, {n:40, name:"Valencia Richel Ongso"},
+            {n:41, name:"Vallerie Liecardo"}, {n:42, name:"Vanessa"}, {n:43, name:"Vanessa Lois"}, {n:44, name:"Vicenzo Alfredo"}, {n:45, name:"Vincent Alvarez Zhuo"},
+            {n:46, name:"Vincent Wijaya"}, {n:47, name:"Wilbert Lieandy"}, {n:48, name:"Winston Hudson Otteo"}
+        ],
+        "XI H": [
+            {n:1, name:"Aurencia Lievianna"}, {n:2, name:"Carlyn Tanclyn"}, {n:3, name:"Clara Auryn Icasia"}, {n:4, name:"Fayola Aretha Lai"}, {n:5, name:"Grace Angeline Wirjawan"},
+            {n:6, name:"Javerlyn Queenicia Chandra"}, {n:7, name:"Jeankelly Samudra Tjuaja"}, {n:8, name:"Joice Kellen"}, {n:9, name:"Jose Fernando"}, {n:10, name:"Justine Tania Chandra"},
+            {n:11, name:"Karen Julia Haspan"}, {n:12, name:"Kelsey Valerie Lin"}, {n:13, name:"Kynthia Callysta"}, {n:14, name:"Leonly Geraldine"}, {n:15, name:"Louis Gabriel"},
+            {n:16, name:"Louis Thomson"}, {n:17, name:"Madelyn Arcadia Chen"}, {n:18, name:"Mervin Sutiono"}, {n:19, name:"Michael Jhonson"}, {n:20, name:"Michelle"},
+            {n:21, name:"Michelle Margareth Cheong"}, {n:22, name:"Nicholas Yang"}, {n:23, name:"Nicole Zasen Yau"}, {n:24, name:"Philips Cuanata"}, {n:25, name:"Revanko Devalim Sunanto"},
+            {n:26, name:"Richard Gani"}, {n:27, name:"Robin Surya Toka"}, {n:28, name:"Roschelly Teisha Widalkho"}, {n:29, name:"Sanny"}, {n:30, name:"Sauri Yap Bella"},
+            {n:31, name:"Selly Alicia"}, {n:32, name:"Sharon Valerie Widjaja"}, {n:33, name:"Silvia Lim"}, {n:34, name:"Steven"}, {n:35, name:"Stevi Yulia Pratam"},
+            {n:36, name:"Tysdeny Tan"}, {n:37, name:"Valerie Tio"}, {n:38, name:"Velin Alicia"}, {n:39, name:"Vicelia Joanna Lie"}, {n:40, name:"Victor Kosasih"},
+            {n:41, name:"Whizley Chen"}, {n:42, name:"William Utama"}, {n:43, name:"Willy"}, {n:44, name:"Veda Arsa Iwanto"}
+        ],
+        "XI I": [
+            {n:1, name:"Carlos Valentino Wenrich"}, {n:2, name:"Clareen Cia"}, {n:3, name:"Edward Kennedy Lim"}, {n:4, name:"Gricherry Khonata"}, {n:5, name:"Hazel Robett Can"},
+            {n:6, name:"Jasmine Winaka"}, {n:7, name:"Jaycent Fritz Reevesen"}, {n:8, name:"Jessica Evangeli Tjiawijaya"}, {n:9, name:"Joeven"}, {n:10, name:"Joevito Jonathan"},
+            {n:11, name:"Jolin Jolicia Ciang"}, {n:12, name:"Kaetlyn Onglicia"}, {n:13, name:"Kaylie Rusli"}, {n:14, name:"Kerich Juin Utama"}, {n:15, name:"Marcelline Metsuko Humutowo"},
+            {n:16, name:"Marvennoto Suvega"}, {n:17, name:"Michelle Teresia Sutanto"}, {n:18, name:"Nicholas Valentino"}, {n:19, name:"Owen Chiuman"}, {n:20, name:"Qrin Tanaka"},
+            {n:21, name:"Rachel Chandler"}, {n:22, name:"Raymond Filbert Salim"}, {n:23, name:"Renzzo Cedric Guovandry"}, {n:24, name:"Richardo Anderson Halim"}, {n:25, name:"Richardo William"},
+            {n:26, name:"Richie Jericho Prince"}, {n:27, name:"Richie Prince Ten"}, {n:28, name:"Ruyi Sun Moon"}, {n:29, name:"Ryanna Nicole Leung"}, {n:30, name:"Sandra Evelyn Limber"},
+            {n:31, name:"Shanty Fidella Fu"}, {n:32, name:"Sky Lim"}, {n:33, name:"Sony Fernando Limber"}, {n:34, name:"Stancio Wunand"}, {n:35, name:"Syerena Tania Susanto"},
+            {n:36, name:"Valerina Florensia"}, {n:37, name:"Vallentino"}, {n:38, name:"Victoria Huang"}, {n:39, name:"Vincent"}, {n:40, name:"Vincent Alexander Colin"},
+            {n:41, name:"Werly"}
+        ]
+    };
+
+    // --- QUESTION DATA ---
+    const questions = [
+        "The Browns have built the large house.", "A jellyfish stung her while she was swimming.", "They gave her a nice present.",
+        "Jane is singing the new song.", "The storm destroyed the house.", "People spent a lot of money on the first shopping Saturday.",
+        "How do you write that word?", "She watered the flowers every day.", "The headmaster called his parents to the office.",
+        "Ben will direct the show.", "The dog has broken the window pane.", "You must pay the bill first.",
+        "They were interviewing her for the job.", "The professor told him not to talk in class.", "You shouldn’t speak to your neighbor.",
+        "Do not leave your bicycle in the hall.", "Can you learn French easily?", "Your impolite tone surprises me.",
+        "James will repair the car.", "An unknown author wrote the book.", "They forced him to steal the money out of his dad’s room.",
+        "Our neighbors have invited us to dinner.", "Why are they tearing down the old theatre?", "I will present my ideas at the conference tonight.",
+        "She would have told you."
+    ];
+
+    const correctAnswers = [
+        "The large house has been built by the Browns", "She was stung by a jellyfish while she was swimming", "She was given a nice present",
+        "The new song is being sung by Jane", "The house was destroyed by the storm", "A lot of money was spent on the first shopping Saturday",
+        "How is that word written", "The flowers were watered every day", "His parents were called to the office by the headmaster",
+        "The show will be directed by Ben", "The window pane has been broken by the dog", "The bill must be paid first",
+        "She was being interviewed for the job", "He was told not to talk in class by the professor", "Your neighbor shouldn’t be spoken to",
+        "Bicycles must not be left in the hall", "Can French be learned easily", "I am surprised by your impolite tone",
+        "The car will be repaired by James", "The book was written by an unknown author", "He was forced to steal the money out of his dad’s room",
+        "We have been invited to dinner", "Why is the old theatre being torn down", "My ideas will be presented at the conference tonight",
+        "You would have been told"
+    ];
+
+    // --- UTILS ---
+    function loadStudents() {
+        const cls = document.getElementById('sClass').value;
+        const nameInput = document.getElementById('sNameInput');
+        const dataList = document.getElementById('student-list');
+        
+        nameInput.value = ""; 
+        dataList.innerHTML = ""; 
+
+        if (cls && studentDB[cls]) {
+            nameInput.disabled = false;
+            nameInput.focus();
+            studentDB[cls].forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.name; 
+                dataList.appendChild(option);
+            });
+        } else {
+            nameInput.disabled = true;
+        }
+    }
+
+    function cleanString(str) {
+        return str.toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    // --- FETCH & RENDER ---
+    async function fetchResults() {
+        const cls = document.getElementById('sClass').value;
+        const enteredName = document.getElementById('sNameInput').value;
+        const errorEl = document.getElementById('error-msg');
+
+        if(!cls || !enteredName) {
+            errorEl.innerText = "Please select Class and Name.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // Validate Name
+        const validStudent = studentDB[cls].find(s => s.name === enteredName);
+        if (!validStudent) {
+            errorEl.innerText = "Invalid Name. Select from list.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        errorEl.style.display = 'none';
+
+        // Fetch DB
+        const docID = `${cls.replace(/\s/g,'')}_${validStudent.n}_${enteredName.replace(/\s/g,'_')}`;
+        const docSnap = await db.collection(COLLECTION_NAME).doc(docID).get();
+
+        if(!docSnap.exists) {
+            errorEl.innerText = "No submission found for this student.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        const data = docSnap.data();
+        
+        // Hide Login, Show Report
+        document.getElementById('login-overlay').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+
+        // Render Header
+        document.getElementById('student-details').innerText = `${data.name} (${data.class} - #${data.number})`;
+        document.getElementById('final-score').innerText = `${data.score} / 25`;
+        document.getElementById('time-taken').innerText = `Submitted: ${data.finish_time}`;
+        
+        // Render Review List
+        const list = document.getElementById('review-list');
+        list.innerHTML = "";
+
+        questions.forEach((q, i) => {
+            const userAns = data.answers[`Q${i+1}`] || "-";
+            const cleanUser = cleanString(userAns);
+            const cleanCorrect = cleanString(correctAnswers[i]);
+            const isCorrect = cleanUser === cleanCorrect;
+
+            list.innerHTML += `
+                <div class="review-card ${isCorrect ? 'correct' : 'wrong'}">
+                    <span class="q-title">${i+1}. ${q}</span>
+                    <div class="ans-row">
+                        <span class="label">You:</span> 
+                        <span class="${isCorrect ? 'correct-ans' : 'wrong-ans-text'}">${userAns}</span>
+                    </div>
+                    ${!isCorrect ? `
+                    <div class="ans-row">
+                        <span class="label">Correct:</span> 
+                        <span class="correct-ans">${correctAnswers[i]}</span>
+                    </div>` : ''}
+                </div>
+            `;
+        });
+    }
+
+</script>
+</body>
+</html>
