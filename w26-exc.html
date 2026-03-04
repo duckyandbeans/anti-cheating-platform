@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 26: Exercises</title>
+    <style>
+        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; user-select: none; }
+        
+        /* LOGIN SCREEN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .login-box select, .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .btn-login { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .btn-login:hover { background: #1d4ed8; }
+
+        /* ANTI-CHEAT UI */
+        #cheat-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        #cheat-counter { position: fixed; top: 10px; right: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--danger); color: var(--danger); font-weight: bold; display: none; z-index: 9000; }
+
+        /* MAIN CONTENT */
+        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
+        h1 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+        
+        .instructions { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px; margin-bottom: 30px; font-size: 1.05rem; color: #92400e; }
+        
+        /* QUESTION STYLES */
+        .question-block { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0; font-size: 1.1rem; line-height: 1.6; }
+        .q-number { font-weight: bold; color: var(--accent); font-size: 1.2rem; margin-bottom: 10px; display: block; }
+
+        /* BUTTONS */
+        .btn-submit { width: 100%; padding: 15px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 30px; transition: 0.2s; }
+        .btn-submit:hover { background: #059669; }
+        
+        #result-summary { text-align: center; padding: 30px; background: #ecfdf5; border: 2px solid var(--success); border-radius: 8px; margin-bottom: 30px; display: none; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <p>This incident has been permanently recorded in the database.</p>
+        <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+    </div>
+
+    <div id="cheat-counter">OFFENSES: 0</div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--primary); margin-bottom:20px;">Week 26 Exercises</h2>
+            <select id="sClass" onchange="loadStudents()">
+                <option value="">Select Class...</option>
+                <option value="XI D">XI D</option>
+                <option value="XI E">XI E</option>
+                <option value="XI H">XI H</option>
+                <option value="XI I">XI I</option>
+            </select>
+            
+            <input type="text" id="sNameInput" list="student-list" placeholder="Search your name..." disabled>
+            <datalist id="student-list"></datalist>
+
+            <button class="btn-login" onclick="attemptLogin()">Start Session</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px;">Please select valid details.</p>
+        </div>
+    </div>
+
+    <div class="container" id="main-content">
+        <h1>Week 26: Practice Exercises</h1>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong> Read the questions below and write your answers in your exercise book. Do not switch tabs or minimize your browser. When you are done, click the "Finish Exercise" button at the bottom.
+        </div>
+
+        <div id="result-summary"></div>
+
+        <div id="questions-area">
+            
+            <h2 style="color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top: 30px;">Section 1: Passive Voice & Formal Passives</h2>
+<p style="color: #64748b; margin-bottom: 20px;"><strong>Identify the incorrect segment (A, B, C, or D).</strong></p>
+
+<div class="question-block">
+    <span class="q-number">Question 1</span>
+    It <u>is being widely believed</u> <b>(A)</b> that the expansion of the Paralympics has fostered a greater <u>sense of belonging</u> <b>(B)</b> among athletes with disabilities, although some critics argue that more <u>needs to be done</u> <b>(C)</b> to ensure total <u>inclusivity is reached</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 2</span>
+    During the high-pressure environment of the Olympics, an athlete’s <u>attention span</u> <b>(A)</b> <u>is said to be</u> <b>(B)</b> significantly shortened if they <u>have not been coached</u> <b>(C)</b> in mindfulness techniques <u>prior to compete</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 3</span>
+    The report <u>is understood to have been</u> <b>(A)</b> commissioned to investigate how <u>self-confidence</u> <b>(B)</b> in youth sports <u>was being eroded</u> <b>(C)</b> by overly competitive coaching styles that <u>is often ignored</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 4</span>
+    While it <u>has been suggested</u> <b>(A)</b> that physical activity <u>improves</u> <b>(B)</b> cognitive function, it must <u>be pointed out</u> <b>(C)</b> that the benefits <u>cannot be fully realized</u> <b>(D)</b> unless a routine is maintained.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 5</span>
+    Elite swimmers <u>are thought to have been</u> <b>(A)</b> practicing visualization for decades, yet it <u>is only recently</u> <b>(B)</b> that the psychological impact <u>is being officially recognized</u> <b>(C)</b> by <u>the sports' authorities</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 6</span>
+    The new stadium <u>was supposed to be</u> <b>(A)</b> completed before the opening ceremony, but it <u>is now reported</u> <b>(B)</b> that the construction <u>is being delayed</u> <b>(C)</b> due to a lack of <u>funding was available</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 7</span>
+    It <u>was once claimed</u> <b>(A)</b> that the Olympics <u>were</u> <b>(B)</b> purely amateur, but that notion <u>has long been discarded</u> <b>(C)</b> as the commercial reality of modern sports <u>was being emerged</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 8</span>
+    To improve <u>social cohesion</u> <b>(A)</b>, it <u>is vital that</u> <b>(B)</b> community sports programs <u>are seen to be</u> <b>(C)</b> accessible to everyone, regardless of their <u>background is</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 9</span>
+    The athlete <u>was heard to complain</u> <b>(A)</b> about the lack of <u>mindful</u> <b>(B)</b> recovery spaces in the Olympic Village, which <u>is said to have</u> <b>(C)</b> affected his <u>overall performance</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 10</span>
+    It <u>is often argued</u> <b>(A)</b> that the <u>attention span</u> <b>(B)</b> of modern viewers <u>is being shaped</u> <b>(C)</b> by short-form highlights, leading to fears that long-form matches <u>will no longer be watched</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 11</span>
+    The Paralympics <u>are widely considered</u> <b>(A)</b> to be a pinnacle of human resilience, yet it <u>is frequently felt</u> <b>(B)</b> that media coverage <u>is not being distributed</u> <b>(C)</b> as <u>equally as it should</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 12</span>
+    A new study <u>is being conducted</u> <b>(A)</b> to see if <u>self-confidence</u> <b>(B)</b> <u>can be boosted</u> <b>(C)</b> through team sports more effectively than <u>by being done</u> <b>(D)</b> solo exercise.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 13</span>
+    It <u>has been reported</u> <b>(A)</b> that the pressure of the games <u>caused</u> <b>(B)</b> several athletes <u>to be withdrawn</u> <b>(C)</b> from the competition to protect their <u>mental well-being</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 14</span>
+    The rules <u>were made to be</u> <b>(A)</b> followed strictly, but it <u>is alleged that</u> <b>(B)</b> several teams <u>have been found</u> <b>(C)</b> to <u>be broken</u> <b>(D)</b> the regulations regarding equipment.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 15</span>
+    It <u>is expected that</u> <b>(A)</b> the upcoming games <u>will be being watched</u> <b>(B)</b> by billions, making it the most <u>widely viewed</u> <b>(C)</b> sporting event <u>in history</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 16</span>
+    The coach <u>is known to have</u> <b>(A)</b> emphasized <u>mindfulness</u> <b>(B)</b> as a key tool, and it <u>is believed that</u> <b>(C)</b> his methods <u>to have led</u> <b>(D)</b> to fewer injuries.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 17</span>
+    Athletes <u>are required to be</u> <b>(A)</b> tested for prohibited substances, and it <u>is strictly forbidden</u> <b>(B)</b> for any results <u>to be leaked</u> <b>(C)</b> before the official <u>announcement is made</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 18</span>
+    It <u>was suggested that</u> <b>(A)</b> the village <u>be designed</u> <b>(B)</b> with more green spaces to help athletes <u>remain mindful</u> <b>(C)</b>, but the plan <u>is said to be</u> <b>(D)</b> rejected.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 19</span>
+    The legacy of the games <u>is often thought</u> <b>(A)</b> to be purely economic, but it <u>is increasingly being seen</u> <b>(B)</b> as a way to <u>promote</u> <b>(C)</b> a <u>sense of belonging</u> <b>(D)</b> in urban areas.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 20</span>
+    It <u>is estimated that</u> <b>(A)</b> the athlete’s <u>attention span</u> <b>(B)</b> <u>is increased</u> <b>(C)</b> by 20% when they <u>are being engaged</u> <b>(D)</b> in high-stakes competition.
+</div>
+
+<h2 style="color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top: 40px;">Section 2: Comparatives & Superlatives</h2>
+<p style="color: #64748b; margin-bottom: 20px;"><strong>Identify the incorrect segment (A, B, C, or D).</strong></p>
+
+<div class="question-block">
+    <span class="q-number">Question 21</span>
+    The <u>more mindful</u> <b>(A)</b> an athlete becomes, the <u>better they are</u> <b>(B)</b> able to handle the <u>more stressful</u> <b>(C)</b> moments of a <u>paralympic final</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 22</span>
+    Of all the factors contributing to <u>social cohesion</u> <b>(A)</b>, team sports are <u>by far the most effective</u> <b>(B)</b> at creating a <u>strong</u> <b>(C)</b> <u>sense of belonging</u> <b>(D)</b> among youth.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 23</span>
+    The <u>faster the pace</u> <b>(A)</b> of the game, the <u>more difficult</u> <b>(B)</b> it becomes for players to maintain their <u>attention span</u> <b>(C)</b> for <u>more than</u> <b>(D)</b> a few minutes.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 24</span>
+    Winning a gold medal is <u>easily the most</u> <b>(A)</b> rewarding experience, but for many, the journey is <u>every bit as</u> <b>(B)</b> important, if <u>not more so</u> <b>(C)</b>, than the <u>victory itself</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 25</span>
+    The Paralympics provide a platform that is <u>considerably more</u> <b>(A)</b> inclusive than any other event, making it <u>one of the most</u> <b>(B)</b> significant <u>milestone</u> <b>(C)</b> in the history of <u>diverse sports</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 26</span>
+    <u>As more people</u> <b>(A)</b> take up mindfulness, the <u>greater the likelihood</u> <b>(B)</b> that we will see <u>fewer</u> <b>(C)</b> cases of burnout in <u>the most elite</u> <b>(D)</b> athletes.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 27</span>
+    Some argue that the Olympics are <u>nowhere near as</u> <b>(A)</b> amateur as they <u>used to be</u> <b>(B)</b>, with corporate sponsorships playing a <u>far more</u> <b>(C)</b> prominent role than <u>ever before</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 28</span>
+    To many athletes, the <u>sense of belonging</u> <b>(A)</b> found in a team is <u>much more</u> <b>(B)</b> valuable than the <u>most prestigious</u> <b>(C)</b> individual award <u>available</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 29</span>
+    The <u>lesser</u> <b>(A)</b> an athlete focuses on their <u>self-confidence</u> <b>(B)</b>, the <u>more likely</u> <b>(C)</b> they are to struggle during <u>the highest</u> <b>(D)</b> levels of competition.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 30</span>
+    Training for the Paralympics is <u>every bit as</u> <b>(A)</b> grueling as training for the Olympics, and the dedication required is <u>no less</u> <b>(B)</b> than that of <u>the more</u> <b>(C)</b> able-bodied <u>counterparts</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 31</span>
+    The <u>further</u> <b>(A)</b> the games expand, the <u>more expensive</u> <b>(B)</b> they become to host, which is <u>the most</u> <b>(C)</b> significant <u>challenge facing</u> <b>(D)</b> the IOC.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 32</span>
+    Maintaining a long <u>attention span</u> <b>(A)</b> is <u>one of the hardest</u> <b>(B)</b> skills to master, particularly in sports that are <u>the most</u> <b>(C)</b> fast-paced and <u>physically demanding</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 33</span>
+    Her <u>self-confidence</u> <b>(A)</b> grew <u>the more</u> <b>(B)</b> she practiced, eventually becoming <u>stronger than</u> <b>(C)</b> any of the <u>other competitor</u> <b>(D)</b> in her heat.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 34</span>
+    While some view the games as a distraction, others believe they are <u>the very most</u> <b>(A)</b> effective way to foster <u>global unity</u> <b>(B)</b> and a <u>deeper</u> <b>(C)</b> <u>sense of belonging</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 35</span>
+    The <u>sooner</u> <b>(A)</b> we prioritize <u>mindfulness</u> <b>(B)</b> in schools, the <u>better the chances</u> <b>(C)</b> that students will develop <u>the higher</u> <b>(D)</b> levels of resilience.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 36</span>
+    For a Paralympian, the <u>most difficult</u> <b>(A)</b> hurdle is often not the sport itself, but the societal barriers that are <u>far more</u> <b>(B)</b> harder to <u>overcome</u> <b>(C)</b> than any <u>physical limit</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 37</span>
+    The <u>more deeply</u> <b>(A)</b> an athlete is involved in their community, the <u>stronger</u> <b>(B)</b> their <u>sense of belonging</u> <b>(C)</b> and the <u>most consistent</u> <b>(D)</b> their performance.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 38</span>
+    It is <u>widely believed</u> <b>(A)</b> that the <u>higher</u> <b>(B)</b> the stakes, the <u>more likely</u> <b>(C)</b> athletes are to rely on their <u>attention span</u> <b>(D)</b> and focus.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 39</span>
+    Watching the Olympics is <u>far and away</u> <b>(A)</b> the <u>most popular</u> <b>(B)</b> pastime during the summer, drawing <u>more</u> <b>(C)</b> viewers than any <u>other event</u> <b>(D)</b>.
+</div>
+
+<div class="question-block">
+    <span class="q-number">Question 40</span>
+    The <u>more better</u> <b>(A)</b> the facilities, the <u>more likely</u> <b>(B)</b> it is that athletes will reach their <u>peak</u> <b>(C)</b> and achieve their <u>most ambitious</u> <b>(D)</b> goals.
+</div>
+
+            </div>
+        
+        <button class="btn-submit" id="submitBtn" onclick="finishSession()">Finish Exercise</button>
+    </div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week26exercises";
+    let studentData = {};
+    let cheatCount = 0;
+    let sessionActive = false;
+    let currentDocID = null;
+    let wakeLock = null;
+
+    // --- STUDENT DATABASE ---
+    const studentDB = {
+        "XI D": [
+            {n:1, name:"Annita"}, {n:2, name:"Arshavince Zenji Milano"}, {n:3, name:"Ashwini Dewan"}, {n:4, name:"Carissa Evelynna Susanto"}, {n:5, name:"Carlin Fayola"},
+            {n:6, name:"Celine Elaine Cen"}, {n:7, name:"Celine Siera Winnata"}, {n:8, name:"Derick Ferdinand"}, {n:9, name:"Ella"}, {n:10, name:"Erich Novaro"},
+            {n:11, name:"Felix Fernando Ang"}, {n:12, name:"Filbert Suciokto"}, {n:13, name:"Fiona Yozuki"}, {n:14, name:"Fleishia Allyce Ng"}, {n:15, name:"Florencia Melanie Nauli"},
+            {n:16, name:"Gabriella Callista Lokman"}, {n:17, name:"Giselle Lee"}, {n:18, name:"Givon"}, {n:19, name:"Goldy Pacific Sun"}, {n:20, name:"Grace Kelly Ignacia"},
+            {n:21, name:"Idellia Antoneta"}, {n:22, name:"James Willard Chen"}, {n:23, name:"Janice Giselle Lim"}, {n:24, name:"Javier Chiuman"}, {n:25, name:"Jessica Sachi"},
+            {n:26, name:"Jessica Tanji"}, {n:27, name:"Jocelyn Princess Yangklyn"}, {n:28, name:"Joe Kusanagi"}, {n:29, name:"Joice Kwan"}, {n:30, name:"Jose Ferguson Tjong"},
+            {n:31, name:"Justin Kwok"}, {n:32, name:"Kendrick Wiliston"}, {n:33, name:"Kenrick Ciuanta"}, {n:34, name:"Kusumo Wijaya"}, {n:35, name:"Lorenzo Alvaro"},
+            {n:36, name:"Luis Fernando Gober"}, {n:37, name:"Marcus Hubert Tandyan"}, {n:38, name:"Michelle Patricia Susanto"}, {n:39, name:"Nico Wiman"}, {n:40, name:"Reegan Gunawan"},
+            {n:41, name:"Richard Ansle"}, {n:42, name:"Roschella Teisha Widalkho"}, {n:43, name:"Stella Keyne"}, {n:44, name:"Valencia Khosasih"}, {n:45, name:"Wendy Salim"},
+            {n:46, name:"Louis Chow"}, {n:47, name:"Valerian Lieandro"}
+        ],
+        "XI E": [
+            {n:1, name:"Angela Sudargo"}, {n:2, name:"Aurellia Fidelya"}, {n:3, name:"Beltiana Lie"}, {n:4, name:"Calvin Khangriawan Tony"}, {n:5, name:"Cathryna Audree Livi"},
+            {n:6, name:"Chen Jian Ping"}, {n:7, name:"Cheryl Quinn Mc Cane"}, {n:8, name:"Christopher Lionel Richie"}, {n:9, name:"Cindy Tanaka"}, {n:10, name:"Clairine Vanessa"},
+            {n:11, name:"Clara Fiorentina"}, {n:12, name:"Clarise Vincella Tho"}, {n:13, name:"Cynthia Kwan"}, {n:14, name:"Darren Alexius Wijaya"}, {n:15, name:"Ethan Chainito"},
+            {n:16, name:"Eunice Yueen"}, {n:17, name:"Evellyn Viorene Khoo"}, {n:18, name:"Evelyn Serenity Tandy"}, {n:19, name:"Federico Oswald"}, {n:20, name:"Filberth Wu"},
+            {n:21, name:"Hans Goldhy"}, {n:22, name:"Joyce Dominique"}, {n:23, name:"Joylynn Devanie Conrad"}, {n:24, name:"Justin Adelio Sunvier"}, {n:25, name:"Lolyson Deevan"},
+            {n:26, name:"Nicholas Sebastian Tandiono"}, {n:27, name:"Nicole Violetta Tjeong"}, {n:28, name:"Revalyn"}, {n:29, name:"Rogelio Carrick Ang"}, {n:30, name:"Sava Tania"},
+            {n:31, name:"Shane Marvin Halim"}, {n:32, name:"Shareen Theodora"}, {n:33, name:"Sherlince Starlene Chandra"}, {n:34, name:"Sophie Aurelia Joycelin"}, {n:35, name:"Stevany Yulia Pratama"},
+            {n:36, name:"Sunrio Adinugroho"}, {n:37, name:"Sutanto Owen Liem"}, {n:38, name:"Thesha Bellina Vicjy"}, {n:39, name:"Torres Yang"}, {n:40, name:"Valencia Richel Ongso"},
+            {n:41, name:"Vallerie Liecardo"}, {n:42, name:"Vanessa"}, {n:43, name:"Vanessa Lois"}, {n:44, name:"Vicenzo Alfredo"}, {n:45, name:"Vincent Alvarez Zhuo"},
+            {n:46, name:"Vincent Wijaya"}, {n:47, name:"Wilbert Lieandy"}, {n:48, name:"Winston Hudson Otteo"}
+        ],
+        "XI H": [
+            {n:1, name:"Aurencia Lievianna"}, {n:2, name:"Carlyn Tanclyn"}, {n:3, name:"Clara Auryn Icasia"}, {n:4, name:"Fayola Aretha Lai"}, {n:5, name:"Grace Angeline Wirjawan"},
+            {n:6, name:"Javerlyn Queenicia Chandra"}, {n:7, name:"Jeankelly Samudra Tjuaja"}, {n:8, name:"Joice Kellen"}, {n:9, name:"Jose Fernando"}, {n:10, name:"Justine Tania Chandra"},
+            {n:11, name:"Karen Julia Haspan"}, {n:12, name:"Kelsey Valerie Lin"}, {n:13, name:"Kynthia Callysta"}, {n:14, name:"Leonly Geraldine"}, {n:15, name:"Louis Gabriel"},
+            {n:16, name:"Louis Thomson"}, {n:17, name:"Madelyn Arcadia Chen"}, {n:18, name:"Mervin Sutiono"}, {n:19, name:"Michael Jhonson"}, {n:20, name:"Michelle"},
+            {n:21, name:"Michelle Margareth Cheong"}, {n:22, name:"Nicholas Yang"}, {n:23, name:"Nicole Zasen Yau"}, {n:24, name:"Philips Cuanata"}, {n:25, name:"Revanko Devalim Sunanto"},
+            {n:26, name:"Richard Gani"}, {n:27, name:"Robin Surya Toka"}, {n:28, name:"Roschelly Teisha Widalkho"}, {n:29, name:"Sanny"}, {n:30, name:"Sauri Yap Bella"},
+            {n:31, name:"Selly Alicia"}, {n:32, name:"Sharon Valerie Widjaja"}, {n:33, name:"Silvia Lim"}, {n:34, name:"Steven"}, {n:35, name:"Stevi Yulia Pratam"},
+            {n:36, name:"Tysdeny Tan"}, {n:37, name:"Valerie Tio"}, {n:38, name:"Velin Alicia"}, {n:39, name:"Vicelia Joanna Lie"}, {n:40, name:"Victor Kosasih"},
+            {n:41, name:"Whizley Chen"}, {n:42, name:"William Utama"}, {n:43, name:"Willy"}, {n:44, name:"Veda Arsa Iwanto"}
+        ],
+        "XI I": [
+            {n:1, name:"Carlos Valentino Wenrich"}, {n:2, name:"Clareen Cia"}, {n:3, name:"Edward Kennedy Lim"}, {n:4, name:"Gricherry Khonata"}, {n:5, name:"Hazel Robett Can"},
+            {n:6, name:"Jasmine Winaka"}, {n:7, name:"Jaycent Fritz Reevesen"}, {n:8, name:"Jessica Evangeli Tjiawijaya"}, {n:9, name:"Joeven"}, {n:10, name:"Joevito Jonathan"},
+            {n:11, name:"Jolin Jolicia Ciang"}, {n:12, name:"Kaetlyn Onglicia"}, {n:13, name:"Kaylie Rusli"}, {n:14, name:"Kerich Juin Utama"}, {n:15, name:"Marcelline Metsuko Humutowo"},
+            {n:16, name:"Marvennoto Suvega"}, {n:17, name:"Michelle Teresia Sutanto"}, {n:18, name:"Nicholas Valentino"}, {n:19, name:"Owen Chiuman"}, {n:20, name:"Qrin Tanaka"},
+            {n:21, name:"Rachel Chandler"}, {n:22, name:"Raymond Filbert Salim"}, {n:23, name:"Renzzo Cedric Guovandry"}, {n:24, name:"Richardo Anderson Halim"}, {n:25, name:"Richardo William"},
+            {n:26, name:"Richie Jericho Prince"}, {n:27, name:"Richie Prince Ten"}, {n:28, name:"Ruyi Sun Moon"}, {n:29, name:"Ryanna Nicole Leung"}, {n:30, name:"Sandra Evelyn Limber"},
+            {n:31, name:"Shanty Fidella Fu"}, {n:32, name:"Sky Lim"}, {n:33, name:"Sony Fernando Limber"}, {n:34, name:"Stancio Wunand"}, {n:35, name:"Syerena Tania Susanto"},
+            {n:36, name:"Valerina Florensia"}, {n:37, name:"Vallentino"}, {n:38, name:"Victoria Huang"}, {n:39, name:"Vincent"}, {n:40, name:"Vincent Alexander Colin"},
+            {n:41, name:"Werly"}
+        ]
+    };
+
+    // --- POPULATE SEARCHABLE LIST ---
+    function loadStudents() {
+        const cls = document.getElementById('sClass').value;
+        const nameInput = document.getElementById('sNameInput');
+        const dataList = document.getElementById('student-list');
+        
+        nameInput.value = ""; 
+        dataList.innerHTML = ""; 
+
+        if (cls && studentDB[cls]) {
+            nameInput.disabled = false;
+            nameInput.focus();
+            studentDB[cls].forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.name; 
+                dataList.appendChild(option);
+            });
+        } else {
+            nameInput.disabled = true;
+        }
+    }
+
+    // --- LOGIN LOGIC ---
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value;
+        const enteredName = document.getElementById('sNameInput').value;
+        const errorEl = document.getElementById('error-msg');
+
+        if(!cls || !enteredName) {
+            errorEl.innerText = "Please fill all fields.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        const validStudent = studentDB[cls].find(s => s.name === enteredName);
+        if (!validStudent) {
+            errorEl.innerText = "Invalid Name. Select from the dropdown list.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // Initialize session
+        studentData = { class: cls, no: validStudent.n, name: enteredName };
+        currentDocID = `${cls.replace(/\s/g,'')}_${validStudent.n}_${enteredName.replace(/\s/g,'_')}`;
+        
+        // Check if session exists (to prevent resetting cheat count via refresh)
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            cheatCount = data.cheat_count || 0;
+            if (data.status === "COMPLETED") {
+                alert("You have already completed this session.");
+            }
+        } else {
+            // New Session Log
+            await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                name: enteredName, class: cls, number: validStudent.n,
+                start_time: new Date().toLocaleString(),
+                status: "STARTED",
+                cheat_count: 0
+            });
+        }
+
+        // UI Updates
+        document.getElementById('login-overlay').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+        document.getElementById('cheat-counter').style.display = 'block';
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        
+        requestWakeLock();
+        setTimeout(() => { sessionActive = true; }, 2000); // Give user 2 seconds to settle
+        document.documentElement.requestFullscreen().catch(e=>{});
+    }
+
+    // --- WAKE LOCK (Anti-Sleep) ---
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+        } catch (err) { console.log(err); }
+    }
+
+    // --- SUBMISSION LOGIC ---
+    async function finishSession() {
+        if(!confirm("Are you sure you are finished with these exercises?")) return;
+        sessionActive = false; // Turn off cheat tracking
+
+        const finishTime = new Date().toLocaleString();
+
+        // Update UI
+        document.getElementById('questions-area').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'none';
+        
+        const summary = document.getElementById('result-summary');
+        summary.innerHTML = `
+            <h2 style="color:#059669; margin-top:0;">Session Completed</h2>
+            <p>Your completion has been logged securely.</p>
+            <div style="font-family: monospace; color: #64748b; margin-top: 10px;">Time Logged: ${finishTime}</div>
+            <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; border-radius:6px; border:none; cursor:pointer;">Close</button>
+        `;
+        summary.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Save final status to DB
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            status: "COMPLETED",
+            finish_time: finishTime,
+            submittedAt_timestamp: Date.now(),
+            final_cheat_count: cheatCount
+        });
+    }
+
+    // --- ANTI-CHEAT (Server-Side Sync) ---
+    function triggerCheat() {
+        if (!sessionActive) return;
+        
+        cheatCount++;
+        
+        // Update UI
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+        
+        // Instantly update database so refreshes don't wipe it
+        if(currentDocID) {
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                cheat_count: cheatCount
+            });
+        }
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    // Trigger on tab switch or minimize
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    // Trigger on clicking outside the browser window (split screen, notifications)
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+</script>
+</body>
+</html>
