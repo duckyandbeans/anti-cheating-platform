@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Week 26: Class XII Materials</title>
+    <style>
+        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --white: #ffffff; --success: #10b981; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; user-select: none; }
+        
+        /* LOGIN SCREEN */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 10000; display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .login-box select, .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .btn-login { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .btn-login:hover { background: #1d4ed8; }
+
+        .wake-notice { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px; text-align: left; font-size: 0.9rem; margin-bottom: 20px; color: #1e40af; border-radius: 4px; }
+
+        /* ANTI-CHEAT UI */
+        #cheat-alert { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(220, 38, 38, 0.95); color: white; z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
+        #cheat-counter { position: fixed; top: 10px; right: 10px; background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--danger); color: var(--danger); font-weight: bold; display: none; z-index: 9000; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        /* MAIN CONTENT */
+        .container { max-width: 800px; margin: 0 auto; background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
+        h1 { color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+        
+        .instructions { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 4px; margin-bottom: 30px; font-size: 1.05rem; color: #92400e; }
+        
+        /* IMAGE STYLES */
+        .material-img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: block; }
+        .img-label { font-weight: bold; color: #64748b; margin-bottom: 5px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+
+        /* BUTTONS */
+        .btn-submit { width: 100%; padding: 15px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-submit:hover { background: #059669; }
+        
+        #result-summary { text-align: center; padding: 30px; background: #ecfdf5; border: 2px solid var(--success); border-radius: 8px; margin-bottom: 30px; display: none; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="cheat-alert">
+        <div style="font-size: 5rem;">⚠️</div>
+        <h1>FOCUS LOST</h1>
+        <p>This incident has been permanently recorded in the database.</p>
+        <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+    </div>
+
+    <div id="cheat-counter">OFFENSES: 0</div>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="color:var(--primary); margin-bottom:15px;">Week 26 Materials</h2>
+            
+            <div class="wake-notice">
+                <strong>💡 Note:</strong> This page automatically prevents your phone from going to sleep. You do not need to change your device settings.
+            </div>
+
+            <select id="sClass" onchange="handleDropdownChange()">
+                <option value="">Select Role/Class...</option>
+                <option value="XII H">Student - XII H</option>
+                <option value="XII I">Student - XII I</option>
+                <option value="Teacher">Teacher</option>
+            </select>
+            
+            <input type="text" id="sNameInput" list="student-list" placeholder="Search your name..." disabled>
+            <datalist id="student-list"></datalist>
+
+            <input type="password" id="tCodeInput" placeholder="Teacher Code" maxlength="3" style="display: none; text-align: center; font-weight: bold; letter-spacing: 2px;">
+
+            <button class="btn-login" onclick="attemptLogin()">Access Materials</button>
+            <p id="error-msg" style="color: red; display: none; margin-top: 10px; font-size: 0.9rem;">Please select valid details.</p>
+        </div>
+    </div>
+
+    <div class="container" id="main-content">
+        <h1 id="page-title">Week 26 Reading Materials</h1>
+        
+        <div class="instructions" id="student-instructions">
+            <strong>Instructions:</strong> Read the materials below. You may pinch to zoom in on any image to read the text clearly. Do not switch tabs or minimize your browser. Click "Finish" when you are done.
+        </div>
+
+        <div id="result-summary"></div>
+
+        <div id="content-area">
+            
+            <div class="img-label">Material 1</div>
+            <img src="1.png" alt="Material 1" class="material-img" onerror="this.src='https://via.placeholder.com/800x600?text=1.png+Missing'">
+
+            <div class="img-label">Material 1a</div>
+            <img src="1a.png" alt="Material 1a" class="material-img" onerror="this.src='https://via.placeholder.com/800x600?text=1a.png+Missing'">
+
+            <div class="img-label">Material 2</div>
+            <img src="2.png" alt="Material 2" class="material-img" onerror="this.src='https://via.placeholder.com/800x600?text=2.png+Missing'">
+
+            <div class="img-label">Material 3</div>
+            <img src="3.png" alt="Material 3" class="material-img" onerror="this.src='https://via.placeholder.com/800x600?text=3.png+Missing'">
+
+            <div class="img-label">Material 4</div>
+            <img src="4.png" alt="Material 4" class="material-img" onerror="this.src='https://via.placeholder.com/800x600?text=4.png+Missing'">
+
+        </div>
+        
+        <button class="btn-submit" id="submitBtn" onclick="finishSession()">Finish Reading</button>
+    </div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "week26xii";
+    const TEACHER_CODE = "030";
+    
+    let studentData = {};
+    let cheatCount = 0;
+    let sessionActive = false;
+    let currentDocID = null;
+    let wakeLock = null;
+    let isTeacher = false;
+
+    // --- STUDENT DATABASE ---
+    const studentDB = {
+        "XII H": [
+            {n:1, name:"Aurencia Lievianna"}, {n:2, name:"Carlyn Tanclyn"}, {n:3, name:"Clara Auryn Icasia"}, {n:4, name:"Fayola Aretha Lai"}, {n:5, name:"Grace Angeline Wirjawan"},
+            {n:6, name:"Javerlyn Queenicia Chandra"}, {n:7, name:"Jeankelly Samudra Tjuaja"}, {n:8, name:"Joice Kellen"}, {n:9, name:"Jose Fernando"}, {n:10, name:"Justine Tania Chandra"},
+            {n:11, name:"Karen Julia Haspan"}, {n:12, name:"Kelsey Valerie Lin"}, {n:13, name:"Kynthia Callysta"}, {n:14, name:"Leonly Geraldine"}, {n:15, name:"Louis Gabriel"},
+            {n:16, name:"Louis Thomson"}, {n:17, name:"Madelyn Arcadia Chen"}, {n:18, name:"Mervin Sutiono"}, {n:19, name:"Michael Jhonson"}, {n:20, name:"Michelle"},
+            {n:21, name:"Michelle Margareth Cheong"}, {n:22, name:"Nicholas Yang"}, {n:23, name:"Nicole Zasen Yau"}, {n:24, name:"Philips Cuanata"}, {n:25, name:"Revanko Devalim Sunanto"},
+            {n:26, name:"Richard Gani"}, {n:27, name:"Robin Surya Toka"}, {n:28, name:"Roschelly Teisha Widalkho"}, {n:29, name:"Sanny"}, {n:30, name:"Sauri Yap Bella"},
+            {n:31, name:"Selly Alicia"}, {n:32, name:"Sharon Valerie Widjaja"}, {n:33, name:"Silvia Lim"}, {n:34, name:"Steven"}, {n:35, name:"Stevi Yulia Pratam"},
+            {n:36, name:"Tysdeny Tan"}, {n:37, name:"Valerie Tio"}, {n:38, name:"Velin Alicia"}, {n:39, name:"Vicelia Joanna Lie"}, {n:40, name:"Victor Kosasih"},
+            {n:41, name:"Whizley Chen"}, {n:42, name:"William Utama"}, {n:43, name:"Willy"}, {n:44, name:"Veda Arsa Iwanto"}
+        ],
+        "XII I": [
+            {n:1, name:"Carlos Valentino Wenrich"}, {n:2, name:"Clareen Cia"}, {n:3, name:"Edward Kennedy Lim"}, {n:4, name:"Gricherry Khonata"}, {n:5, name:"Hazel Robett Can"},
+            {n:6, name:"Jasmine Winaka"}, {n:7, name:"Jaycent Fritz Reevesen"}, {n:8, name:"Jessica Evangeli Tjiawijaya"}, {n:9, name:"Joeven"}, {n:10, name:"Joevito Jonathan"},
+            {n:11, name:"Jolin Jolicia Ciang"}, {n:12, name:"Kaetlyn Onglicia"}, {n:13, name:"Kaylie Rusli"}, {n:14, name:"Kerich Juin Utama"}, {n:15, name:"Marcelline Metsuko Humutowo"},
+            {n:16, name:"Marvennoto Suvega"}, {n:17, name:"Michelle Teresia Sutanto"}, {n:18, name:"Nicholas Valentino"}, {n:19, name:"Owen Chiuman"}, {n:20, name:"Qrin Tanaka"},
+            {n:21, name:"Rachel Chandler"}, {n:22, name:"Raymond Filbert Salim"}, {n:23, name:"Renzzo Cedric Guovandry"}, {n:24, name:"Richardo Anderson Halim"}, {n:25, name:"Richardo William"},
+            {n:26, name:"Richie Jericho Prince"}, {n:27, name:"Richie Prince Ten"}, {n:28, name:"Ruyi Sun Moon"}, {n:29, name:"Ryanna Nicole Leung"}, {n:30, name:"Sandra Evelyn Limber"},
+            {n:31, name:"Shanty Fidella Fu"}, {n:32, name:"Sky Lim"}, {n:33, name:"Sony Fernando Limber"}, {n:34, name:"Stancio Wunand"}, {n:35, name:"Syerena Tania Susanto"},
+            {n:36, name:"Valerina Florensia"}, {n:37, name:"Vallentino"}, {n:38, name:"Victoria Huang"}, {n:39, name:"Vincent"}, {n:40, name:"Vincent Alexander Colin"},
+            {n:41, name:"Werly"}
+        ]
+    };
+
+    // --- DYNAMIC UI HANDLER ---
+    function handleDropdownChange() {
+        const cls = document.getElementById('sClass').value;
+        const nameInput = document.getElementById('sNameInput');
+        const codeInput = document.getElementById('tCodeInput');
+        const dataList = document.getElementById('student-list');
+        const errorEl = document.getElementById('error-msg');
+        
+        nameInput.value = ""; 
+        codeInput.value = "";
+        dataList.innerHTML = ""; 
+        errorEl.style.display = 'none';
+
+        if (cls === "Teacher") {
+            nameInput.style.display = "none";
+            codeInput.style.display = "block";
+            codeInput.focus();
+        } else if (cls && studentDB[cls]) {
+            nameInput.style.display = "block";
+            codeInput.style.display = "none";
+            nameInput.disabled = false;
+            nameInput.focus();
+            
+            studentDB[cls].forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.name; 
+                dataList.appendChild(option);
+            });
+        } else {
+            nameInput.style.display = "block";
+            codeInput.style.display = "none";
+            nameInput.disabled = true;
+        }
+    }
+
+    // --- LOGIN LOGIC ---
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value;
+        const errorEl = document.getElementById('error-msg');
+
+        if(!cls) {
+            errorEl.innerText = "Please select a Role/Class.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // --- TEACHER LOGIN ---
+        if (cls === "Teacher") {
+            const enteredCode = document.getElementById('tCodeInput').value;
+            if (enteredCode !== TEACHER_CODE) {
+                errorEl.innerText = "Invalid Teacher Code.";
+                errorEl.style.display = 'block';
+                return;
+            }
+            // Teacher Success
+            isTeacher = true;
+            document.getElementById('login-overlay').style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+            document.getElementById('page-title').innerText = "Materials Preview (Teacher Mode)";
+            document.getElementById('student-instructions').style.display = 'none';
+            document.getElementById('submitBtn').innerText = "Exit Preview";
+            return; // Exit function, do not trigger DB or anti-cheat
+        }
+
+        // --- STUDENT LOGIN ---
+        const enteredName = document.getElementById('sNameInput').value;
+        if(!enteredName) {
+            errorEl.innerText = "Please search and select your name.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        const validStudent = studentDB[cls].find(s => s.name === enteredName);
+        if (!validStudent) {
+            errorEl.innerText = "Invalid Name. Select from the dropdown list.";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // Initialize Session
+        studentData = { class: cls, no: validStudent.n, name: enteredName };
+        currentDocID = `${cls.replace(/\s/g,'')}_${validStudent.n}_${enteredName.replace(/\s/g,'_')}`;
+        
+        // Check if session exists
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            cheatCount = data.cheat_count || 0;
+            if (data.status === "COMPLETED") {
+                alert("You have already completed this session.");
+            }
+        } else {
+            // New Session Log
+            await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                name: enteredName, class: cls, number: validStudent.n,
+                start_time: new Date().toLocaleString(),
+                status: "READING",
+                cheat_count: 0
+            });
+        }
+
+        // UI Updates for Student
+        document.getElementById('login-overlay').style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+        document.getElementById('cheat-counter').style.display = 'block';
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        
+        requestWakeLock();
+        setTimeout(() => { sessionActive = true; }, 2000); // Activate tracking
+        
+        // Optional: Attempt fullscreen
+        try { document.documentElement.requestFullscreen(); } catch(e) {}
+    }
+
+    // --- WAKE LOCK (Anti-Sleep) ---
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            // Re-acquire lock if visibility changes
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+        } catch (err) { 
+            console.log("Wake Lock error:", err); 
+        }
+    }
+
+    // --- SUBMISSION LOGIC ---
+    async function finishSession() {
+        if (isTeacher) {
+            location.reload(); // Just reload for teacher
+            return;
+        }
+
+        if(!confirm("Are you sure you are finished reading the materials?")) return;
+        sessionActive = false; // Turn off cheat tracking
+
+        const finishTime = new Date().toLocaleString();
+
+        // Update UI
+        document.getElementById('content-area').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'none';
+        
+        const summary = document.getElementById('result-summary');
+        summary.innerHTML = `
+            <h2 style="color:#059669; margin-top:0;">Session Completed</h2>
+            <p>Your reading completion has been logged securely.</p>
+            <div style="font-family: monospace; color: #64748b; margin-top: 10px;">Time Logged: ${finishTime}</div>
+            <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; border-radius:6px; border:none; cursor:pointer;">Exit</button>
+        `;
+        summary.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Save final status to DB
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            status: "COMPLETED",
+            finish_time: finishTime,
+            submittedAt_timestamp: Date.now(),
+            final_cheat_count: cheatCount
+        });
+        
+        // Release wake lock
+        if(wakeLock !== null) {
+            wakeLock.release().then(() => { wakeLock = null; });
+        }
+    }
+
+    // --- ANTI-CHEAT (Server-Side Sync) ---
+    function triggerCheat() {
+        if (!sessionActive || isTeacher) return;
+        
+        cheatCount++;
+        
+        // Update UI
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+        
+        // Instantly update database so refreshes don't wipe it
+        if(currentDocID) {
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                cheat_count: cheatCount
+            });
+        }
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    // Trigger on tab switch or minimize
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    // Trigger on clicking outside the browser window
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+</script>
+</body>
+</html>
