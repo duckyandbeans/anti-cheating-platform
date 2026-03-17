@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STS Genap - Bahasa Inggris XII</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: var(--primary);
+            user-select: none; /* Prevent easy copying */
+        }
+
+        /* ANTI-CHEAT UI */
+        #cheat-alert {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(231, 76, 60, 0.95); color: white;
+            z-index: 20000; display: none; justify-content: center;
+            align-items: center; flex-direction: column; text-align: center;
+        }
+        #cheat-counter {
+            position: fixed; top: 70px; right: 20px;
+            background: white; padding: 5px 15px; border-radius: 20px;
+            border: 2px solid var(--danger); color: var(--danger);
+            font-weight: bold; z-index: 9000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #timer-banner {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto 50px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px double #ddd;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        h2, h3 { margin: 5px 0; }
+
+        .section-title {
+            background: var(--secondary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 40px;
+        }
+
+        .text-passage {
+            background: #f8f9fa;
+            padding: 25px;
+            border-left: 6px solid var(--accent);
+            margin: 25px 0;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .question-block:hover {
+            border-color: var(--accent);
+            background: #fafafa;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .options label:hover { background: #edf2f7; }
+
+        input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        #submit-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        #submit-btn:hover {
+            background: #219150;
+            transform: translateY(-2px);
+        }
+
+        #result-card {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            margin-top: 30px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="cheat-alert">
+    <div style="font-size: 5rem;">⚠️</div>
+    <h1>FOCUS LOST</h1>
+    <p>Please return to the exam immediately. This incident has been recorded.</p>
+    <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+</div>
+
+<div id="cheat-counter">OFFENSES: 0</div>
+
+<div id="timer-banner">TIME REMAINING: <span id="time-display">60:00</span></div>
+
+<div class="container">
+    <header>
+        <h2>SUMATIF TENGAH SEMESTER GENAP</h2>
+        <h3>SMA SWASTA CINTA BUDAYA / CHONG WEN</h3>
+        <p><strong>Subject:</strong> Bahasa Inggris | <strong>Class/Phase:</strong> XII / F | <strong>Time:</strong> 60 Minutes</p>
+    </header>
+
+    <form id="examForm">
+        <h3 class="section-title">I. Vocabulary & Usage</h3>
+        
+        <div class="question-block">
+            <span class="question-text">1. Which sentence correctly uses "put down root"?</span>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> A. He put down root the book on the table and left.</label>
+                <label><input type="radio" name="q1" value="B"> B. After years of traveling, they decided to put down root in Canada.</label>
+                <label><input type="radio" name="q1" value="C"> C. Please put down root your name on this piece of paper.</label>
+                <label><input type="radio" name="q1" value="D"> D. The cat put down root the mouse before running away.</label>
+                <label><input type="radio" name="q1" value="E"> E. We must put down root the fire before it spreads.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">2. Which sentence correctly uses "uprooted"?</span>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A"> A. She uprooted her jacket because the room was very warm.</label>
+                <label><input type="radio" name="q2" value="B"> B. The heavy storm uprooted several old trees in the park.</label>
+                <label><input type="radio" name="q2" value="C"> C. He uprooted the computer after finishing his work.</label>
+                <label><input type="radio" name="q2" value="D"> D. They uprooted the car to the garage for repairs.</label>
+                <label><input type="radio" name="q2" value="E"> E. The chef uprooted the vegetables before cooking the soup.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">3. Which sentence correctly uses "formative years"?</span>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A"> A. I spent my formative years living in a small coastal village.</label>
+                <label><input type="radio" name="q3" value="B"> B. The formative years building was constructed in 1990.</label>
+                <label><input type="radio" name="q3" value="C"> C. She bought a formative years dress for the party tonight.</label>
+                <label><input type="radio" name="q3" value="D"> D. He finished his formative years homework very quickly.</label>
+                <label><input type="radio" name="q3" value="E"> E. They are formative years the project for the science fair.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">4. Which sentence correctly uses "settle down"?</span>
+            <div class="options">
+                <label><input type="radio" name="q4" value="A"> A. Please settle down the windows because it is raining.</label>
+                <label><input type="radio" name="q4" value="B"> B. He wants to travel for a few more years before he settle down.</label>
+                <label><input type="radio" name="q4" value="C"> C. She settle down her coffee on the desk and started typing.</label>
+                <label><input type="radio" name="q4" value="D"> D. The team settle down the match after scoring the final goal.</label>
+                <label><input type="radio" name="q4" value="E"> E. They settle down the boxes in the warehouse yesterday.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">5. Which sentence correctly uses "cultural identity"?</span>
+            <div class="options">
+                <label><input type="radio" name="q5" value="A"> A. My cultural identity is stored in my wallet next to my cash.</label>
+                <label><input type="radio" name="q5" value="B"> B. Language plays a vital role in shaping a person's cultural identity.</label>
+                <label><input type="radio" name="q5" value="C"> C. He lost his cultural identity when he dropped his phone.</label>
+                <label><input type="radio" name="q5" value="D"> D. The cultural identity of the car is a bright red color.</label>
+                <label><input type="radio" name="q5" value="E"> E. She printed her cultural identity on the printer at the office.</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">II. Reading Comprehension: Megacities</h3>
+        <div class="text-passage">
+            <strong>The Growth of Urban Hubs</strong><br>
+            The rise of megacities has transformed global society over the past century. Initially, urban centers grew through natural migration, leading to the formation of a <strong>conurbation</strong>—a vast network where multiple cities blend into one. This connectivity boosted economic trade but presented difficult obstacles for local authorities.<br><br>
+            A major result of this growth is <strong>urban sprawl</strong>, where residential zones extend far into rural landscapes. While providing more housing, this expansion often results in severe traffic congestion and environmental degradation. Today’s megacities are hubs of digital innovation, yet they require sustainable management to balance their social and environmental impacts.
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">6. What is the main idea of the text?</span>
+            <div class="options">
+                <label><input type="radio" name="q6" value="A"> A. Megacities are failing because of high population.</label>
+                <label><input type="radio" name="q6" value="B"> B. Megacities provide opportunities but require careful management.</label>
+                <label><input type="radio" name="q6" value="C"> C. Small towns are more innovative than large conurbations.</label>
+                <label><input type="radio" name="q6" value="D"> D. Urban sprawl is the only way to save modern cities.</label>
+                <label><input type="radio" name="q6" value="E"> E. Technology has no place in the future of megacities.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">7. Which option best summarizes the text?</span>
+            <div class="options">
+                <label><input type="radio" name="q7" value="A"> A. Modern cities face challenges like sprawl despite being centers of progress.</label>
+                <label><input type="radio" name="q7" value="B"> B. Megacities are only interested in building more factories.</label>
+                <label><input type="radio" name="q7" value="C"> C. People prefer living in villages rather than in large conurbations.</label>
+                <label><input type="radio" name="q7" value="D"> D. Traffic congestion is the only problem found in megacities.</label>
+                <label><input type="radio" name="q7" value="E"> E. Evolution of cities has stopped due to environmental issues.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">8. Who is the intended audience?</span>
+            <div class="options">
+                <label><input type="radio" name="q8" value="A"> A. Professional athletes looking for new stadiums.</label>
+                <label><input type="radio" name="q8" value="B"> B. Students or readers interested in urban development.</label>
+                <label><input type="radio" name="q8" value="C"> C. Children who want to draw pictures of small houses.</label>
+                <label><input type="radio" name="q8" value="D"> D. Farmers looking for advice on planting crops.</label>
+                <label><input type="radio" name="q8" value="E"> E. Pilots studying international flight paths.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">9. Which detail is mentioned in the text?</span>
+            <div class="options">
+                <label><input type="radio" name="q9" value="A"> A. Megacities are shrinking because people are moving to farms.</label>
+                <label><input type="radio" name="q9" value="B"> B. Urban sprawl leads to traffic issues and environmental damage.</label>
+                <label><input type="radio" name="q9" value="C"> C. Conurbations are areas where people only do gardening.</label>
+                <label><input type="radio" name="q9" value="D"> D. Managing growth is an easy task for city planners.</label>
+                <label><input type="radio" name="q9" value="E"> E. Technology makes megacities less connected than before.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">10. What does "conurbation" mean in the text?</span>
+            <div class="options">
+                <label><input type="radio" name="q10" value="A"> A. A single isolated building in the forest.</label>
+                <label><input type="radio" name="q10" value="B"> B. A connected area made up of several cities.</label>
+                <label><input type="radio" name="q10" value="C"> C. A type of vehicle used in large urban centers.</label>
+                <label><input type="radio" name="q10" value="D"> D. A specific law regarding city pollution.</label>
+                <label><input type="radio" name="q10" value="E"> E. A small park located inside a city center.</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">III. Grammar & Structure</h3>
+
+        <div class="question-block">
+            <span class="question-text">11. Which sentence is grammatically correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q11" value="A"> A. If the weather is nice, the event will be held outside.</label>
+                <label><input type="radio" name="q11" value="B"> B. If the weather is nice, the event will held outside.</label>
+                <label><input type="radio" name="q11" value="C"> C. If the weather was nice, the event will be held outside.</label>
+                <label><input type="radio" name="q11" value="D"> D. If the weather is nice, the event be held outside.</label>
+                <label><input type="radio" name="q11" value="E"> E. If the weather is nice, the event held outside.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">12. Which sentence is grammatically correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q12" value="A"> A. If we had more money, the project would be finished.</label>
+                <label><input type="radio" name="q12" value="B"> B. If we had more money, the project will be finish.</label>
+                <label><input type="radio" name="q12" value="C"> C. If we had more money, the project is finished.</label>
+                <label><input type="radio" name="q12" value="D"> D. If we had more money, the project finished.</label>
+                <label><input type="radio" name="q12" value="E"> E. If we had more money, the project will finished.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">13. Which sentence is grammatically correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q13" value="A"> A. It is said that the new mall will attracts many tourists.</label>
+                <label><input type="radio" name="q13" value="B"> B. It is said that the new mall will attract many tourists.</label>
+                <label><input type="radio" name="q13" value="C"> C. It is said that the new mall attract many tourists.</label>
+                <label><input type="radio" name="q13" value="D"> D. It is said that the new mall will attracting many tourists.</label>
+                <label><input type="radio" name="q13" value="E"> E. It is said that the new mall attracted many tourists.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">14. Which sentence is grammatically correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q14" value="A"> A. It is said that the team, despite the rain, will wins the game.</label>
+                <label><input type="radio" name="q14" value="B"> B. It is said that the team, despite the rain, will winning the game.</label>
+                <label><input type="radio" name="q14" value="C"> C. It is said that the team, despite the rain, will win the game.</label>
+                <label><input type="radio" name="q14" value="D"> D. It is said that the team, despite the rain, win the game.</label>
+                <label><input type="radio" name="q14" value="E"> E. It is said that the team, despite the rain, wins the game.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">15. Original: "You should study hard if you want to pass the exam." (Select best paraphrase)</span>
+            <div class="options">
+                <label><input type="radio" name="q15" value="A"> A. Passing the exam is impossible even if you study.</label>
+                <label><input type="radio" name="q15" value="B"> B. If you intend to pass the exam, studying hard is advisable.</label>
+                <label><input type="radio" name="q15" value="C"> C. Students always pass exams without studying.</label>
+                <label><input type="radio" name="q15" value="D"> D. Studying is less important than passing the exam.</label>
+                <label><input type="radio" name="q15" value="E"> E. You have already passed the exam without studying.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">16. Which sentence is correct in passive form?</span>
+            <div class="options">
+                <label><input type="radio" name="q16" value="A"> A. The report was write by the manager yesterday.</label>
+                <label><input type="radio" name="q16" value="B"> B. The report was written by the manager yesterday.</label>
+                <label><input type="radio" name="q16" value="C"> C. The report is write by the manager yesterday.</label>
+                <label><input type="radio" name="q16" value="D"> D. The manager written the report yesterday.</label>
+                <label><input type="radio" name="q16" value="E"> E. The report were written by the manager yesterday.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">17. Which sentence uses an impersonal "it" construction correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q17" value="A"> A. It is believed that exercise improves mental health.</label>
+                <label><input type="radio" name="q17" value="B"> B. It is believe that exercise improves mental health.</label>
+                <label><input type="radio" name="q17" value="C"> C. It is believes that exercise improves mental health.</label>
+                <label><input type="radio" name="q17" value="D"> D. It is believing that exercise improves mental health.</label>
+                <label><input type="radio" name="q17" value="E"> E. It is to believe that exercise improves mental health.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">18. Which sentence uses an impersonal "there" construction correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q18" value="A"> A. There is say to be a treasure hidden in the cave.</label>
+                <label><input type="radio" name="q18" value="B"> B. There is said to be a treasure hidden in the cave.</label>
+                <label><input type="radio" name="q18" value="C"> C. There said to be a treasure hidden in the cave.</label>
+                <label><input type="radio" name="q18" value="D"> D. There is saying to be a treasure hidden in the cave.</label>
+                <label><input type="radio" name="q18" value="E"> E. There is says to be a treasure hidden in the cave.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">19. Which sentence is correct in advanced passive reporting?</span>
+            <div class="options">
+                <label><input type="radio" name="q19" value="A"> A. It is reported that the suspect has fled the country.</label>
+                <label><input type="radio" name="q19" value="B"> B. It is report that the suspect has fled the country.</label>
+                <label><input type="radio" name="q19" value="C"> C. It is reports that the suspect has fled the country.</label>
+                <label><input type="radio" name="q19" value="D"> D. It is reported the suspect have fled the country.</label>
+                <label><input type="radio" name="q19" value="E"> E. It is reporting that the suspect has fled the country.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">20. Original: "He advised me not to quit my job until I found a new one."</span>
+            <div class="options">
+                <label><input type="radio" name="q20" value="A"> A. He suggested staying in my current job until I secured a new position.</label>
+                <label><input type="radio" name="q20" value="B"> B. I should quit my job immediately before looking for a new one.</label>
+                <label><input type="radio" name="q20" value="C"> C. He was angry because I found a new job so quickly.</label>
+                <label><input type="radio" name="q20" value="D"> D. I ignored him and quit my job without any future plans.</label>
+                <label><input type="radio" name="q20" value="E"> E. He wanted to take my job so he told me to quit.</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">IV. Reading Comprehension: Cryptography</h3>
+        <div class="text-passage">
+            <strong>Security in the Cyber World</strong><br>
+            Cryptography involves the practice of encoding data to maintain privacy. In the modern age, it is the backbone of internet security. Without robust encryption, our digital footprints—such as passwords and credit card numbers—could be accessed by malicious actors.<br><br>
+            There are two primary frameworks: <strong>Symmetric</strong> and <strong>Asymmetric</strong> encryption. Symmetric uses a single key for both locking and unlocking, whereas Asymmetric utilizes a pair of keys (public and private). As technology advances, so do the threats. Therefore, cryptography must constantly progress to defend against sophisticated cyber-attacks.
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">21. What is the primary goal of cryptography?</span>
+            <div class="options">
+                <label><input type="radio" name="q21" value="A"> A. To make internet speeds faster for all users.</label>
+                <label><input type="radio" name="q21" value="B"> B. To secure private information through encoding.</label>
+                <label><input type="radio" name="q21" value="C"> C. To help hackers find passwords more efficiently.</label>
+                <label><input type="radio" name="q21" value="D"> D. To delete all private messages from the internet.</label>
+                <label><input type="radio" name="q21" value="E"> E. To change the way people buy computers.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">22. Which method uses a pair of keys (one public, one private)?</span>
+            <div class="options">
+                <label><input type="radio" name="q22" value="A"> A. Symmetric encryption.</label>
+                <label><input type="radio" name="q22" value="B"> B. Asymmetric encryption.</label>
+                <label><input type="radio" name="q22" value="C"> C. Single-key encryption.</label>
+                <label><input type="radio" name="q22" value="D"> D. Physical locking encryption.</label>
+                <label><input type="radio" name="q22" value="E"> E. Simple code encryption.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">23. What is a risk of symmetric encryption?</span>
+            <div class="options">
+                <label><input type="radio" name="q23" value="A"> A. It is too slow for modern computers.</label>
+                <label><input type="radio" name="q23" value="B"> B. It is dangerous if the single shared key is compromised.</label>
+                <label><input type="radio" name="q23" value="C"> C. It uses too many different keys for one message.</label>
+                <label><input type="radio" name="q23" value="D"> D. It cannot be used for banking or shopping.</label>
+                <label><input type="radio" name="q23" value="E"> E. It is only used by people without internet access.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">24. Where is encryption most vital today?</span>
+            <div class="options">
+                <label><input type="radio" name="q24" value="A"> A. In printed newspapers and magazines.</label>
+                <label><input type="radio" name="q24" value="B"> B. In digital banking, messaging, and data protection.</label>
+                <label><input type="radio" name="q24" value="C"> C. In coloring books for small children.</label>
+                <label><input type="radio" name="q24" value="D"> D. In offline sports and physical activities.</label>
+                <label><input type="radio" name="q24" value="E"> E. In traditional handwritten letters sent by post.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">25. Why must cryptography "constantly progress"?</span>
+            <div class="options">
+                <label><input type="radio" name="q25" value="A"> A. Because researchers are bored with old methods.</label>
+                <label><input type="radio" name="q25" value="B"> B. Because cyber-attacks are becoming more advanced.</label>
+                <label><input type="radio" name="q25" value="C"> C. Because users want to change their passwords every day.</label>
+                <label><input type="radio" name="q25" value="D"> D. Because the internet is becoming smaller and simpler.</label>
+                <label><input type="radio" name="q25" value="E"> E. Because it is a requirement for all university students.</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">V. Quantifiers & Negatives</h3>
+
+        <div class="question-block">
+            <span class="question-text">26. Which sentence uses "no" correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q26" value="A"> A. There were no reasons for her to be late.</label>
+                <label><input type="radio" name="q26" value="B"> B. There were no reason for her to be late.</label>
+                <label><input type="radio" name="q26" value="C"> C. There was no reasons for her to be late.</label>
+                <label><input type="radio" name="q26" value="D"> D. There no was reasons for her to be late.</label>
+                <label><input type="radio" name="q26" value="E"> E. There was no reason for she to be late.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">27. Which sentence uses "not" correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q27" value="A"> A. They are not satisfied with the results of the test.</label>
+                <label><input type="radio" name="q27" value="B"> B. They are not satisfy with the results of the test.</label>
+                <label><input type="radio" name="q27" value="C"> C. They not are satisfied with the results of the test.</label>
+                <label><input type="radio" name="q27" value="D"> D. They are not satisfying with the results of the test.</label>
+                <label><input type="radio" name="q27" value="E"> E. They are not to satisfied with the results of the test.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">28. Which sentence uses "no one" correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q28" value="A"> A. No one knows the answer to that difficult question.</label>
+                <label><input type="radio" name="q28" value="B"> B. No one know the answer to that difficult question.</label>
+                <label><input type="radio" name="q28" value="C"> C. No one knowing the answer to that difficult question.</label>
+                <label><input type="radio" name="q28" value="D"> D. No one is know the answer to that difficult question.</label>
+                <label><input type="radio" name="q28" value="E"> E. No one to know the answer to that difficult question.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">29. Which sentence uses "neither" correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q29" value="A"> A. Neither of the two shirts fits me perfectly.</label>
+                <label><input type="radio" name="q29" value="B"> B. Neither of the two shirts fit me perfectly.</label>
+                <label><input type="radio" name="q29" value="C"> C. Neither of the two shirts fitting me perfectly.</label>
+                <label><input type="radio" name="q29" value="D"> D. Neither of the two shirts are fit me perfectly.</label>
+                <label><input type="radio" name="q29" value="E"> E. Neither of the two shirts was fit me perfectly.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">30. Which sentence uses "none" correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q30" value="A"> A. None of the guests were happy with the food.</label>
+                <label><input type="radio" name="q30" value="B"> B. None of the guests was happy with the food.</label>
+                <label><input type="radio" name="q30" value="C"> C. None of the guests is happy with the food.</label>
+                <label><input type="radio" name="q30" value="D"> D. None of the guests be happy with the food.</label>
+                <label><input type="radio" name="q30" value="E"> E. None of the guests are happy with the food.</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">VI. Relative Clauses & Ordering</h3>
+
+        <div class="question-block">
+            <span class="question-text">31. Which is a correct non-defining relative clause?</span>
+            <div class="options">
+                <label><input type="radio" name="q31" value="A"> A. My brother, who lives in Tokyo, is a doctor.</label>
+                <label><input type="radio" name="q31" value="B"> B. My brother that lives in Tokyo is a doctor.</label>
+                <label><input type="radio" name="q31" value="C"> C. My brother who lives in Tokyo is a doctor.</label>
+                <label><input type="radio" name="q31" value="D"> D. My brother, which lives in Tokyo, is a doctor.</label>
+                <label><input type="radio" name="q31" value="E"> E. My brother whom lives in Tokyo is a doctor.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">32. Which uses "whom" with a preposition correctly?</span>
+            <div class="options">
+                <label><input type="radio" name="q32" value="A"> A. The woman to whom I sent the email is my boss.</label>
+                <label><input type="radio" name="q32" value="B"> B. The woman whom I sent the email to her is my boss.</label>
+                <label><input type="radio" name="q32" value="C"> C. The woman to who I sent the email is my boss.</label>
+                <label><input type="radio" name="q32" value="D"> D. The woman whom I sent the email is my boss.</label>
+                <label><input type="radio" name="q32" value="E"> E. The woman who I sent the email to is my boss to.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">33. Which sentence is correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q33" value="A"> A. The house where I grew up in is very old.</label>
+                <label><input type="radio" name="q33" value="B"> B. The house which I grew up there is very old.</label>
+                <label><input type="radio" name="q33" value="C"> C. The house where I grew up is very old.</label>
+                <label><input type="radio" name="q33" value="D"> D. The house what I grew up is very old.</label>
+                <label><input type="radio" name="q33" value="E"> E. The house where I grew up it is very old.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">34. Which is formal and grammatically correct?</span>
+            <div class="options">
+                <label><input type="radio" name="q34" value="A"> A. The project, for which we received funding, starts tomorrow.</label>
+                <label><input type="radio" name="q34" value="B"> B. The project, which we received funding for it, starts tomorrow.</label>
+                <label><input type="radio" name="q34" value="C"> C. The project for that we received funding starts tomorrow.</label>
+                <label><input type="radio" name="q34" value="D"> D. The project, which for we received funding, starts tomorrow.</label>
+                <label><input type="radio" name="q34" value="E"> E. The project, for whom we received funding, starts tomorrow.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">35. Which clause refers to a whole idea?</span>
+            <div class="options">
+                <label><input type="radio" name="q35" value="A"> A. The rain stopped, that was a huge relief.</label>
+                <label><input type="radio" name="q35" value="B"> B. The rain stopped which was a huge relief.</label>
+                <label><input type="radio" name="q35" value="C"> C. The rain stopped, which was a huge relief.</label>
+                <label><input type="radio" name="q35" value="D"> D. The rain stopped, what was a huge relief.</label>
+                <label><input type="radio" name="q35" value="E"> E. The rain stopped, which it was a huge relief.</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">36. Arrange the sentences logically: (1) Melting ice (2) Global warming is a challenge (3) Caused by gases (4) Govt must work (5) Gases trap heat</span>
+            <div class="options">
+                <label><input type="radio" name="q36" value="A"> A. 2 → 3 → 5 → 1 → 4</label>
+                <label><input type="radio" name="q36" value="B"> B. 2 → 1 → 3 → 5 → 4</label>
+                <label><input type="radio" name="q36" value="C"> C. 3 → 5 → 2 → 1 → 4</label>
+                <label><input type="radio" name="q36" value="D"> D. 2 → 3 → 1 → 5 → 4</label>
+                <label><input type="radio" name="q36" value="E"> E. 1 → 2 → 3 → 5 → 4</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">37. Arrange the sentences logically: (1) Deforestation is removal (2) Loss of habitat (3) Room for agriculture (4) Oxygen decrease (5) Protection needed</span>
+            <div class="options">
+                <label><input type="radio" name="q37" value="A"> A. 1 → 3 → 2 → 4 → 5</label>
+                <label><input type="radio" name="q37" value="B"> B. 1 → 2 → 3 → 4 → 5</label>
+                <label><input type="radio" name="q37" value="C"> C. 3 → 1 → 2 → 4 → 5</label>
+                <label><input type="radio" name="q37" value="D"> D. 1 → 3 → 4 → 2 → 5</label>
+                <label><input type="radio" name="q37" value="E"> E. 4 → 1 → 3 → 2 → 5</label>
+            </div>
+        </div>
+
+        <h3 class="section-title">VII. True / False / Not Given</h3>
+        <div class="text-passage">
+            Digital literacy is becoming a requirement in the modern workplace. Employees who can use various software and online tools are often more efficient. However, older generations may find it difficult to adapt to these rapid technological changes. Companies are now offering training programs to help all staff improve their tech skills.
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">38. Digital literacy helps employees work more efficiently.</span>
+            <div class="options">
+                <label><input type="radio" name="q38" value="A"> A. True</label>
+                <label><input type="radio" name="q38" value="B"> B. False</label>
+                <label><input type="radio" name="q38" value="C"> C. Not Given</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">39. All older employees refuse to use new technology.</span>
+            <div class="options">
+                <label><input type="radio" name="q39" value="A"> A. True</label>
+                <label><input type="radio" name="q39" value="B"> B. False</label>
+                <label><input type="radio" name="q39" value="C"> C. Not Given</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <span class="question-text">40. Companies provide training to help workers with technology.</span>
+            <div class="options">
+                <label><input type="radio" name="q40" value="A"> A. True</label>
+                <label><input type="radio" name="q40" value="B"> B. False</label>
+                <label><input type="radio" name="q40" value="C"> C. Not Given</label>
+            </div>
+        </div>
+
+        <button type="button" id="submit-btn" onclick="submitExam()">SUBMIT EXAM</button>
+    </form>
+
+    <div id="result-card">
+        <h2 id="score-text"></h2>
+        <p id="sub-text"></p>
+    </div>
+</div>
+
+<script>
+    // Hidden Answer Key
+    const key = {
+        q1:"B", q2:"B", q3:"A", q4:"B", q5:"B",
+        q6:"B", q7:"A", q8:"B", q9:"B", q10:"B",
+        q11:"A", q12:"A", q13:"B", q14:"C", q15:"B",
+        q16:"B", q17:"A", q18:"B", q19:"A", q20:"A",
+        q21:"B", q22:"B", q23:"B", q24:"B", q25:"B",
+        q26:"A", q27:"A", q28:"A", q29:"A", q30:"A",
+        q31:"A", q32:"A", q33:"C", q34:"A", q35:"C",
+        q36:"A", q37:"A", q38:"A", q39:"B", q40:"A"
+    };
+
+    let sessionActive = true;
+    let cheatCount = 0;
+
+    // --- ANTI-CHEAT SYSTEM ---
+    function triggerCheat() {
+        if (!sessionActive) return;
+        
+        cheatCount++;
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    // Trigger on tab switch or minimize
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    // Trigger on clicking outside the browser window
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+    // --- TIMER LOGIC ---
+    let secondsLeft = 3600; // 1 Hour
+    const display = document.getElementById('time-display');
+
+    const timer = setInterval(() => {
+        let mins = Math.floor(secondsLeft / 60);
+        let secs = secondsLeft % 60;
+        display.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        
+        if (secondsLeft <= 0) {
+            clearInterval(timer);
+            alert("Time is up! Your exam will be submitted automatically.");
+            submitExam();
+        }
+        secondsLeft--;
+    }, 1000);
+
+    // --- SUBMIT EXAM ---
+    function submitExam() {
+        clearInterval(timer);
+        sessionActive = false; // Turn off cheat tracking
+        const form = document.getElementById('examForm');
+        let rawScore = 0;
+        const total = 40;
+
+        for (let i = 1; i <= total; i++) {
+            const qName = 'q' + i;
+            const selected = form.elements[qName].value;
+            if (selected === key[qName]) {
+                rawScore++;
+            }
+        }
+
+        const percent = Math.round((rawScore / total) * 100);
+        
+        // Show Results
+        const resultCard = document.getElementById('result-card');
+        const scoreText = document.getElementById('score-text');
+        const subText = document.getElementById('sub-text');
+        
+        form.style.display = 'none';
+        resultCard.style.display = 'block';
+        scoreText.innerText = `Final Score: ${percent}%`;
+        subText.innerHTML = `You got ${rawScore} out of ${total} questions correct.<br><br><strong>Cheat Offenses: ${cheatCount}</strong>`;
+        
+        if (percent >= 75) {
+            resultCard.style.background = "#d4edda";
+            resultCard.style.color = "#155724";
+        } else {
+            resultCard.style.background = "#f8d7da";
+            resultCard.style.color = "#721c24";
+        }
+
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
