@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STS Genap - Bahasa Inggris XI (Fase F) Make Up</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: var(--primary);
+            user-select: none; /* Prevent copying */
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); z-index: 10000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+        }
+
+        .login-box {
+            background: white; padding: 30px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .login-box input {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border: 1px solid #cbd5e1; border-radius: 6px;
+            box-sizing: border-box; font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%; padding: 12px; background: var(--accent); color: white;
+            border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-login:hover { background: #2980b9; }
+
+        /* --- ANTI-CHEAT UI --- */
+        #cheat-alert {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(231, 76, 60, 0.95); color: white;
+            z-index: 20000; display: none; justify-content: center;
+            align-items: center; flex-direction: column; text-align: center;
+        }
+        #cheat-counter {
+            position: fixed; top: 70px; right: 20px;
+            background: white; padding: 5px 15px; border-radius: 20px;
+            border: 2px solid var(--danger); color: var(--danger);
+            font-weight: bold; z-index: 9000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        /* --- MAIN EXAM UI --- */
+        #main-content { display: none; }
+
+        #timer-banner {
+            position: fixed; top: 0; width: 100%; background: var(--primary);
+            color: white; text-align: center; padding: 15px 0;
+            font-size: 1.4rem; font-weight: bold; z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: none;
+        }
+
+        .container {
+            max-width: 900px; margin: 80px auto 50px; background: white;
+            padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header { text-align: center; border-bottom: 3px double #ddd; margin-bottom: 30px; padding-bottom: 20px; }
+
+        .section-title {
+            background: var(--secondary); color: white; padding: 12px 15px;
+            border-radius: 4px; margin-top: 40px; text-transform: uppercase;
+            font-size: 1.1rem; letter-spacing: 1px;
+        }
+
+        .text-passage {
+            background: var(--light); padding: 25px; border-left: 6px solid var(--accent);
+            margin: 25px 0; font-size: 1.05rem; line-height: 1.8; border-radius: 0 8px 8px 0;
+        }
+
+        .cloze-container {
+            background: #fffdf0; padding: 30px; border: 2px dashed #d1d1d1;
+            border-radius: 8px; margin-bottom: 30px; font-size: 1.1rem; line-height: 2;
+        }
+
+        .cloze-blank { font-weight: bold; color: var(--accent); text-decoration: underline; padding: 0 5px; }
+
+        .question-block {
+            margin-bottom: 30px; padding: 20px; border: 1px solid #eee;
+            border-radius: 8px; transition: all 0.2s;
+        }
+
+        .question-block:hover { border-color: var(--accent); background: #fafafa; }
+
+        .question-text { font-weight: 600; display: block; margin-bottom: 15px; }
+
+        .options label {
+            display: flex; align-items: center; padding: 10px; margin: 5px 0;
+            border-radius: 5px; cursor: pointer;
+        }
+
+        .options label:hover { background: #edf2f7; }
+
+        input[type="radio"] { margin-right: 15px; transform: scale(1.2); }
+
+        #submit-btn {
+            display: block; width: 100%; padding: 20px; background: var(--success);
+            color: white; border: none; border-radius: 8px; font-size: 1.3rem;
+            font-weight: bold; cursor: pointer; margin-top: 40px;
+        }
+
+        #result-card {
+            display: none; text-align: center; padding: 40px; margin-top: 30px; border-radius: 12px;
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="cheat-alert">
+    <div style="font-size: 5rem;">⚠️</div>
+    <h1>FOCUS LOST</h1>
+    <p>Please return to the exam immediately. This incident has been recorded.</p>
+    <button onclick="dismissCheatAlert()" style="padding: 10px 20px; font-size: 1.2rem; border: none; background: white; color: var(--danger); font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px;">I'm Back</button>
+</div>
+
+<div id="cheat-counter">OFFENSES: 0</div>
+
+<div id="login-overlay">
+    <div class="login-box">
+        <h2 style="color:var(--primary); margin-bottom:20px;">Make-Up Exam Login</h2>
+        <p style="color:#64748b; font-size:0.9rem; margin-bottom: 20px;">Please enter your details manually.</p>
+        
+        <input type="text" id="sClass" placeholder="Class (e.g., XI D)" required>
+        <input type="number" id="sNo" placeholder="Attendance Number" required>
+        <input type="text" id="sName" placeholder="Full Name" required>
+        
+        <button class="btn-login" onclick="attemptLogin()">Start Exam</button>
+        <p id="error-msg" style="color: red; display: none; margin-top: 10px; font-size: 0.9rem;">Please fill all fields.</p>
+    </div>
+</div>
+
+<div id="timer-banner">TIME REMAINING: <span id="time-display">90:00</span></div>
+
+<div class="container" id="main-content">
+    <header>
+        <h2>SUMATIF TENGAH SEMESTER GENAP (MAKE-UP)</h2>
+        <h3>SMA SWASTA CINTA BUDAYA / CHONG WEN</h3>
+        <p><strong>Subject:</strong> Bahasa Inggris | <strong>Class/Phase:</strong> XI / F | <strong>Time:</strong> 90 Minutes</p>
+    </header>
+
+    <form id="examForm">
+        <h3 class="section-title">I. Reading Comprehension: Francisca Mardones</h3>
+        <div class="text-passage">
+            <strong>The Silent Strength of Francisca Mardones: A Legacy of Resilience</strong><br>
+            In the realm of Paralympic sports, Francisca Mardones stands as a beacon of excellence. Her transition from a promising tennis player to a world-record holder in shot put is more than a display of physical power; it is an masterclass in resilience and psychological fortitude. Today, Mardones is honored as a role model for individuals with disabilities worldwide, illustrating that peak performance requires as much emotional regulation as technical precision.<br><br>
+            Success was the result of a deliberate mindset. Mardones was renowned for being remarkably mindful during competition. During her record-breaking throws, her concentration never flickered, even when facing internal doubts. She demonstrated a sophisticated level of mental clarity, remaining composed when the stakes at the Tokyo Games were at their highest. This self-confidence allowed her to surpass competitors who relied solely on raw strength but lacked her strategic focus.<br><br>
+            Her journey was marked by significant adversity. Following a traumatic injury during a hurricane in 1999, the weight of her physical limitations could have easily eroded her self-esteem. However, her sense of belonging to the global athletic community and her unwavering grit kept her motivated. Sports historians often note that her gold medal in 2021 was secured through sheer determination, as she overcame both personal grief and a field of younger, formidable rivals.<br><br>
+            The impact of her career transcends the medals she has won. Through her achievements, Paralympic sports in Chile were transformed into a focus of national pride. Her training methods are still analyzed by aspiring athletes, and her shot put records are unlikely to be eclipsed in the near future. Mardones’ story reminds us that while technical skill is essential, it is self-discipline and mental fortitude that turn a competitor into a lasting icon.
+        </div>
+
+        <div class="question-block"><span class="question-text">1. What is the writer’s primary purpose in the first paragraph?</span>
+        <div class="options">
+            <label><input type="radio" name="q1" value="A"> A. To describe the technical mechanics of the shot put event.</label>
+            <label><input type="radio" name="q1" value="B"> B. To emphasize that Mardones’ mental strength is as vital as her physical ability.</label>
+            <label><input type="radio" name="q1" value="C"> C. To compare Chilean athletes to world-record holders.</label>
+            <label><input type="radio" name="q1" value="D"> D. To explain the rules of Paralympic tennis qualifications.</label>
+            <label><input type="radio" name="q1" value="E"> E. To argue success was a result of environment.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">2. In the second paragraph, the term "mindful" most closely implies that Mardones:</span>
+        <div class="options">
+            <label><input type="radio" name="q2" value="A"> A. Was constantly worried about the final score.</label>
+            <label><input type="radio" name="q2" value="B"> B. Maintained a conscious and intentional focus on the immediate task.</label>
+            <label><input type="radio" name="q2" value="C"> C. Had memorized every instruction her coach provided.</label>
+            <label><input type="radio" name="q2" value="D"> D. Was easily distracted but managed to recover.</label>
+            <label><input type="radio" name="q2" value="E"> E. Relied strictly on instincts rather than strategy.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">3. According to the text, how did "emotional regulation" contribute to her success?</span>
+        <div class="options">
+            <label><input type="radio" name="q3" value="A"> A. It helped her intimidate opponents.</label>
+            <label><input type="radio" name="q3" value="B"> B. It enabled her to keep her composure during high-pressure moments.</label>
+            <label><input type="radio" name="q3" value="C"> C. It increased the physical speed of her throws.</label>
+            <label><input type="radio" name="q3" value="D"> D. It ensured she never felt fatigue.</label>
+            <label><input type="radio" name="q3" value="E"> E. It gave her an advantage over referees.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">4. What can be inferred about the "adversity" Mardones faced?</span>
+        <div class="options">
+            <label><input type="radio" name="q4" value="A"> A. It was caused by lack of government support.</label>
+            <label><input type="radio" name="q4" value="B"> B. It involved overcoming the psychological impact of a life-altering injury.</label>
+            <label><input type="radio" name="q4" value="C"> C. It stemmed from injury sustained during her seventh title.</label>
+            <label><input type="radio" name="q4" value="D"> D. It caused a loss of belonging in the team.</label>
+            <label><input type="radio" name="q4" value="E"> E. It was due to declining popularity of sports in Chile.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">5. Which describes the relationship between "self-esteem" and Mardones’ performance?</span>
+        <div class="options">
+            <label><input type="radio" name="q5" value="A"> A. High self-esteem was a prerequisite for physical speed.</label>
+            <label><input type="radio" name="q5" value="B"> B. She used her sense of belonging to protect her self-esteem from the weight of injury.</label>
+            <label><input type="radio" name="q5" value="C"> C. Her self-esteem was frequently damaged by national expectations.</label>
+            <label><input type="radio" name="q5" value="D"> D. Trophies were the only way she maintained self-esteem.</label>
+            <label><input type="radio" name="q5" value="E"> E. Self-esteem is less important than determination.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">6. Why is the passive voice used in "Paralympic sports in Chile were transformed..."?</span>
+        <div class="options">
+            <label><input type="radio" name="q6" value="A"> A. To emphasize the person responsible.</label>
+            <label><input type="radio" name="q6" value="B"> B. To emphasize the result and impact rather than the agent.</label>
+            <label><input type="radio" name="q6" value="C"> C. To suggest it happened by pure chance.</label>
+            <label><input type="radio" name="q6" value="D"> D. To indicate it is currently ongoing.</label>
+            <label><input type="radio" name="q6" value="E"> E. To question if it was beneficial.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">7. The phrase "surpass competitors who relied solely on raw strength" suggests:</span>
+        <div class="options">
+            <label><input type="radio" name="q7" value="A"> A. Strength training is a disadvantage.</label>
+            <label><input type="radio" name="q7" value="B"> B. Technical and mental discipline can overcome purely physical advantages.</label>
+            <label><input type="radio" name="q7" value="C"> C. Mardones was the weakest player in the circuit.</label>
+            <label><input type="radio" name="q7" value="D"> D. Strategic depth is only for tired athletes.</label>
+            <label><input type="radio" name="q7" value="E"> E. Strength training didn't exist in her era.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">8. What does the text imply about her gold medal victory in 2021?</span>
+        <div class="options">
+            <label><input type="radio" name="q8" value="A"> A. It was her easiest victory.</label>
+            <label><input type="radio" name="q8" value="B"> B. It was her only title in Guinness World Records.</label>
+            <label><input type="radio" name="q8" value="C"> C. It represented her resilience in overcoming grief and younger challengers.</label>
+            <label><input type="radio" name="q8" value="D"> D. It was achieved after retirement.</label>
+            <label><input type="radio" name="q8" value="E"> E. It was less significant than her first title.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">9. A sports psychologist would be most interested in which section?</span>
+        <div class="options">
+            <label><input type="radio" name="q9" value="A"> A. The list of medals won.</label>
+            <label><input type="radio" name="q9" value="B"> B. The description of crowd sizes.</label>
+            <label><input type="radio" name="q9" value="C"> C. The analysis of her mental clarity and concentration.</label>
+            <label><input type="radio" name="q9" value="D"> D. The history of Chilean championships.</label>
+            <label><input type="radio" name="q9" value="E"> E. The physical dimensions of a stadium.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">10. Which statement best summarizes the legacy mentioned?</span>
+        <div class="options">
+            <label><input type="radio" name="q10" value="A"> A. Records are meant to be broken.</label>
+            <label><input type="radio" name="q10" value="B"> B. Influence is passive when not playing.</label>
+            <label><input type="radio" name="q10" value="C"> C. Success was a synergy of mental fortitude and community connection.</label>
+            <label><input type="radio" name="q10" value="D"> D. Modern players are more mindful than previous icons.</label>
+            <label><input type="radio" name="q10" value="E"> E. Determination only works with belonging.</label>
+        </div></div>
+
+        <h3 class="section-title">II. Data Analysis: Trends in School Wellness</h3>
+        <div class="question-block"><span class="question-text">11. What is the overall trend shown between 2000 and 2020?</span>
+        <div class="options">
+            <label><input type="radio" name="q11" value="A"> A. Programs remained stagnant.</label>
+            <label><input type="radio" name="q11" value="B"> B. Every level showed a decline due to costs.</label>
+            <label><input type="radio" name="q11" value="C"> C. Universal increase in schools offering mental health support.</label>
+            <label><input type="radio" name="q11" value="D"> D. Only primary schools showed improvement.</label>
+            <label><input type="radio" name="q11" value="E"> E. Only universities offer support.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">12. Which group experienced the largest absolute percentage point increase?</span>
+        <div class="options">
+            <label><input type="radio" name="q12" value="A"> A. Primary Schools</label>
+            <label><input type="radio" name="q12" value="B"> B. Junior High</label>
+            <label><input type="radio" name="q12" value="C"> C. Senior High</label>
+            <label><input type="radio" name="q12" value="D"> D. University (65+ equivalent)</label>
+            <label><input type="radio" name="q12" value="E"> E. All identical.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">13. In the year 2000, what was the relationship between education level and programs?</span>
+        <div class="options">
+            <label><input type="radio" name="q13" value="A"> A. Programs increased as education level got higher.</label>
+            <label><input type="radio" name="q13" value="B"> B. Programs peaked in primary schools.</label>
+            <label><input type="radio" name="q13" value="C"> C. Inverse relationship: higher levels had fewer programs.</label>
+            <label><input type="radio" name="q13" value="D"> D. No correlation.</label>
+            <label><input type="radio" name="q13" value="E"> E. Junior high was twice as active.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">14. Which group showed the most "stability" (least amount of change)?</span>
+        <div class="options">
+            <label><input type="radio" name="q14" value="A"> A. Primary Schools</label>
+            <label><input type="radio" name="q14" value="B"> B. Junior High</label>
+            <label><input type="radio" name="q14" value="C"> C. Senior High</label>
+            <label><input type="radio" name="q14" value="D"> D. University</label>
+            <label><input type="radio" name="q14" value="E"> E. All changed significantly.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">15. What can be inferred about the Primary Schools (65+ equiv.)?</span>
+        <div class="options">
+            <label><input type="radio" name="q15" value="A"> A. They are primary drivers of fitness economy.</label>
+            <label><input type="radio" name="q15" value="B"> B. Starting lowest, engagement nearly doubled.</label>
+            <label><input type="radio" name="q15" value="C"> C. More active in 2000 than Senior High in 2020.</label>
+            <label><input type="radio" name="q15" value="D"> D. Surpassed Universities in total time.</label>
+            <label><input type="radio" name="q15" value="E"> E. Lack of activity due to facility lack.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">16. The participation gap between youngest and oldest has:</span>
+        <div class="options">
+            <label><input type="radio" name="q16" value="A"> A. Narrowed significantly.</label>
+            <label><input type="radio" name="q16" value="B"> B. Stayed the same.</label>
+            <label><input type="radio" name="q16" value="C"> C. Widened, as younger participation grew faster.</label>
+            <label><input type="radio" name="q16" value="D"> D. Disappeared.</label>
+            <label><input type="radio" name="q16" value="E"> E. Inverted.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">17. Which finding would be most relevant to Mardones' early era baseline?</span>
+        <div class="options">
+            <label><input type="radio" name="q17" value="A"> A. High activity in 2020.</label>
+            <label><input type="radio" name="q17" value="B"> B. Most Indonesians exercise now.</label>
+            <label><input type="radio" name="q17" value="C"> C. Relatively lower baseline activity in 2000.</label>
+            <label><input type="radio" name="q17" value="D"> D. Decline in middle-aged activity.</label>
+            <label><input type="radio" name="q17" value="E"> E. Guinness records.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">18. Which is a superlative fact from the data?</span>
+        <div class="options">
+            <label><input type="radio" name="q18" value="A"> A. 25-44 is least active.</label>
+            <label><input type="radio" name="q18" value="B"> B. Primary (65+) most improved.</label>
+            <label><input type="radio" name="q18" value="C"> C. Youngest reached highest level recorded.</label>
+            <label><input type="radio" name="q18" value="D"> D. 2000 was the best year.</label>
+            <label><input type="radio" name="q18" value="E"> E. Senior high has fewest barriers.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">19. How does data respond to "Youth are lazier" claim?</span>
+        <div class="options">
+            <label><input type="radio" name="q19" value="A"> A. Supports it.</label>
+            <label><input type="radio" name="q19" value="B"> B. Contradicts it, showing highest and fastest growth in youth.</label>
+            <label><input type="radio" name="q19" value="C"> C. Neutral.</label>
+            <label><input type="radio" name="q19" value="D"> D. Suggests only parents are active.</label>
+            <label><input type="radio" name="q19" value="E"> E. Parents are most active.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">20. Likely signpost phrase for this graph?</span>
+        <div class="options">
+            <label><input type="radio" name="q20" value="A"> A. Start with biography.</label>
+            <label><input type="radio" name="q20" value="B"> B. "To explain more, let's turn to this comparison..."</label>
+            <label><input type="radio" name="q20" value="C"> C. Conclusion on badminton.</label>
+            <label><input type="radio" name="q20" value="D"> D. Passive voice use.</label>
+            <label><input type="radio" name="q20" value="E"> E. Despite adversity.</label>
+        </div></div>
+
+        <h3 class="section-title">III. Error Analysis (Choose Incorrect Part)</h3>
+
+        <div class="question-block"><span class="question-text">21. The witness’s account <u>was</u>(A) subsequently <u>deemed</u>(B) to <u>have been</u>(C) <u>corroborating</u>(D) by several forensic experts.</span>
+        <div class="options">
+            <label><input type="radio" name="q21" value="A"> A</label><label><input type="radio" name="q21" value="B"> B</label><label><input type="radio" name="q21" value="C"> C</label><label><input type="radio" name="q21" value="D"> D</label><label><input type="radio" name="q21" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">22. A major part of the files <u>has</u>(A) been <u>unintentionally</u>(B) <u>delete</u>(C) <u>from</u>(D) the database.</span>
+        <div class="options">
+            <label><input type="radio" name="q22" value="A"> A</label><label><input type="radio" name="q22" value="B"> B</label><label><input type="radio" name="q22" value="C"> C</label><label><input type="radio" name="q22" value="D"> D</label><label><input type="radio" name="q22" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">23. The data <u>was</u>(A) <u>initially</u>(B) <u>thought</u>(C) to be <u>extrapolate</u>(D) from unreliable sources.</span>
+        <div class="options">
+            <label><input type="radio" name="q23" value="A"> A</label><label><input type="radio" name="q23" value="B"> B</label><label><input type="radio" name="q23" value="C"> C</label><label><input type="radio" name="q23" value="D"> D</label><label><input type="radio" name="q23" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">24. The CEO’s comments <u>were</u>(A) <u>subsequently</u>(B) <u>regarded</u>(C) to have <u>implied</u>(D) a merger.</span>
+        <div class="options">
+            <label><input type="radio" name="q24" value="A"> A</label><label><input type="radio" name="q24" value="B"> B</label><label><input type="radio" name="q24" value="C"> C</label><label><input type="radio" name="q24" value="D"> D</label><label><input type="radio" name="q24" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">25. After the audit, several errors <u>were</u>(A) <u>formally</u>(B) <u>attributed</u>(C) <u>by</u>(D) poor record-keeping.</span>
+        <div class="options">
+            <label><input type="radio" name="q25" value="A"> A</label><label><input type="radio" name="q25" value="B"> B</label><label><input type="radio" name="q25" value="C"> C</label><label><input type="radio" name="q25" value="D"> D</label><label><input type="radio" name="q25" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">26. Amid the scandal, the funds <u>are</u>(A) <u>widely</u>(B) believed to <u>have</u>(C) <u>being</u>(D) embezzled.</span>
+        <div class="options">
+            <label><input type="radio" name="q26" value="A"> A</label><label><input type="radio" name="q26" value="B"> B</label><label><input type="radio" name="q26" value="C"> C</label><label><input type="radio" name="q26" value="D"> D</label><label><input type="radio" name="q26" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">27. During the storm, the signal <u>are</u>(A) <u>being</u>(B) <u>interrupted</u>(C) <u>by</u>(D) atmospheric interference.</span>
+        <div class="options">
+            <label><input type="radio" name="q27" value="A"> A</label><label><input type="radio" name="q27" value="B"> B</label><label><input type="radio" name="q27" value="C"> C</label><label><input type="radio" name="q27" value="D"> D</label><label><input type="radio" name="q27" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">28. Under new laws, the suspects <u>should</u>(A) have <u>been</u>(B) <u>being</u>(C) <u>questioned</u>(D) by the police.</span>
+        <div class="options">
+            <label><input type="radio" name="q28" value="A"> A</label><label><input type="radio" name="q28" value="B"> B</label><label><input type="radio" name="q28" value="C"> C</label><label><input type="radio" name="q28" value="D"> D</label><label><input type="radio" name="q28" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">29. According to the news, the city <u>had</u>(A) already <u>been</u>(B) <u>evacuated</u>(C) <u>before</u>(D) the flood hit.</span>
+        <div class="options">
+            <label><input type="radio" name="q29" value="A"> A</label><label><input type="radio" name="q29" value="B"> B</label><label><input type="radio" name="q29" value="C"> C</label><label><input type="radio" name="q29" value="D"> D</label><label><input type="radio" name="q29" value="E"> E (No Error)</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">30. By the time the case <u>concludes</u>(A), the evidence <u>may</u>(B) already <u>have been being reviewed</u>(C) by <u>independent</u>(D) judges.</span>
+        <div class="options">
+            <label><input type="radio" name="q30" value="A"> A</label><label><input type="radio" name="q30" value="B"> B</label><label><input type="radio" name="q30" value="C"> C</label><label><input type="radio" name="q30" value="D"> D</label><label><input type="radio" name="q30" value="E"> E (No Error)</label>
+        </div></div>
+
+        <h3 class="section-title">IV. Grammar & Structure Selection</h3>
+
+        <div class="question-block"><span class="question-text">31. Which of the following sentences is considered as correct?</span>
+        <div class="options">
+            <label><input type="radio" name="q31" value="A"> A. By the time audit concludes, discrepancies may have been being resolved.</label>
+            <label><input type="radio" name="q31" value="B"> B. Following breach, credentials were been compromised.</label>
+            <label><input type="radio" name="q31" value="C"> C. Under revised regulations, all applications will have been processed before deadline.</label>
+            <label><input type="radio" name="q31" value="D"> D. During transition, policy has being implemented without oversight.</label>
+            <label><input type="radio" name="q31" value="E"> E. After deliberation, proposal had have been approved.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">32. Which of the following sentences is considered as incorrect?</span>
+        <div class="options">
+            <label><input type="radio" name="q32" value="A"> A. By the time inquiry was launched, documents had already been classified.</label>
+            <label><input type="radio" name="q32" value="B"> B. Under emergency legislation, curfew may be extended.</label>
+            <label><input type="radio" name="q32" value="C"> C. Following months of negotiation, treaty has been ratified.</label>
+            <label><input type="radio" name="q32" value="D"> D. During inspection, critical safety failures were been identified.</label>
+            <label><input type="radio" name="q32" value="E"> E. After verdict, defendant was remanded.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">33. Which of the following sentences is grammatically correct?</span>
+        <div class="options">
+            <label><input type="radio" name="q33" value="A"> A. Amid scrutiny, official is said to have being dismissed.</label>
+            <label><input type="radio" name="q33" value="B"> B. By end of year, merger will have being finalized.</label>
+            <label><input type="radio" name="q33" value="C"> C. During response, procedures were have been coordinated.</label>
+            <label><input type="radio" name="q33" value="D"> D. According to internal reports, findings had already been verified before publication.</label>
+            <label><input type="radio" name="q33" value="E"> E. Following investigation, suspect may been detained.</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">34. Which of the following sentences is considered as incorrect?</span>
+        <div class="options">
+            <label><input type="radio" name="q34" value="A"> A. By the time deadline expires, reports will have been submitted.</label>
+            <label><input type="radio" name="q34" value="B"> B. During preliminary phase, hypothesis was being tested.</label>
+            <label><input type="radio" name="q34" value="C"> C. According to leaked emails, decision may have been influenced.</label>
+            <label><input type="radio" name="q34" value="D"> D. Following audit, irregularities were formally documented.</label>
+            <label><input type="radio" name="q34" value="E"> E. After policy shift, several departments had been being restructured simultaneously.</label>
+        </div></div>
+
+        <h3 class="section-title">V. Cloze Passage</h3>
+        <div class="cloze-container">
+            During the first week of the project, several safety protocols <span class="cloze-blank">(35)</span> improperly <span class="cloze-blank">______</span> the staff without adequate training. Although the error was small, it was later discovered that the chemicals <span class="cloze-blank">(36)</span> <span class="cloze-blank">______</span> an uncertified laboratory that had not been inspected.<br><br>
+            By the time the mistakes were identified, a report <span class="cloze-blank">(37)</span> already <span class="cloze-blank">______ ______</span> a safety commission. As a result, the blame for the incident <span class="cloze-blank">(38)</span> largely <span class="cloze-blank">______</span> the supervisor rather than the workers.<br><br>
+            Throughout the fix, new rules <span class="cloze-blank">(39)</span> systematically <span class="cloze-blank">______</span> all branches, ensuring safety. Ultimately, the success of these rules <span class="cloze-blank">(40)</span> closely <span class="cloze-blank">______</span> the lower accident rates.
+        </div>
+
+        <div class="question-block"><span class="question-text">35. Blank 35:</span>
+        <div class="options">
+            <label><input type="radio" name="q35" value="A"> A. Were/ used by</label><label><input type="radio" name="q35" value="B"> B. Were/ used with</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">36. Blank 36:</span>
+        <div class="options">
+            <label><input type="radio" name="q36" value="A"> A. Had been / handled by</label><label><input type="radio" name="q36" value="B"> B. Were being / handled with</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">37. Blank 37:</span>
+        <div class="options">
+            <label><input type="radio" name="q37" value="A"> A. Has / been / written by</label><label><input type="radio" name="q37" value="B"> B. Had / been / written by</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">38. Blank 38:</span>
+        <div class="options">
+            <label><input type="radio" name="q38" value="A"> A. Was / assigned with</label><label><input type="radio" name="q38" value="B"> B. Was / assigned to</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">39. Blank 39:</span>
+        <div class="options">
+            <label><input type="radio" name="q39" value="A"> A. Had / implemented</label><label><input type="radio" name="q39" value="B"> B. Were / implemented across</label>
+        </div></div>
+
+        <div class="question-block"><span class="question-text">40. Blank 40:</span>
+        <div class="options">
+            <label><input type="radio" name="q40" value="A"> A. Was / measured by</label><label><input type="radio" name="q40" value="B"> B. Has been / measured through</label>
+        </div></div>
+
+        <button type="button" id="submit-btn" onclick="submitExam()">SUBMIT EXAM</button>
+    </form>
+
+    <div id="result-card">
+        <h2 id="score-text"></h2>
+        <p id="sub-text"></p>
+    </div>
+</div>
+
+<script>
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
+    };
+    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
+
+    const COLLECTION_NAME = "ximakeupexam"; // New collection as requested
+    
+    let studentData = {};
+    let cheatCount = 0;
+    let sessionActive = false;
+    let currentDocID = null;
+    let wakeLock = null;
+
+    // --- ANSWER KEY ---
+    const key = {
+        q1:"B", q2:"B", q3:"B", q4:"B", q5:"B", q6:"B", q7:"B", q8:"C", q9:"C", q10:"C",
+        q11:"C", q12:"D", q13:"A", q14:"A", q15:"B", q16:"C", q17:"C", q18:"C", q19:"B", q20:"B",
+        q21:"D", q22:"C", q23:"D", q24:"E", q25:"D", q26:"D", q27:"A", q28:"C", q29:"E", q30:"E",
+        q31:"C", q32:"D", q33:"D", q34:"E",
+        q35:"A", q36:"A", q37:"B", q38:"B", q39:"B", q40:"A"
+    };
+
+    // --- TIMER LOGIC ---
+    let secondsLeft = 5400; // 90 Minutes
+    let timer;
+
+    // --- LOGIN LOGIC ---
+    async function attemptLogin() {
+        const cls = document.getElementById('sClass').value.trim().toUpperCase();
+        const no = document.getElementById('sNo').value.trim();
+        const name = document.getElementById('sName').value.trim();
+        const errorEl = document.getElementById('error-msg');
+
+        if(!cls || !no || !name) {
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        // Initialize Session
+        studentData = { class: cls, no: no, name: name };
+        currentDocID = `${cls.replace(/\s/g,'')}_${no}_${name.replace(/\s/g,'_')}`;
+        
+        // Check DB
+        const docSnap = await db.collection(COLLECTION_NAME).doc(currentDocID).get();
+        
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            cheatCount = data.cheat_count || 0;
+            if (data.status === "COMPLETED") {
+                alert("You have already completed this exam.");
+                return; // Prevent starting if already done
+            }
+        } else {
+            // New Session
+            await db.collection(COLLECTION_NAME).doc(currentDocID).set({
+                name: name, class: cls, number: no,
+                start_time: new Date().toLocaleString(),
+                status: "STARTED",
+                cheat_count: 0
+            });
+        }
+
+        // Transition UI
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('timer-banner').style.display = 'block';
+        document.getElementById('cheat-counter').style.display = 'block';
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        
+        requestWakeLock();
+        setTimeout(() => { sessionActive = true; }, 2000); 
+        
+        // Start Timer
+        startTimer();
+        
+        try { document.documentElement.requestFullscreen(); } catch(e) {}
+    }
+
+    function startTimer() {
+        const display = document.getElementById('time-display');
+        timer = setInterval(() => {
+            let mins = Math.floor(secondsLeft / 60);
+            let secs = secondsLeft % 60;
+            display.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            if (secondsLeft <= 0) {
+                clearInterval(timer);
+                submitExam();
+            }
+            secondsLeft--;
+        }, 1000);
+    }
+
+    // --- WAKE LOCK ---
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            });
+        } catch (err) { console.log(err); }
+    }
+
+    // --- SUBMISSION ---
+    async function submitExam() {
+        clearInterval(timer);
+        sessionActive = false; // Stop cheat tracking
+        const form = document.getElementById('examForm');
+        let rawScore = 0;
+        let total = Object.keys(key).length;
+        let userAnswers = {};
+
+        for (const [q, a] of Object.entries(key)) {
+            const selectedVal = form.elements[q] ? form.elements[q].value : "";
+            userAnswers[q] = selectedVal;
+            if (selectedVal === a) {
+                rawScore++;
+            }
+        }
+
+        const percent = Math.round((rawScore / total) * 100);
+        const finishTime = new Date().toLocaleString();
+        
+        // UI Update
+        form.style.display = 'none';
+        document.getElementById('timer-banner').style.display = 'none';
+        const card = document.getElementById('result-card');
+        card.style.display = 'block';
+        card.style.background = percent >= 75 ? "#d4edda" : "#f8d7da";
+        document.getElementById('score-text').innerText = `Final Score: ${percent}%`;
+        document.getElementById('sub-text').innerHTML = `You answered ${rawScore} out of ${total} correctly.<br><br><strong>Cheat Offenses Recorded: ${cheatCount}</strong>`;
+        window.scrollTo(0, 0);
+
+        // Save to DB
+        await db.collection(COLLECTION_NAME).doc(currentDocID).update({
+            score: percent,
+            raw_score: rawScore,
+            answers: userAnswers,
+            status: "COMPLETED",
+            finish_time: finishTime,
+            submittedAt_timestamp: Date.now(),
+            final_cheat_count: cheatCount
+        });
+        
+        if(wakeLock !== null) { wakeLock.release().then(() => { wakeLock = null; }); }
+    }
+
+    // --- ANTI-CHEAT ---
+    function triggerCheat() {
+        if (!sessionActive) return;
+        
+        cheatCount++;
+        document.getElementById('cheat-counter').innerText = `OFFENSES: ${cheatCount}`;
+        document.getElementById('cheat-alert').style.display = 'flex';
+        
+        if(currentDocID) {
+            db.collection(COLLECTION_NAME).doc(currentDocID).update({
+                cheat_count: cheatCount
+            });
+        }
+    }
+
+    function dismissCheatAlert() {
+        document.getElementById('cheat-alert').style.display = 'none';
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') triggerCheat();
+    });
+
+    window.addEventListener("blur", () => {
+        triggerCheat();
+    });
+
+</script>
+</body>
+</html>
