@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Quiz - Corpus Mid Terms Exam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <header class="border-b pb-4 mb-6">
+            <h1 class="text-2xl font-bold text-blue-800">English Vocabulary Quiz</h1>
+            <p class="text-gray-600">Corpus Mid Terms Exam</p>
+        </header>
+
+        <div id="student-info" class="mb-8 p-4 bg-blue-50 rounded border border-blue-200">
+            <label class="block font-semibold mb-2">Student Name:</label>
+            <input type="text" id="studentName" class="w-full p-2 border rounded" placeholder="Enter your full name">
+        </div>
+
+        <form id="quizForm" class="space-y-6">
+            <!-- Questions will be injected here by JS -->
+            <div id="questionsContainer" class="space-y-8"></div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                Submit Exam
+            </button>
+        </form>
+
+        <!-- Result Section -->
+        <div id="resultArea" class="hidden mt-8 p-6 border-2 border-dashed border-gray-300 rounded-lg text-center">
+            <h2 class="text-3xl font-bold mb-2">Quiz Result</h2>
+            <p id="scoreDisplay" class="text-5xl font-extrabold text-blue-600 mb-4"></p>
+            <div id="mistakesList" class="text-left space-y-2 mb-6"></div>
+            <p class="text-sm text-gray-500 italic">Please screenshot this entire section and send it via WhatsApp.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        // Replace these with your actual Firebase project settings
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+          authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+          projectId: "anti-cheating-remedial-quiz",
+          storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+          messagingSenderId: "979294386230",
+          appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+          measurementId: "G-84YB5CYGM8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const questions = [
+            { id: 1, text: "If you are t_______ (economical), you can find ways to decorate your room stylishly yet inexpensively." },
+            { id: 2, text: "He nervously v_______ (proceed to face the risk) out onto the ice." },
+            { id: 3, text: "Their r_______ (hurried) actions resulted in a serious accident that could have killed someone." },
+            { id: 4, text: "Our boss was a very j_______ (cheerful, joyous) man, always laughing." },
+            { id: 5, text: "Gaetz had already been involved in efforts to o_______ (reverse, invalidate) the 2020 election results." },
+            { id: 6, text: "To make all coastal residents more aware of the s_______ (seriousness) of the cyclone hazard, and to increase faith and trust in evacuation orders, the emergency personnel must educate them about the benefits of taking refuge in public shelters prior to an approaching cyclone." },
+            { id: 7, text: "The fighting along the border has temporarily c_______ (stopped)." },
+            { id: 8, text: "Buffalo resisted the u_______ (drive) to take the top running back and instead opted to fill one of their few areas of need." },
+            { id: 9, text: "The bomb killed 16 people and m_______ (injured, crippled) several others." },
+            { id: 10, text: "If they keep spending this way, they'll e_______ (use up) their savings." },
+            { id: 11, text: "Experts told Fox News Digital that in Philadelphia one constant for j_______ (teenage) offenders arrested for violent crimes was that many had prior arrests for carjacking or gun crimes." },
+            { id: 12, text: "The witness refused to cooperate, h_______ (obstructing) the investigation." },
+            { id: 13, text: "The soil is full of pathogenic fungi just waiting for a nice juicy fire ant to b_______ (make careless mistakes) into them." },
+            { id: 14, text: "All states e_______ (exclude, free from a liability) people with medical conditions that make vaccination inadvisable." },
+            { id: 15, text: "In July, Kendall dismissed one of the counts without p_______ (preconceived judgement) after a witness who was expected to testify did not show up." },
+            { id: 16, text: "The party should c_______ (force) party leaders to pay meaningful access fees to participate in a national, state, regional, or county committee." },
+            { id: 17, text: "For a half a century, scholars have searched in v_______ (with no success) for the source of the jade that the early civilizations of the Americas prized above all else." },
+            { id: 18, text: "The actions appear to be efforts to p_______ (appease, calm) the people, who are protesting countrywide to hold the president and the entire Rajapaksa family responsible." },
+            { id: 19, text: "Companies that can r_______ (keep, maintain) their employees will find that onboarding and upskilling become quicker." },
+            { id: 20, text: "We thoroughly q_______ (ended) the campfire before we headed to bed." }
+        ];
+
+        // Answer Key 
+        const correctAnswers = {
+            q1: "thrifty",
+            q2: "ventured",
+            q3: "rash",
+            q4: "jolly",
+            q5: "overturn",
+            q6: "severity",
+            q7: "ceased",
+            q8: "urge",
+            q9: "maimed",
+            q10: "exhaust",
+            q11: "juvenile",
+            q12: "hindering",
+            q13: "blunder",
+            q14: "exempt",
+            q15: "prejudice",
+            q16: "compel",
+            q17: "vain",
+            q18: "pacify", 
+            q19: "retain",
+            q20: "quenched" 
+        };
+
+        const container = document.getElementById('questionsContainer');
+        questions.forEach((q, index) => {
+            container.innerHTML += `
+                <div class="question-block bg-white p-4 border rounded shadow-sm">
+                    <p class="font-medium text-gray-800 mb-3">${index + 1}. ${q.text}</p>
+                    <input type="text" name="q${q.id}" required class="w-full p-2 border-b-2 border-gray-300 focus:border-blue-600 outline-none bg-gray-50" placeholder="Type your answer here...">
+                </div>
+            `;
+        });
+
+        document.getElementById('quizForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value;
+            if (!name) return alert("Please enter your name first!");
+
+            let score = 0;
+            const studentAnswers = {};
+            const mistakes = [];
+
+            questions.forEach(q => {
+                const val = e.target[`q${q.id}`].value.trim().toLowerCase();
+                studentAnswers[`q${q.id}`] = val;
+                
+                if (val === correctAnswers[`q${q.id}`]) {
+                    score++;
+                } else {
+                    mistakes.push(`<strong>Question ${q.id}:</strong> You wrote "<span class="text-red-500">${val}</span>", but the correct answer was "<span class="text-green-600">${correctAnswers[`q${q.id}`]}</span>"`);
+                }
+            });
+
+            // Calculate final score based on formula: (Correct / Total) * 100
+            const finalScore = Math.round((score / questions.length) * 100);
+
+            // 1. Show the local results to the student immediately
+            document.getElementById('quizForm').classList.add('hidden');
+            document.getElementById('student-info').classList.add('hidden');
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+            
+            document.getElementById('scoreDisplay').innerText = `Score: ${finalScore}`;
+            
+            const mistakesContainer = document.getElementById('mistakesList');
+            if (mistakes.length > 0) {
+                mistakesContainer.innerHTML = `<h3 class="font-bold text-lg mb-2 border-b pb-2">Review your mistakes:</h3>` + 
+                    mistakes.map(m => `<p class="text-md text-gray-800 py-1">${m}</p>`).join('');
+            } else {
+                mistakesContainer.innerHTML = `<p class="text-green-600 font-bold text-xl text-center">Perfect Score! Excellent job.</p>`;
+            }
+
+            // 2. Save data to Firebase in the background
+            try {
+                await db.collection("quiz_results").add({
+                    studentName: name,
+                    score: finalScore,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    answers: studentAnswers
+                });
+                console.log("Result saved to database successfully.");
+            } catch (error) {
+                console.error("Error saving to Firebase: ", error);
+                // We don't alert the student here so it doesn't interrupt them screenshotting
+            }
+        });
+    </script>
+</body>
+</html>
