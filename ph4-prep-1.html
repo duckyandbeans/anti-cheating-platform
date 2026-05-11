@@ -1,1 +1,1236 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XI English Assessment | Advanced Grammar</title>
+    
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
+            background: var(--bg-gradient); 
+            background-attachment: fixed;
+            margin: 0;
+            padding: 20px; 
+            color: var(--text-main); 
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); 
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Typography */
+        h1, h2, h3 { color: #0f172a; margin-top: 0; }
+        h1 { text-align: center; font-weight: 700; margin-bottom: 0.5rem; }
+        h2 { border-left: 5px solid var(--secondary); padding-left: 15px; margin-top: 2.5rem; color: var(--primary); }
+        h3 { color: var(--secondary); font-weight: 600; }
+        p { color: #334155; }
+        
+        header p { text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; }
+        
+        input[type="text"], input[type="number"], select, textarea { 
+            width: 100%; 
+            padding: 0.85rem 1rem; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 10px; 
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+        
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary); 
+            outline: none; 
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); 
+        }
+
+        button { 
+            display: block; 
+            width: 100%; 
+            padding: 1rem; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            font-size: 1.1rem;
+            cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        button:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); 
+        }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Anti-Cheat & Alerts */
+        #cheat-alert { 
+            background: #fef2f2; 
+            border: 2px solid #fecaca; 
+            color: #b91c1c; 
+            padding: 1rem; 
+            border-radius: 12px; 
+            margin-bottom: 2rem; 
+            display: none; 
+            text-align: center; 
+            font-weight: 700; 
+            animation: pulse 2s infinite;
+        }
+        
+        #timer-box { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(15, 23, 42, 0.9); 
+            color: #fff; 
+            padding: 12px 24px; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            display: none; 
+            z-index: 9999; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Helpers */
+        #exam-section { display: none; }
+        .error-msg { color: var(--danger); font-weight: bold; text-align: center; display:none; margin-top: 10px; }
+        .teacher-link { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-weight: 500; }
+        .explanation-box { background: rgba(255, 255, 255, 0.6); border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .explanation-box ul { padding-left: 1.5rem; margin-bottom: 0; }
+        .explanation-box li { margin-bottom: 0.5rem; }
+
+        /* Question Blocks (Sections 1 & 2) */
+        .question { background: #ffffff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .question p { font-weight: 600; margin-top: 0; }
+        .options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .options label { 
+            display: flex; align-items: center; padding: 0.75rem 1rem; 
+            background: #f8fafc; border: 2px solid transparent; border-radius: 8px; 
+            cursor: pointer; font-weight: 500; margin: 0;
+        }
+        .options label:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .options input[type="radio"] { margin-right: 12px; width: auto; transform: scale(1.2); cursor: pointer; }
+        .feedback { font-weight: 700; margin-top: 10px; display: none; padding: 10px; border-radius: 8px; }
+        .feedback.correct { background: #d1fae5; color: #047857; }
+        .feedback.incorrect { background: #fee2e2; color: #b91c1c; }
+        .score-display { margin-top: 15px; font-size: 1.2rem; text-align: center; display: none; padding: 1rem; background: #e0e7ff; color: var(--primary); border-radius: 10px; }
+
+        /* Text Wrap Groups (Section 3) */
+        .text-wrap-group { display: flex; align-items: flex-start; margin-bottom: 15px; gap: 12px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .text-wrap-group label { font-weight: 600; color: var(--primary); white-space: nowrap; margin-top: 8px; min-width: 100px; margin-bottom: 0; }
+        .text-wrap-group textarea { flex-grow: 1; resize: vertical; min-height: 50px; }
+        .impersonal-question-block { margin-bottom: 35px; padding-bottom: 15px; border-bottom: 2px dashed #cbd5e1; }
+        .impersonal-question-block:last-child { border-bottom: none; }
+
+        /* Tables & Verb Grid (Section 4) */
+        .grammar-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 35px; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .grammar-table th { color: white; padding: 15px; text-align: left; font-weight: 600; }
+        .grammar-table th:first-child { background: var(--primary); } 
+        .grammar-table th:nth-child(2) { background: var(--secondary); } 
+        .grammar-table th:nth-child(3) { background: var(--accent); }
+        .grammar-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        .grammar-table tr:last-child td { border-bottom: none; }
+        .grammar-table tr:nth-child(even) { background: #f8fafc; }
+        .grammar-table tr:hover td { background: #f1f5f9; }
+
+        .verb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
+        .verb-card { background: #ffffff; border: 2px solid #e2e8f0; padding: 15px; border-radius: 10px; text-align: center; font-weight: 600; color: var(--primary); }
+        .verb-card:hover { border-color: var(--secondary); background: #f5f3ff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.15); }
+
+        .reported-question-block { background: #ffffff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .reported-question-block p { font-weight: 600; margin-top: 0; margin-bottom: 1rem; }
+        .kaomoji-speaker { color: var(--accent); font-weight: bold; margin-right: 5px; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div id="timer-box">⏱️ 01:00:00</div>
+
+<div class="container">
+    <div id="cheat-alert">⚠️ WARNING: You have left the exam screen! Count: <span id="cheat-count-display">0</span></div>
+
+    <!-- LOGIN SECTION -->
+    <div id="login-section">
+        <h1>Student Portal</h1>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Please verify your identity to begin the assessment.</p>
+        
+        <div class="form-group">
+            <label>Class</label>
+            <select id="studentClass">
+                <option value="">Select Class...</option>
+                <option value="XI D">XI D</option>
+                <option value="XI E">XI E</option>
+                <option value="XI H">XI H</option>
+                <option value="XI I">XI I</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Student Number (No. Absen)</label>
+            <input type="number" id="studentNo" placeholder="e.g. 15">
+        </div>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="studentName" placeholder="Type your full name here">
+        </div>
+        
+        <button id="startBtn" onclick="startExam()">Start Exam</button>
+        <p class="error-msg" id="login-error"></p>
+        
+        <div class="teacher-link" onclick="teacherLogin()">Teacher's Login</div>
+    </div>
+
+    <!-- EXAM SECTION -->
+    <div id="exam-section">
+        <header>
+            <h1>Advanced Grammar Mastery</h1>
+            <p>Refine your writing, fix common mistakes, and level up your English.</p>
+        </header>
+
+        <!-- SECTION 1: Subject-Verb Agreement -->
+        <div class="section" id="part1">
+            <h2>1. Common Mistakes: Singular vs. Plural</h2>
+            
+            <div class="explanation-box">
+                <h3>The Golden Rule of Subject-Verb Agreement</h3>
+                <p>A singular subject takes a singular verb, and a plural subject takes a plural verb. While this sounds simple, it gets tricky when words come between the subject and the verb, or when dealing with indefinite pronouns.</p>
+                <ul>
+                    <li><strong>Prepositional Phrases:</strong> The subject is never in a prepositional phrase. <em>(The <u>list</u> of items <u>is</u> on the desk.)</em></li>
+                    <li><strong>Indefinite Pronouns:</strong> Words like <em>everybody, anyone, nobody, each,</em> and <em>someone</em> are always singular. <em>(<u>Everybody</u> <u>knows</u> the answer.)</em></li>
+                    <li><strong>Or / Nor:</strong> When subjects are joined by <em>or</em> or <em>nor</em>, the verb agrees with the subject closest to it. <em>(Either the teacher or the <u>students</u> <u>are</u> late.)</em></li>
+                </ul>
+            </div>
+
+            <form id="sva-form">
+                
+                <!-- WARM UP QUESTIONS -->
+                <h3 style="margin: 30px 0 20px 0;">Warm-up: Basic Pronoun Rules</h3>
+                
+                <div class="question" data-answer="a">
+                    <p>a. He ________ tennis every weekend.</p>
+                    <div class="options">
+                        <label><input type="radio" name="qa" value="a"> plays</label>
+                        <label><input type="radio" name="qa" value="b"> play</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>b. She ________ reading a book right now.</p>
+                    <div class="options">
+                        <label><input type="radio" name="qb" value="a"> are</label>
+                        <label><input type="radio" name="qb" value="b"> is</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>c. It ________ like it is going to rain soon.</p>
+                    <div class="options">
+                        <label><input type="radio" name="qc" value="a"> looks</label>
+                        <label><input type="radio" name="qc" value="b"> look</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>d. They ________ to the park every afternoon.</p>
+                    <div class="options">
+                        <label><input type="radio" name="qd" value="a"> runs</label>
+                        <label><input type="radio" name="qd" value="b"> run</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>e. We ________ a lot of homework to finish today.</p>
+                    <div class="options">
+                        <label><input type="radio" name="qe" value="a"> have</label>
+                        <label><input type="radio" name="qe" value="b"> has</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <!-- ADVANCED QUESTIONS -->
+                <h3 style="margin: 40px 0 20px 0;">Advanced Challenge</h3>
+
+                <div class="question" data-answer="a">
+                    <p>1. The bouquet of yellow roses ________ color and fragrance to the room.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q1" value="a"> lends</label>
+                        <label><input type="radio" name="q1" value="b"> lend</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>2. My brother and my sister ________ in New York.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q2" value="a"> lives</label>
+                        <label><input type="radio" name="q2" value="b"> live</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>3. Either the shoes or the coat ________ in the closet.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q3" value="a"> are</label>
+                        <label><input type="radio" name="q3" value="b"> is</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>4. Everybody in the class ________ done the homework.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q4" value="a"> have</label>
+                        <label><input type="radio" name="q4" value="b"> has</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>5. Mathematics ________ my favorite subject.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q5" value="a"> is</label>
+                        <label><input type="radio" name="q5" value="b"> are</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>6. The committee ________ expected to reach a decision today.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q6" value="a"> is</label>
+                        <label><input type="radio" name="q6" value="b"> are</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>7. Neither of the boys ________ to leave the park.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q7" value="a"> want</label>
+                        <label><input type="radio" name="q7" value="b"> wants</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>8. A number of students ________ absent today.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q8" value="a"> is</label>
+                        <label><input type="radio" name="q8" value="b"> are</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>9. The number of students in the class ________ strictly limited to twenty.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q9" value="a"> are</label>
+                        <label><input type="radio" name="q9" value="b"> is</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>10. The scientist, along with her research assistants, ________ publishing a new paper.</p>
+                    <div class="options">
+                        <label><input type="radio" name="q10" value="a"> is</label>
+                        <label><input type="radio" name="q10" value="b"> are</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <button type="button" onclick="checkAnswers('sva-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto;">Check Answers</button>
+                <div id="sva-score" class="score-display"></div>
+            </form>
+        </div>
+
+        <!-- SECTION 2: Word Formation -->
+        <div class="section" id="part2">
+            <h2>2. Common Mistakes: Word Formation</h2>
+            
+            <div class="explanation-box">
+                <h3>Using the Correct Parts of Speech</h3>
+                <p>A frequent error is confusing nouns, verbs, adjectives, and adverbs. Paying attention to suffixes (word endings) can help you identify and use the correct form.</p>
+                <ul>
+                    <li><strong>Nouns (Things/Concepts):</strong> Often end in <em>-tion, -ment, -ness, -ity, -ance/ence</em>. (e.g., Development)</li>
+                    <li><strong>Verbs (Actions):</strong> Often end in <em>-ize, -ate, -en, -ify</em>. (e.g., Memorize)</li>
+                    <li><strong>Adjectives (Describing nouns):</strong> Often end in <em>-al, -ful, -ous, -ive, -able</em>. (e.g., Successful)</li>
+                    <li><strong>Adverbs (Describing verbs/adjectives):</strong> Usually end in <em>-ly</em>. (e.g., Carefully)</li>
+                </ul>
+            </div>
+
+            <form id="wf-form">
+                <div class="question" data-answer="b">
+                    <p>1. She made a very generous ________ to the local charity.</p>
+                    <div class="options">
+                        <label><input type="radio" name="wf1" value="a"> contribute (Verb)</label>
+                        <label><input type="radio" name="wf1" value="b"> contribution (Noun)</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>2. It is important to ________ the vocabulary before the exam.</p>
+                    <div class="options">
+                        <label><input type="radio" name="wf2" value="a"> memorize (Verb)</label>
+                        <label><input type="radio" name="wf2" value="b"> memory (Noun)</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="a">
+                    <p>3. He spoke very ________ during the presentation, impressing the board.</p>
+                    <div class="options">
+                        <label><input type="radio" name="wf3" value="a"> confidently (Adverb)</label>
+                        <label><input type="radio" name="wf3" value="b"> confidence (Noun)</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <div class="question" data-answer="b">
+                    <p>4. The weather in this region is extremely ________ during the spring.</p>
+                    <div class="options">
+                        <label><input type="radio" name="wf4" value="a"> change (Verb/Noun)</label>
+                        <label><input type="radio" name="wf4" value="b"> changeable (Adjective)</label>
+                    </div>
+                    <div class="feedback"></div>
+                </div>
+
+                <button type="button" onclick="checkAnswers('wf-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto;">Check Answers</button>
+                <div id="wf-score" class="score-display"></div>
+            </form>
+        </div>
+
+        <!-- SECTION 3: Impersonal Language -->
+        <div class="section" id="part3">
+            <h2>3. Impersonal Language & Passive Voice</h2>
+            
+            <div class="explanation-box">
+                <h3>Distancing the Writer</h3>
+                <p>Academic and formal writing often requires an objective tone. We achieve this by using impersonal structures or the passive voice to shift focus from the 'doer' to the action itself.</p>
+                <ul>
+                    <li><strong>The "It" Pattern:</strong> It + passive verb + that + clause. <em>(It is said that...)</em></li>
+                    <li><strong>The Subjective Pattern:</strong> Subject + passive verb + to-infinitive. <em>(The children are said to be...)</em></li>
+                </ul>
+            </div>
+
+            <form id="impersonal-form">
+                <p><em>Transform the following sentences into impersonal and personal passive sentences.</em></p>
+
+                <div class="impersonal-question-block">
+                    <p><strong>1. People say that the children are afraid of ghosts.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea placeholder="is said that..."></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>The children</label>
+                        <textarea placeholder="are said to..."></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>2. They suppose that this book will become a best seller.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>This book</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>3. People say that men drive better than women.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Men</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>4. Some people believe that the world will end soon.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>The world</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>5. Everyone thinks that an engine failure was the cause of my car accident.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>An</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>6. Her neighbors suppose that she moved here at the age of 25.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>She</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>7. The police think that this man had robbed a bank.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>This</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>8. Many scientists believe that some planets are inhabited.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Some</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>9. His friend said that Peter was the strongest boy in the class.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Peter</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>10. People say that the corona virus came from China.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>The</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>11. People know that she is a good swimmer.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>She</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>12. They say that Francis is in hospital.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Francis</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>13. They think that the children are in bed.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>The children</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>14. People believe that the robber has worked in the bank.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>The robber</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>15. People believe that nuclear power stations are dangerous.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Nuclear power stations</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>16. His colleagues thought that he was on holiday.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>He</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>17. People know that cars pollute the environment.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>Cars</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>18. They suppose that the new product will come out soon.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>the new product</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <div class="impersonal-question-block">
+                    <p><strong>19. They believe that she will win a gold medal.</strong></p>
+                    <div class="text-wrap-group">
+                        <label>It</label>
+                        <textarea></textarea>
+                    </div>
+                    <div class="text-wrap-group">
+                        <label>She</label>
+                        <textarea></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- SECTION 4: Reported Speech -->
+        <div class="section" id="part4">
+            <h2>4. Reported Speech</h2>
+            
+            <div class="explanation-box">
+                <h3>The Rules of Backshifting</h3>
+                <p>When reporting what someone else said, we typically shift the tense back one step in time (e.g., Present Simple becomes Past Simple). You also need to adjust pronouns and specific time/place expressions so the sentence makes sense from the reporter's perspective.</p>
+            </div>
+
+            <h3>Tenses & Modals Backshift Table</h3>
+            <div style="overflow-x: auto;">
+                <table class="grammar-table">
+                    <thead>
+                        <tr>
+                            <th>Direct Speech</th>
+                            <th>Indirect / Reported Speech</th>
+                            <th>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Simple present</td><td>Past simple</td><td><strong>Direct:</strong> "I play soccer," she said.<br><strong>Reported:</strong> She said that she played soccer.</td></tr>
+                        <tr><td>Present continuous / progressive</td><td>Past continuous / progressive</td><td><strong>Direct:</strong> "I'm eating cereal," he said.<br><strong>Reported:</strong> He said that he was eating cereal.</td></tr>
+                        <tr><td>Present perfect</td><td>Past perfect</td><td><strong>Direct:</strong> "We have visited Greece five times," they said.<br><strong>Reported:</strong> They said that they had visited Greece five times.</td></tr>
+                        <tr><td>Present perfect continuous</td><td>Past perfect continuous</td><td><strong>Direct:</strong> "I have been drinking a lot of water," she said.<br><strong>Reported:</strong> She said that she had been drinking a lot of water.</td></tr>
+                        <tr><td>Past simple</td><td>Past simple OR past perfect</td><td><strong>Direct:</strong> "I danced with Tommy," she said.<br><strong>Reported:</strong> She said that she danced / had danced with Tommy.</td></tr>
+                        <tr><td>Past continuous</td><td>Past continuous OR past perfect continuous</td><td><strong>Direct:</strong> "I was avoiding my responsibilities," Matt said.<br><strong>Reported:</strong> Matt said that he was avoiding / had been avoiding his responsibilities.</td></tr>
+                        <tr><td>Past perfect</td><td>Past perfect</td><td><strong>Direct:</strong> "I had accepted the offer," you said.<br><strong>Reported:</strong> You said that you had accepted the offer.</td></tr>
+                        <tr><td>Past perfect continuous</td><td>Past perfect continuous</td><td><strong>Direct:</strong> "I had been learning English for seven years," she said.<br><strong>Reported:</strong> She said that she had been learning English for seven years.</td></tr>
+                        <tr><td>Future simple (will)</td><td>Would</td><td><strong>Direct:</strong> "I will buy it tomorrow," Brian said.<br><strong>Reported:</strong> Brian said that he would buy it the next / following day.</td></tr>
+                        <tr><td>Future (going to)</td><td>Was / were going to</td><td><strong>Direct:</strong> "I'm going to the city," she said.<br><strong>Reported:</strong> She said that she was going to go to the city.</td></tr>
+                        <tr><td>Would</td><td>Would</td><td><strong>Direct:</strong> "I would guess the answer," he said.<br><strong>Reported:</strong> He said that he would guess the answer.</td></tr>
+                        <tr><td>Can</td><td>Could</td><td><strong>Direct:</strong> "I can explain the topic," Amanda said.<br><strong>Reported:</strong> Amanda said that she could explain the topic.</td></tr>
+                        <tr><td>Could</td><td>Could</td><td><strong>Direct:</strong> "I could go," she said.<br><strong>Reported:</strong> She said that she could go.</td></tr>
+                        <tr><td>Should</td><td>Should</td><td><strong>Direct:</strong> "I should drink more water," James said.<br><strong>Reported:</strong> James said that he should drink more water.</td></tr>
+                        <tr><td>Must</td><td>Had to</td><td><strong>Direct:</strong> "I must write the essay," Jennifer said.<br><strong>Reported:</strong> Jennifer said that she had to write the essay.</td></tr>
+                        <tr><td>May</td><td>Might</td><td><strong>Direct:</strong> "I may go to the park," he said.<br><strong>Reported:</strong> He said that he might go to the park.</td></tr>
+                        <tr><td>Might</td><td>Might</td><td><strong>Direct:</strong> "I might identify the problem," she said.<br><strong>Reported:</strong> She said that she might identify the problem.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Time Expressions in Reported Speech</h3>
+            <div style="overflow-x: auto;">
+                <table class="grammar-table">
+                    <thead>
+                        <tr>
+                            <th>Direct Speech</th>
+                            <th>Indirect / Reported Speech</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Ago</td><td>Before</td></tr>
+                        <tr><td>Bring</td><td>Take</td></tr>
+                        <tr><td>Come</td><td>Go</td></tr>
+                        <tr><td>Here</td><td>There</td></tr>
+                        <tr><td>Last night</td><td>The night before <em>or</em> the previous night</td></tr>
+                        <tr><td>Last week</td><td>The week before <em>or</em> the previous week</td></tr>
+                        <tr><td>Next week</td><td>The week after <em>or</em> the following week</td></tr>
+                        <tr><td>Next year</td><td>The following year</td></tr>
+                        <tr><td>Now</td><td>Then</td></tr>
+                        <tr><td>These</td><td>Those</td></tr>
+                        <tr><td>This</td><td>That</td></tr>
+                        <tr><td>This week</td><td>That week</td></tr>
+                        <tr><td>Thus</td><td>So</td></tr>
+                        <tr><td>Today</td><td>That day</td></tr>
+                        <tr><td>Tomorrow</td><td>The next day <em>or</em> the following day</td></tr>
+                        <tr><td>Tonight</td><td>That night</td></tr>
+                        <tr><td>Yesterday</td><td>The day before <em>or</em> the previous day</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="explanation-box" style="background: rgba(139, 92, 246, 0.05); border-left: 4px solid var(--secondary);">
+                <h3 style="color: var(--secondary);">Level Up: 8 Advanced Reporting Verbs</h3>
+                <p>Don't just use <em>said</em> or <em>told</em>! Depending on the speaker's tone, use one of these verbs to make your writing more precise and academic:</p>
+                <div class="verb-grid">
+                    <div class="verb-card">1. Admitted</div>
+                    <div class="verb-card">2. Denied</div>
+                    <div class="verb-card">3. Claimed</div>
+                    <div class="verb-card">4. Warned</div>
+                    <div class="verb-card">5. Advised</div>
+                    <div class="verb-card">6. Suggested</div>
+                    <div class="verb-card">7. Offered</div>
+                    <div class="verb-card">8. Promised</div>
+                </div>
+            </div>
+
+            <form id="reported-form">
+                
+                <h3 style="margin: 40px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 1: Punctuation</h3>
+                <p><em>Punctuate the following sentences. Use direct speech and capital letters where necessary.</em></p>
+
+                <div id="exercise-1-container">
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡♥‿♥｡)</span> 1. John said I am very happy to meet you</p>
+                        <textarea placeholder='e.g., John said, "I am very happy to meet you."'></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•̀ᴗ-)✧</span> 2. The doctor said you should cut down on your salt intake</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•́︿•̀｡)</span> 3. Natasha explained I am here to learn not to fool around</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(°ロ°) !</span> 4. Pack your bags and get out of here screamed the landlord</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(⊙_☉)</span> 5. I believe Toshiko said that you are holding my bag</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(°д°)</span> 6. Can you tell me how to get to Route 17 Atsuko asked</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(=^･ω･^=)</span> 7. The fastest way out is through the library Robert explained</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(￣□￣;)</span> 8. The professor said we will have a test on Friday</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(ಥ﹏ಥ)</span> 9. Boris yelled where are my new shoes</p>
+                        <textarea></textarea>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•́︿•̀｡)</span> 10. I think that you are wrong Oleg stated and I also feel that you don't understand the subject at all</p>
+                        <textarea></textarea>
+                    </div>
+                </div>
+
+                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 4: Direct to Reported Speech</h3>
+                <p><em>Report these sentences, beginning with "Lisa said that..."</em></p>
+
+                <div id="exercise-4-container">
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(°ロ°) !</span> 1. "We must leave at 6:00."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</span> 2. "My birthday will be a special day."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(＾ω＾)</span> 3. "I may go to the movies after class."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(✿◠‿◠)</span> 4. "Letitia has to come to the party."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(╥﹏╥)</span> 5. "I might not come with you to the restaurant."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•́︿•̀｡)</span> 6. "It will probably rain on Thursday."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(ಥ﹏ಥ)</span> 7. "Paul won't remember to call me."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(≧◡≦) ♡</span> 8. "Julie can give her presentation after Hanna."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(´；д；`)</span> 9. "Juan will never do it on time."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•̀ᴗ-)✧</span> 10. "You should buy a new pair of shoes for the dance."</p>
+                        <div class="text-wrap-group">
+                            <label>Lisa said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 5: Direct to Reported Speech</h3>
+                <p><em>Report these sentences, beginning with "The professor said that..."<br><strong>Note:</strong> When an infinitive verb is required (commands), use "The professor told us..."</em></p>
+
+                <div id="exercise-5-container">
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(￣□￣;)</span> 1. "We will have a test on Monday."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(=^･ω･^=)</span> 2. "We are going to study conditionals."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•̀ᴗ•́｡)</span> 3. "Study hard!"</p>
+                        <div class="text-wrap-group">
+                            <label>The professor told us</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(＾ω＾)</span> 4. "The exam is easy."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(｡•̀ᴗ-)✧</span> 5. "You should bring a dictionary to class."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(°ロ°) !</span> 6. "Don't cheat!"</p>
+                        <div class="text-wrap-group">
+                            <label>The professor told us</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(✿◠‿◠)</span> 7. "Leave when you are finished."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor told us</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(っ◔◡◔)っ ♥</span> 8. "I am going to correct the tests on the weekend."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(≧◡≦)</span> 9. "You can take the tests home."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                    <div class="reported-question-block">
+                        <p><span class="kaomoji-speaker">(⊙_☉)</span> 10. "The class will end on Wednesday, August 7."</p>
+                        <div class="text-wrap-group">
+                            <label>The professor said that</label>
+                            <textarea></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #e2e8f0;">
+            <button id="submitBtn" onclick="submitExam()">Finalize & Submit Assessment</button>
+            <p id="status-msg" style="text-align: center; margin-top: 1rem; font-weight: bold;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Utility check answer function
+    function checkAnswers(formId) {
+        const form = document.getElementById(formId);
+        const questions = form.querySelectorAll('.question');
+        let score = 0;
+        let total = questions.length;
+
+        questions.forEach(q => {
+            const correctAnswer = q.getAttribute('data-answer');
+            const options = q.querySelectorAll('input[type="radio"]');
+            const feedback = q.querySelector('.feedback');
+            let answered = false;
+
+            options.forEach(opt => {
+                if (opt.checked) {
+                    answered = true;
+                    if (opt.value === correctAnswer) {
+                        score++;
+                        feedback.innerHTML = "🎯 Correct!";
+                        feedback.className = "feedback correct";
+                    } else {
+                        feedback.innerHTML = "💡 Incorrect. Please review the explanation rules.";
+                        feedback.className = "feedback incorrect";
+                    }
+                    feedback.style.display = "block";
+                }
+            });
+
+            if (!answered) {
+                feedback.innerHTML = "⚠️ Please select an answer.";
+                feedback.className = "feedback incorrect";
+                feedback.style.display = "block";
+            }
+        });
+
+        let scoreDisplayId = formId === 'sva-form' ? 'sva-score' : 
+                             formId === 'wf-form' ? 'wf-score' : null;
+        
+        if (scoreDisplayId) {
+            let scoreDisplay = document.getElementById(scoreDisplayId);
+            scoreDisplay.innerHTML = `<strong>🌟 Your Score: ${score} out of ${total}</strong>`;
+            scoreDisplay.style.display = "block";
+        }
+    }
+
+    // ============================================
+    // 1. FIREBASE CONFIGURATION
+    // ============================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+      projectId: "anti-cheating-remedial-quiz",
+      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+      messagingSenderId: "979294386230",
+      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+      measurementId: "G-84YB5CYGM8"
+    };
+
+    let db;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch (e) {
+        document.getElementById('login-error').innerText = "System Error: Database connection failed.";
+        document.getElementById('login-error').style.display = 'block';
+    }
+
+    // ============================================
+    // 2. ANTI-CHEAT LOGIC
+    // ============================================
+    let switchCount = 0;
+    let evidenceLogs = []; 
+
+    document.addEventListener("visibilitychange", () => {
+        const timeString = new Date().toLocaleTimeString();
+        if (document.hidden) {
+            switchCount++;
+            evidenceLogs.push(`[LEFT at ${timeString}]`);
+            document.getElementById('cheat-count-display').innerText = switchCount;
+            document.getElementById('cheat-alert').style.display = 'block';
+        } else {
+            evidenceLogs.push(`[RETURNED at ${timeString}]`);
+        }
+    });
+
+    // ============================================
+    // 3. TIMER LOGIC
+    // ============================================
+    let timerInterval;
+    function startTimer(durationInSeconds) {
+        let timer = durationInSeconds, hours, minutes, seconds;
+        const display = document.getElementById('timer-box');
+        display.style.display = 'block';
+
+        timerInterval = setInterval(() => {
+            hours = parseInt(timer / 3600, 10);
+            minutes = parseInt((timer % 3600) / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = `⏱️ ${hours}:${minutes}:${seconds}`;
+
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                alert("⏰ TIME IS UP! Submitting your answers automatically.");
+                submitExam(true); 
+            }
+        }, 1000);
+    }
+
+    // ============================================
+    // 4. AUTHENTICATION & LOGIN LOGIC
+    // ============================================
+    function teacherLogin() {
+        if (prompt("Enter Teacher Password:") === "030") {
+            document.getElementById('studentClass').value = "XI D"; 
+            document.getElementById('studentNo').value = "0";
+            document.getElementById('studentName').value = "TEACHER_TEST";
+            startExam(true);
+        } else { alert("Incorrect Password"); }
+    }
+
+    async function startExam(isTeacher = false) {
+        const btn = document.getElementById('startBtn');
+        const errorMsg = document.getElementById('login-error');
+        
+        const cls = document.getElementById('studentClass').value;
+        const no = document.getElementById('studentNo').value;
+        const name = document.getElementById('studentName').value;
+        
+        if (!isTeacher && (!cls || !no || !name)) { 
+            alert("Please fill in all details (Class, Number, and Name)."); 
+            return; 
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Checking access...";
+        errorMsg.style.display = 'none';
+
+        let uniqueID = isTeacher ? "TEACHER_TEST" : `${cls}_${no}`;
+
+        try {
+            if (!isTeacher) {
+                const docRef = db.collection("exam_starts").doc(uniqueID);
+                const docSnap = await docRef.get();
+
+                if (docSnap.exists) {
+                    btn.innerText = "Access Denied";
+                    errorMsg.innerHTML = `⛔ ERROR: Exam already started at ${docSnap.data().startTime}.<br>Refresh/Restart is not allowed.`;
+                    errorMsg.style.display = 'block';
+                    return; 
+                }
+
+                await docRef.set({
+                    class: cls,
+                    number: no,
+                    name: name,
+                    startTime: new Date().toLocaleTimeString(),
+                    timestamp: new Date().toString()
+                });
+            }
+
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('exam-section').style.display = 'block';
+            
+            // Start Timer (3600 seconds = 60 mins)
+            startTimer(3600); 
+
+        } catch (e) {
+            console.error(e);
+            alert("System Error: " + (e.message || e));
+            btn.disabled = false;
+            btn.innerText = "Start Exam";
+        }
+    }
+
+    // ============================================
+    // 5. SUBMISSION LOGIC
+    // ============================================
+    async function submitExam(isAuto = false) {
+        if (!isAuto && !confirm("Are you sure you want to finish?")) return;
+        
+        clearInterval(timerInterval);
+
+        const btn = document.getElementById('submitBtn');
+        const status = document.getElementById('status-msg');
+        btn.disabled = true;
+        status.innerText = "Submitting data...";
+        status.style.color = "var(--primary)";
+
+        // ADD YOUR GRADING LOGIC HERE
+        let finalScore = 0; 
+        let rawScoreStr = "0/0"; 
+        let answerSheet = "A1 | A2 | A3"; 
+        let gradingSheet = "1 | 0 | 1"; 
+        
+        let cls = document.getElementById('studentClass').value;
+        let no = document.getElementById('studentNo').value;
+        let studentName = document.getElementById('studentName').value;
+
+        if(typeof window.isTeacherRun !== 'undefined' && window.isTeacherRun) {
+             studentName = "TEACHER_TEST"; cls = "TEACHER"; no = "0";
+        }
+
+        try {
+            await db.collection("exam_results").add({
+                class: cls,
+                number: no,
+                name: studentName,
+                total_score: finalScore,
+                raw_score: rawScoreStr,
+                cheat_count: switchCount,
+                evidence_logs: evidenceLogs.join(" | "), 
+                all_answers: answerSheet,
+                answer_key_status: gradingSheet,
+                timestamp: new Date().toString()
+            });
+            
+            status.style.color = "var(--success)";
+            status.innerText = "✅ Submitted! You can close this tab.";
+            
+            if(!isAuto) {
+                alert(`Exam Submitted Successfully!`);
+            } else {
+                document.body.innerHTML = `<div class="container" style="text-align:center; padding: 4rem;"><h1>⏰ Time's Up!</h1><p>Your exam was automatically submitted.</p></div>`;
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("Error submitting. Check your internet connection.");
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
