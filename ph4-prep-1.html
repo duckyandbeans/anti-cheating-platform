@@ -3,232 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XI English Assessment | Advanced Grammar</title>
+    <title>Week 34 - XI Practice</title>
     
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Added a fun, modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --secondary: #8b5cf6;
-            --accent: #ec4899;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --bg-gradient: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            /* Fun, bright color palette */
+            --primary: #FF6B6B;      /* Vibrant Coral/Red */
+            --secondary: #4ECDC4;    /* Bright Mint Green */
+            --accent: #FFE66D;       /* Sunny Yellow */
+            --dark: #2D3142;         /* Soft Dark Blue for text */
+            --light: #F7FFF7;        /* Off-white for backgrounds */
+            --bg-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
 
-        * {
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif; 
-            background: var(--bg-gradient); 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
             background-attachment: fixed;
+            color: var(--dark);
             margin: 0;
-            padding: 20px; 
-            color: var(--text-main); 
+            padding: 40px 20px;
             line-height: 1.6;
         }
 
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 2.5rem; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); 
-            border: 1px solid var(--glass-border);
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 4px solid white;
+        }
+
+        #content-section {
+            display: none; /* Hidden until login */
         }
 
         /* Typography */
-        h1, h2, h3 { color: #0f172a; margin-top: 0; }
-        h1 { text-align: center; font-weight: 700; margin-bottom: 0.5rem; }
-        h2 { border-left: 5px solid var(--secondary); padding-left: 15px; margin-top: 2.5rem; color: var(--primary); }
-        h3 { color: var(--secondary); font-weight: 600; }
-        p { color: #334155; }
-        
-        header p { text-align: center; color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; }
-
-        /* Form Controls */
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; }
-        
-        input[type="text"], input[type="number"], select, textarea { 
-            width: 100%; 
-            padding: 0.85rem 1rem; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 10px; 
-            background: #ffffff;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-main);
-        }
-        
-        input:focus, select:focus, textarea:focus { 
-            border-color: var(--primary); 
-            outline: none; 
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); 
+        h1, h2, h3 {
+            color: var(--primary);
+            font-weight: 800;
+            text-align: center;
         }
 
-        button { 
-            display: block; 
-            width: 100%; 
-            padding: 1rem; 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: 700; 
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 0px var(--accent);
+        }
+
+        h3 {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            border-bottom: 4px dashed var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        p { font-size: 1.1rem; }
+
+        header p { text-align: center; font-weight: 600; color: #7f8c8d; }
+
+        /* Form & Inputs */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-family: 'Poppins', sans-serif;
             font-size: 1.1rem;
-            cursor: pointer; 
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: var(--light);
+            cursor: pointer;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 5px rgba(78, 205, 196, 0.3);
+            background: #ffffff;
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 15px 30px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white;
+            background: var(--primary);
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-transform: uppercase;
+            box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 20px rgba(255, 107, 107, 0.5);
+            background: #ff5252;
+        }
+
+        /* Status Bar (Anti-Cheat & User Info) */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--secondary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        #cheat-display {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .cheat-warning {
+            background: var(--primary) !important;
+            color: white !important;
+            animation: shake 0.5s infinite alternate;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+        }
+
+        /* Question Blocks & Explanations */
+        .explanation-box {
+            background: #fff9e6;
+            border-left: 8px solid var(--accent);
+            padding: 20px 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .question {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            border-color: var(--secondary);
+            transform: scale(1.02);
+        }
+
+        .question p {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 0;
+        }
+
+        /* Multiple Choice Options */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark);
+            border: 2px solid #eeeeee;
+        }
+
+        .options label:hover {
+            background: var(--light);
+            border-color: var(--secondary);
+        }
+
+        .options input[type="radio"] {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: 700;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .feedback.incorrect { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .score-display { text-align: center; font-size: 1.4rem; color: var(--primary); margin-top: 15px; font-weight: 800; }
+
+        /* Textareas for Sections 3 & 4 */
+        .text-wrap-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            transition: 0.3s;
+        }
+
+        .text-wrap-group:focus-within {
+            border-color: var(--secondary);
+            background: #ffffff;
+        }
+
+        .text-wrap-group label {
+            color: var(--primary);
+            margin: 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #cccccc;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            resize: vertical;
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.2);
+        }
+
+        .impersonal-question-block, .reported-question-block {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: 0.3s;
         }
         
-        button:hover:not(:disabled) { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); 
+        .impersonal-question-block:hover, .reported-question-block:hover {
+            border-color: var(--accent);
         }
-        button:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* Anti-Cheat & Alerts */
-        #cheat-alert { 
-            background: #fef2f2; 
-            border: 2px solid #fecaca; 
-            color: #b91c1c; 
-            padding: 1rem; 
-            border-radius: 12px; 
-            margin-bottom: 2rem; 
-            display: none; 
-            text-align: center; 
-            font-weight: 700; 
-            animation: pulse 2s infinite;
+        .kaomoji-speaker {
+            color: var(--primary);
+            font-size: 1.3rem;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        /* Grammar Tables */
+        .grammar-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            background: white;
         }
         
-        #timer-box { 
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            background: rgba(15, 23, 42, 0.9); 
-            color: #fff; 
-            padding: 12px 24px; 
-            border-radius: 30px; 
-            font-weight: 700; 
-            display: none; 
-            z-index: 9999; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            backdrop-filter: blur(8px);
+        .grammar-table th {
+            background: var(--secondary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 1.1rem;
         }
 
-        /* Helpers */
-        #exam-section { display: none; }
-        .error-msg { color: var(--danger); font-weight: bold; text-align: center; display:none; margin-top: 10px; }
-        .teacher-link { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-weight: 500; }
-        .explanation-box { background: rgba(255, 255, 255, 0.6); border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
-        .explanation-box ul { padding-left: 1.5rem; margin-bottom: 0; }
-        .explanation-box li { margin-bottom: 0.5rem; }
-
-        /* Question Blocks (Sections 1 & 2) */
-        .question { background: #ffffff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .question p { font-weight: 600; margin-top: 0; }
-        .options { display: flex; flex-direction: column; gap: 0.5rem; }
-        .options label { 
-            display: flex; align-items: center; padding: 0.75rem 1rem; 
-            background: #f8fafc; border: 2px solid transparent; border-radius: 8px; 
-            cursor: pointer; font-weight: 500; margin: 0;
+        .grammar-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eeeeee;
         }
-        .options label:hover { background: #f1f5f9; border-color: #cbd5e1; }
-        .options input[type="radio"] { margin-right: 12px; width: auto; transform: scale(1.2); cursor: pointer; }
-        .feedback { font-weight: 700; margin-top: 10px; display: none; padding: 10px; border-radius: 8px; }
-        .feedback.correct { background: #d1fae5; color: #047857; }
-        .feedback.incorrect { background: #fee2e2; color: #b91c1c; }
-        .score-display { margin-top: 15px; font-size: 1.2rem; text-align: center; display: none; padding: 1rem; background: #e0e7ff; color: var(--primary); border-radius: 10px; }
-
-        /* Text Wrap Groups (Section 3) */
-        .text-wrap-group { display: flex; align-items: flex-start; margin-bottom: 15px; gap: 12px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .text-wrap-group label { font-weight: 600; color: var(--primary); white-space: nowrap; margin-top: 8px; min-width: 100px; margin-bottom: 0; }
-        .text-wrap-group textarea { flex-grow: 1; resize: vertical; min-height: 50px; }
-        .impersonal-question-block { margin-bottom: 35px; padding-bottom: 15px; border-bottom: 2px dashed #cbd5e1; }
-        .impersonal-question-block:last-child { border-bottom: none; }
-
-        /* Tables & Verb Grid (Section 4) */
-        .grammar-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 35px; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .grammar-table th { color: white; padding: 15px; text-align: left; font-weight: 600; }
-        .grammar-table th:first-child { background: var(--primary); } 
-        .grammar-table th:nth-child(2) { background: var(--secondary); } 
-        .grammar-table th:nth-child(3) { background: var(--accent); }
-        .grammar-table td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        
         .grammar-table tr:last-child td { border-bottom: none; }
-        .grammar-table tr:nth-child(even) { background: #f8fafc; }
-        .grammar-table tr:hover td { background: #f1f5f9; }
+        .grammar-table tr:nth-child(even) td { background: #f8f9fa; }
 
-        .verb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px; }
-        .verb-card { background: #ffffff; border: 2px solid #e2e8f0; padding: 15px; border-radius: 10px; text-align: center; font-weight: 600; color: var(--primary); }
-        .verb-card:hover { border-color: var(--secondary); background: #f5f3ff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.15); }
+        /* Verb Grid styling */
+        .verb-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
 
-        .reported-question-block { background: #ffffff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .reported-question-block p { font-weight: 600; margin-top: 0; margin-bottom: 1rem; }
-        .kaomoji-speaker { color: var(--accent); font-weight: bold; margin-right: 5px; }
+        .verb-card {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            cursor: default;
+        }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        .verb-card:hover {
+            transform: translateY(-5px);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+            100% { transform: translateX(0); }
         }
     </style>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<div id="timer-box">⏱️ 01:00:00</div>
-
-<div class="container">
-    <div id="cheat-alert">⚠️ WARNING: You have left the exam screen! Count: <span id="cheat-count-display">0</span></div>
-
-    <!-- LOGIN SECTION -->
-    <div id="login-section">
-        <h1>Student Portal</h1>
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Please verify your identity to begin the assessment.</p>
-        
+    <!-- Login Section -->
+    <div id="login-section" class="container">
+        <h2>Practice Login</h2>
         <div class="form-group">
-            <label>Class</label>
-            <select id="studentClass">
-                <option value="">Select Class...</option>
-                <option value="XI D">XI D</option>
-                <option value="XI E">XI E</option>
-                <option value="XI H">XI H</option>
-                <option value="XI I">XI I</option>
+            <label for="student-select">Select Your Name:</label>
+            <select id="student-select">
+                <option value="">-- Choose your name --</option>
+                <optgroup label="XI D">
+                    <option value="XI D - Annita">Annita</option>
+                    <option value="XI D - Arshavince Zenji Milano">Arshavince Zenji Milano</option>
+                    <option value="XI D - Ashwini Dewan">Ashwini Dewan</option>
+                    <option value="XI D - Carissa Evelynna Susanto">Carissa Evelynna Susanto</option>
+                    <option value="XI D - Carlin Fayola">Carlin Fayola</option>
+                    <option value="XI D - Celine Elaine Cen">Celine Elaine Cen</option>
+                    <option value="XI D - Celine Siera Winnata">Celine Siera Winnata</option>
+                    <option value="XI D - Derick Ferdinand">Derick Ferdinand</option>
+                    <option value="XI D - Ella">Ella</option>
+                    <option value="XI D - Erich Novaro">Erich Novaro</option>
+                    <option value="XI D - Felix Fernando Ang">Felix Fernando Ang</option>
+                    <option value="XI D - Filbert Suciokto">Filbert Suciokto</option>
+                    <option value="XI D - Fiona Yozuki">Fiona Yozuki</option>
+                    <option value="XI D - Fleishia Allyce Ng">Fleishia Allyce Ng</option>
+                    <option value="XI D - Florencia Melanie Nauli">Florencia Melanie Nauli</option>
+                    <option value="XI D - Gabriella Callista Lokman">Gabriella Callista Lokman</option>
+                    <option value="XI D - Giselle Lee">Giselle Lee</option>
+                    <option value="XI D - Givon">Givon</option>
+                    <option value="XI D - Goldy Pacific Sun">Goldy Pacific Sun</option>
+                    <option value="XI D - Grace Kelly Ignacia">Grace Kelly Ignacia</option>
+                    <option value="XI D - Idellia Antoneta">Idellia Antoneta</option>
+                    <option value="XI D - James Willard Chen">James Willard Chen</option>
+                    <option value="XI D - Janice Giselle Lim">Janice Giselle Lim</option>
+                    <option value="XI D - Javier Chiuman">Javier Chiuman</option>
+                    <option value="XI D - Jessica Sachi">Jessica Sachi</option>
+                    <option value="XI D - Jessica Tanji">Jessica Tanji</option>
+                    <option value="XI D - Jocelyn Princess Yangklyn">Jocelyn Princess Yangklyn</option>
+                    <option value="XI D - Joe Kusanagi">Joe Kusanagi</option>
+                    <option value="XI D - Joice Kwan">Joice Kwan</option>
+                    <option value="XI D - Jose Ferguson Tjong">Jose Ferguson Tjong</option>
+                    <option value="XI D - Justin Kwok">Justin Kwok</option>
+                    <option value="XI D - Kendrick Wiliston">Kendrick Wiliston</option>
+                    <option value="XI D - Kenrick Ciuanta">Kenrick Ciuanta</option>
+                    <option value="XI D - Kusumo Wijaya">Kusumo Wijaya</option>
+                    <option value="XI D - Lorenzo Alvaro">Lorenzo Alvaro</option>
+                    <option value="XI D - Luis Fernando Gober">Luis Fernando Gober</option>
+                    <option value="XI D - Marcus Hubert Tandyan">Marcus Hubert Tandyan</option>
+                    <option value="XI D - Michelle Patricia Susanto">Michelle Patricia Susanto</option>
+                    <option value="XI D - Nico Wiman">Nico Wiman</option>
+                    <option value="XI D - Reegan Gunawan">Reegan Gunawan</option>
+                    <option value="XI D - Richard Ansle">Richard Ansle</option>
+                    <option value="XI D - Roschella Teisha Widalkho">Roschella Teisha Widalkho</option>
+                    <option value="XI D - Stella Keyne">Stella Keyne</option>
+                    <option value="XI D - Valencia Khosasih">Valencia Khosasih</option>
+                    <option value="XI D - Wendy Salim">Wendy Salim</option>
+                    <option value="XI D - Louis Chow">Louis Chow</option>
+                    <option value="XI D - Valerian Lieandro">Valerian Lieandro</option>
+                </optgroup>
+                <optgroup label="XI E">
+                    <option value="XI E - Angela Sudargo">Angela Sudargo</option>
+                    <option value="XI E - Aurellia Fidelya">Aurellia Fidelya</option>
+                    <option value="XI E - Beltiana Lie">Beltiana Lie</option>
+                    <option value="XI E - Calvin Khangriawan Tony">Calvin Khangriawan Tony</option>
+                    <option value="XI E - Cathryna Audree Livi">Cathryna Audree Livi</option>
+                    <option value="XI E - Chen Jian Ping">Chen Jian Ping</option>
+                    <option value="XI E - Cheryl Quinn Mc Cane">Cheryl Quinn Mc Cane</option>
+                    <option value="XI E - Christopher Lionel Richie">Christopher Lionel Richie</option>
+                    <option value="XI E - Cindy Tanaka">Cindy Tanaka</option>
+                    <option value="XI E - Clairine Vanessa">Clairine Vanessa</option>
+                    <option value="XI E - Clara Fiorentina">Clara Fiorentina</option>
+                    <option value="XI E - Clarise Vincella Tho">Clarise Vincella Tho</option>
+                    <option value="XI E - Cynthia Kwan">Cynthia Kwan</option>
+                    <option value="XI E - Darren Alexius Wijaya">Darren Alexius Wijaya</option>
+                    <option value="XI E - Ethan Chainito">Ethan Chainito</option>
+                    <option value="XI E - Eunice Yueen">Eunice Yueen</option>
+                    <option value="XI E - Evellyn Viorene Khoo">Evellyn Viorene Khoo</option>
+                    <option value="XI E - Evelyn Serenity Tandy">Evelyn Serenity Tandy</option>
+                    <option value="XI E - Federico Oswald">Federico Oswald</option>
+                    <option value="XI E - Filberth Wu">Filberth Wu</option>
+                    <option value="XI E - Hans Goldhy">Hans Goldhy</option>
+                    <option value="XI E - Joyce Dominique">Joyce Dominique</option>
+                    <option value="XI E - Joylynn Devanie Conrad">Joylynn Devanie Conrad</option>
+                    <option value="XI E - Justin Adelio Sunvier">Justin Adelio Sunvier</option>
+                    <option value="XI E - Lolyson Deevan">Lolyson Deevan</option>
+                    <option value="XI E - Nicholas Sebastian Tandiono">Nicholas Sebastian Tandiono</option>
+                    <option value="XI E - Nicole Violetta Tjeong">Nicole Violetta Tjeong</option>
+                    <option value="XI E - Revalyn">Revalyn</option>
+                    <option value="XI E - Rogelio Carrick Ang">Rogelio Carrick Ang</option>
+                    <option value="XI E - Sava Tania">Sava Tania</option>
+                    <option value="XI E - Shane Marvin Halim">Shane Marvin Halim</option>
+                    <option value="XI E - Shareen Theodora">Shareen Theodora</option>
+                    <option value="XI E - Sherlince Starlene Chandra">Sherlince Starlene Chandra</option>
+                    <option value="XI E - Sophie Aurelia Joycelin">Sophie Aurelia Joycelin</option>
+                    <option value="XI E - Stevany Yulia Pratama">Stevany Yulia Pratama</option>
+                    <option value="XI E - Sunrio Adinugroho">Sunrio Adinugroho</option>
+                    <option value="XI E - Sutanto Owen Liem">Sutanto Owen Liem</option>
+                    <option value="XI E - Thesha Bellina Vicjy">Thesha Bellina Vicjy</option>
+                    <option value="XI E - Torres Yang">Torres Yang</option>
+                    <option value="XI E - Valencia Richel Ongso">Valencia Richel Ongso</option>
+                    <option value="XI E - Vallerie Liecardo">Vallerie Liecardo</option>
+                    <option value="XI E - Vanessa">Vanessa</option>
+                    <option value="XI E - Vanessa Lois">Vanessa Lois</option>
+                    <option value="XI E - Vicenzo Alfredo">Vicenzo Alfredo</option>
+                    <option value="XI E - Vincent Alvarez Zhuo">Vincent Alvarez Zhuo</option>
+                    <option value="XI E - Vincent Wijaya">Vincent Wijaya</option>
+                    <option value="XI E - Wilbert Lieandy">Wilbert Lieandy</option>
+                    <option value="XI E - Winston Hudson Otteo">Winston Hudson Otteo</option>
+                </optgroup>
+                <optgroup label="XI H">
+                    <option value="XI H - Aurencia Lievianna">Aurencia Lievianna</option>
+                    <option value="XI H - Carlyn Tanclyn">Carlyn Tanclyn</option>
+                    <option value="XI H - Clara Auryn Icasia">Clara Auryn Icasia</option>
+                    <option value="XI H - Fayola Aretha Lai">Fayola Aretha Lai</option>
+                    <option value="XI H - Grace Angeline Wirjawan">Grace Angeline Wirjawan</option>
+                    <option value="XI H - Javerlyn Queenicia Chandra">Javerlyn Queenicia Chandra</option>
+                    <option value="XI H - Jeankelly Samudra Tjuaja">Jeankelly Samudra Tjuaja</option>
+                    <option value="XI H - Joice Kellen">Joice Kellen</option>
+                    <option value="XI H - Jose Fernando">Jose Fernando</option>
+                    <option value="XI H - Justine Tania Chandra">Justine Tania Chandra</option>
+                    <option value="XI H - Karen Julia Haspan">Karen Julia Haspan</option>
+                    <option value="XI H - Kelsey Valerie Lin">Kelsey Valerie Lin</option>
+                    <option value="XI H - Kynthia Callysta">Kynthia Callysta</option>
+                    <option value="XI H - Leonly Geraldine">Leonly Geraldine</option>
+                    <option value="XI H - Louis Gabriel">Louis Gabriel</option>
+                    <option value="XI H - Louis Thomson">Louis Thomson</option>
+                    <option value="XI H - Madelyn Arcadia Chen">Madelyn Arcadia Chen</option>
+                    <option value="XI H - Mervin Sutiono">Mervin Sutiono</option>
+                    <option value="XI H - Michael Jhonson">Michael Jhonson</option>
+                    <option value="XI H - Michelle">Michelle</option>
+                    <option value="XI H - Michelle Margareth Cheong">Michelle Margareth Cheong</option>
+                    <option value="XI H - Nicholas Yang">Nicholas Yang</option>
+                    <option value="XI H - Nicole Zasen Yau">Nicole Zasen Yau</option>
+                    <option value="XI H - Philips Cuanata">Philips Cuanata</option>
+                    <option value="XI H - Revanko Devalim Sunanto">Revanko Devalim Sunanto</option>
+                    <option value="XI H - Richard Gani">Richard Gani</option>
+                    <option value="XI H - Robin Surya Toka">Robin Surya Toka</option>
+                    <option value="XI H - Roschelly Teisha Widalkho">Roschelly Teisha Widalkho</option>
+                    <option value="XI H - Sanny">Sanny</option>
+                    <option value="XI H - Sauri Yap Bella">Sauri Yap Bella</option>
+                    <option value="XI H - Selly Alicia">Selly Alicia</option>
+                    <option value="XI H - Sharon Valerie Widjaja">Sharon Valerie Widjaja</option>
+                    <option value="XI H - Silvia Lim">Silvia Lim</option>
+                    <option value="XI H - Steven">Steven</option>
+                    <option value="XI H - Stevi Yulia Pratam">Stevi Yulia Pratam</option>
+                    <option value="XI H - Tysdeny Tan">Tysdeny Tan</option>
+                    <option value="XI H - Valerie Tio">Valerie Tio</option>
+                    <option value="XI H - Velin Alicia">Velin Alicia</option>
+                    <option value="XI H - Vicelia Joanna Lie">Vicelia Joanna Lie</option>
+                    <option value="XI H - Victor Kosasih">Victor Kosasih</option>
+                    <option value="XI H - Whizley Chen">Whizley Chen</option>
+                    <option value="XI H - William Utama">William Utama</option>
+                    <option value="XI H - Willy">Willy</option>
+                    <option value="XI H - Veda Arsa Iwanto">Veda Arsa Iwanto</option>
+                </optgroup>
+                <optgroup label="XI I">
+                    <option value="XI I - Carlos Valentino Wenrich">Carlos Valentino Wenrich</option>
+                    <option value="XI I - Clareen Cia">Clareen Cia</option>
+                    <option value="XI I - Edward Kennedy Lim">Edward Kennedy Lim</option>
+                    <option value="XI I - Gricherry Khonata">Gricherry Khonata</option>
+                    <option value="XI I - Hazel Robett Can">Hazel Robett Can</option>
+                    <option value="XI I - Jasmine Winaka">Jasmine Winaka</option>
+                    <option value="XI I - Jaycent Fritz Reevesen">Jaycent Fritz Reevesen</option>
+                    <option value="XI I - Jessica Evangeli Tjiawijaya">Jessica Evangeli Tjiawijaya</option>
+                    <option value="XI I - Joeven">Joeven</option>
+                    <option value="XI I - Joevito Jonathan">Joevito Jonathan</option>
+                    <option value="XI I - Jolin Jolicia Ciang">Jolin Jolicia Ciang</option>
+                    <option value="XI I - Kaetlyn Onglicia">Kaetlyn Onglicia</option>
+                    <option value="XI I - Kaylie Rusli">Kaylie Rusli</option>
+                    <option value="XI I - Kerich Juin Utama">Kerich Juin Utama</option>
+                    <option value="XI I - Marcelline Metsuko Humutowo">Marcelline Metsuko Humutowo</option>
+                    <option value="XI I - Marvennoto Suvega">Marvennoto Suvega</option>
+                    <option value="XI I - Michelle Teresia Sutanto">Michelle Teresia Sutanto</option>
+                    <option value="XI I - Nicholas Valentino">Nicholas Valentino</option>
+                    <option value="XI I - Owen Chiuman">Owen Chiuman</option>
+                    <option value="XI I - Qrin Tanaka">Qrin Tanaka</option>
+                    <option value="XI I - Rachel Chandler">Rachel Chandler</option>
+                    <option value="XI I - Raymond Filbert Salim">Raymond Filbert Salim</option>
+                    <option value="XI I - Renzzo Cedric Guovandry">Renzzo Cedric Guovandry</option>
+                    <option value="XI I - Richardo Anderson Halim">Richardo Anderson Halim</option>
+                    <option value="XI I - Richardo William">Richardo William</option>
+                    <option value="XI I - Richie Jericho Prince">Richie Jericho Prince</option>
+                    <option value="XI I - Richie Prince Ten">Richie Prince Ten</option>
+                    <option value="XI I - Ruyi Sun Moon">Ruyi Sun Moon</option>
+                    <option value="XI I - Ryanna Nicole Leung">Ryanna Nicole Leung</option>
+                    <option value="XI I - Sandra Evelyn Limber">Sandra Evelyn Limber</option>
+                    <option value="XI I - Shanty Fidella Fu">Shanty Fidella Fu</option>
+                    <option value="XI I - Sky Lim">Sky Lim</option>
+                    <option value="XI I - Sony Fernando Limber">Sony Fernando Limber</option>
+                    <option value="XI I - Stancio Wunand">Stancio Wunand</option>
+                    <option value="XI I - Syerena Tania Susanto">Syerena Tania Susanto</option>
+                    <option value="XI I - Valerina Florensia">Valerina Florensia</option>
+                    <option value="XI I - Vallentino">Vallentino</option>
+                    <option value="XI I - Victoria Huang">Victoria Huang</option>
+                    <option value="XI I - Vincent">Vincent</option>
+                    <option value="XI I - Vincent Alexander Colin">Vincent Alexander Colin</option>
+                    <option value="XI I - Werly">Werly</option>
+                </optgroup>
             </select>
         </div>
-        <div class="form-group">
-            <label>Student Number (No. Absen)</label>
-            <input type="number" id="studentNo" placeholder="e.g. 15">
-        </div>
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="studentName" placeholder="Type your full name here">
-        </div>
-        
-        <button id="startBtn" onclick="startExam()">Start Exam</button>
-        <p class="error-msg" id="login-error"></p>
-        
-        <div class="teacher-link" onclick="teacherLogin()">Teacher's Login</div>
+        <button onclick="loginUser()">Log In</button>
     </div>
 
-    <!-- EXAM SECTION -->
-    <div id="exam-section">
+    <!-- Content Section -->
+    <div id="content-section" class="container">
+        <div class="status-bar">
+            <div>Logged in as: <strong id="display-name"></strong></div>
+            <div id="cheat-display">Cheat Count: 0</div>
+        </div>
+        
+        <h2>Week 34 Practice</h2>
+        
+        <div id="exam-section">
         <header>
             <h1>Advanced Grammar Mastery</h1>
             <p>Refine your writing, fix common mistakes, and level up your English.</p>
@@ -391,7 +733,7 @@
                     <div class="feedback"></div>
                 </div>
 
-                <button type="button" onclick="checkAnswers('sva-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto;">Check Answers</button>
+                <button type="button" onclick="checkAnswers('sva-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto; display:block;">Check Answers</button>
                 <div id="sva-score" class="score-display"></div>
             </form>
         </div>
@@ -448,7 +790,7 @@
                     <div class="feedback"></div>
                 </div>
 
-                <button type="button" onclick="checkAnswers('wf-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto;">Check Answers</button>
+                <button type="button" onclick="checkAnswers('wf-form')" style="width:auto; padding: 0.8rem 2rem; margin: 0 auto; display:block;">Check Answers</button>
                 <div id="wf-score" class="score-display"></div>
             </form>
         </div>
@@ -771,7 +1113,7 @@
                 </table>
             </div>
 
-            <div class="explanation-box" style="background: rgba(139, 92, 246, 0.05); border-left: 4px solid var(--secondary);">
+            <div class="explanation-box" style="background: rgba(78, 205, 196, 0.1); border-left: 8px solid var(--secondary);">
                 <h3 style="color: var(--secondary);">Level Up: 8 Advanced Reporting Verbs</h3>
                 <p>Don't just use <em>said</em> or <em>told</em>! Depending on the speaker's tone, use one of these verbs to make your writing more precise and academic:</p>
                 <div class="verb-grid">
@@ -788,7 +1130,7 @@
 
             <form id="reported-form">
                 
-                <h3 style="margin: 40px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 1: Punctuation</h3>
+                <h3 style="margin: 40px 0 20px 0; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px;">Exercise 1: Punctuation</h3>
                 <p><em>Punctuate the following sentences. Use direct speech and capital letters where necessary.</em></p>
 
                 <div id="exercise-1-container">
@@ -834,7 +1176,7 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 4: Direct to Reported Speech</h3>
+                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px;">Exercise 4: Direct to Reported Speech</h3>
                 <p><em>Report these sentences, beginning with "Lisa said that..."</em></p>
 
                 <div id="exercise-4-container">
@@ -910,7 +1252,7 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">Exercise 5: Direct to Reported Speech</h3>
+                <h3 style="margin: 50px 0 20px 0; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px;">Exercise 5: Direct to Reported Speech</h3>
                 <p><em>Report these sentences, beginning with "The professor said that..."<br><strong>Note:</strong> When an infinitive verb is required (commands), use "The professor told us..."</em></p>
 
                 <div id="exercise-5-container">
@@ -989,14 +1331,15 @@
         </div>
 
         <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #e2e8f0;">
-            <button id="submitBtn" onclick="submitExam()">Finalize & Submit Assessment</button>
+            <!-- Added a clear submit/finish button -->
+            <button id="submitBtn" onclick="submitExam()">Finalize & Submit Practice Sheet</button>
             <p id="status-msg" style="text-align: center; margin-top: 1rem; font-weight: bold;"></p>
         </div>
     </div>
 </div>
 
+<!-- Included the checkAnswers function for the HTML buttons to work -->
 <script>
-    // Utility check answer function
     function checkAnswers(formId) {
         const form = document.getElementById(formId);
         const questions = form.querySelectorAll('.question');
@@ -1040,197 +1383,105 @@
             scoreDisplay.style.display = "block";
         }
     }
-
-    // ============================================
-    // 1. FIREBASE CONFIGURATION
-    // ============================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
-      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
-      projectId: "anti-cheating-remedial-quiz",
-      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
-      messagingSenderId: "979294386230",
-      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
-      measurementId: "G-84YB5CYGM8"
-    };
-
-    let db;
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-    } catch (e) {
-        document.getElementById('login-error').innerText = "System Error: Database connection failed.";
-        document.getElementById('login-error').style.display = 'block';
-    }
-
-    // ============================================
-    // 2. ANTI-CHEAT LOGIC
-    // ============================================
-    let switchCount = 0;
-    let evidenceLogs = []; 
-
-    document.addEventListener("visibilitychange", () => {
-        const timeString = new Date().toLocaleTimeString();
-        if (document.hidden) {
-            switchCount++;
-            evidenceLogs.push(`[LEFT at ${timeString}]`);
-            document.getElementById('cheat-count-display').innerText = switchCount;
-            document.getElementById('cheat-alert').style.display = 'block';
-        } else {
-            evidenceLogs.push(`[RETURNED at ${timeString}]`);
-        }
-    });
-
-    // ============================================
-    // 3. TIMER LOGIC
-    // ============================================
-    let timerInterval;
-    function startTimer(durationInSeconds) {
-        let timer = durationInSeconds, hours, minutes, seconds;
-        const display = document.getElementById('timer-box');
-        display.style.display = 'block';
-
-        timerInterval = setInterval(() => {
-            hours = parseInt(timer / 3600, 10);
-            minutes = parseInt((timer % 3600) / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-
-            hours = hours < 10 ? "0" + hours : hours;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            display.textContent = `⏱️ ${hours}:${minutes}:${seconds}`;
-
-            if (--timer < 0) {
-                clearInterval(timerInterval);
-                alert("⏰ TIME IS UP! Submitting your answers automatically.");
-                submitExam(true); 
-            }
-        }, 1000);
-    }
-
-    // ============================================
-    // 4. AUTHENTICATION & LOGIN LOGIC
-    // ============================================
-    function teacherLogin() {
-        if (prompt("Enter Teacher Password:") === "030") {
-            document.getElementById('studentClass').value = "XI D"; 
-            document.getElementById('studentNo').value = "0";
-            document.getElementById('studentName').value = "TEACHER_TEST";
-            startExam(true);
-        } else { alert("Incorrect Password"); }
-    }
-
-    async function startExam(isTeacher = false) {
-        const btn = document.getElementById('startBtn');
-        const errorMsg = document.getElementById('login-error');
-        
-        const cls = document.getElementById('studentClass').value;
-        const no = document.getElementById('studentNo').value;
-        const name = document.getElementById('studentName').value;
-        
-        if (!isTeacher && (!cls || !no || !name)) { 
-            alert("Please fill in all details (Class, Number, and Name)."); 
-            return; 
-        }
-
-        btn.disabled = true;
-        btn.innerText = "Checking access...";
-        errorMsg.style.display = 'none';
-
-        let uniqueID = isTeacher ? "TEACHER_TEST" : `${cls}_${no}`;
-
-        try {
-            if (!isTeacher) {
-                const docRef = db.collection("exam_starts").doc(uniqueID);
-                const docSnap = await docRef.get();
-
-                if (docSnap.exists) {
-                    btn.innerText = "Access Denied";
-                    errorMsg.innerHTML = `⛔ ERROR: Exam already started at ${docSnap.data().startTime}.<br>Refresh/Restart is not allowed.`;
-                    errorMsg.style.display = 'block';
-                    return; 
-                }
-
-                await docRef.set({
-                    class: cls,
-                    number: no,
-                    name: name,
-                    startTime: new Date().toLocaleTimeString(),
-                    timestamp: new Date().toString()
-                });
-            }
-
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('exam-section').style.display = 'block';
-            
-            // Start Timer (3600 seconds = 60 mins)
-            startTimer(3600); 
-
-        } catch (e) {
-            console.error(e);
-            alert("System Error: " + (e.message || e));
-            btn.disabled = false;
-            btn.innerText = "Start Exam";
-        }
-    }
-
-    // ============================================
-    // 5. SUBMISSION LOGIC
-    // ============================================
-    async function submitExam(isAuto = false) {
-        if (!isAuto && !confirm("Are you sure you want to finish?")) return;
-        
-        clearInterval(timerInterval);
-
-        const btn = document.getElementById('submitBtn');
-        const status = document.getElementById('status-msg');
-        btn.disabled = true;
-        status.innerText = "Submitting data...";
-        status.style.color = "var(--primary)";
-
-        // ADD YOUR GRADING LOGIC HERE
-        let finalScore = 0; 
-        let rawScoreStr = "0/0"; 
-        let answerSheet = "A1 | A2 | A3"; 
-        let gradingSheet = "1 | 0 | 1"; 
-        
-        let cls = document.getElementById('studentClass').value;
-        let no = document.getElementById('studentNo').value;
-        let studentName = document.getElementById('studentName').value;
-
-        if(typeof window.isTeacherRun !== 'undefined' && window.isTeacherRun) {
-             studentName = "TEACHER_TEST"; cls = "TEACHER"; no = "0";
-        }
-
-        try {
-            await db.collection("exam_results").add({
-                class: cls,
-                number: no,
-                name: studentName,
-                total_score: finalScore,
-                raw_score: rawScoreStr,
-                cheat_count: switchCount,
-                evidence_logs: evidenceLogs.join(" | "), 
-                all_answers: answerSheet,
-                answer_key_status: gradingSheet,
-                timestamp: new Date().toString()
-            });
-            
-            status.style.color = "var(--success)";
-            status.innerText = "✅ Submitted! You can close this tab.";
-            
-            if(!isAuto) {
-                alert(`Exam Submitted Successfully!`);
-            } else {
-                document.body.innerHTML = `<div class="container" style="text-align:center; padding: 4rem;"><h1>⏰ Time's Up!</h1><p>Your exam was automatically submitted.</p></div>`;
-            }
-
-        } catch (e) {
-            console.error(e);
-            alert("Error submitting. Check your internet connection.");
-            btn.disabled = false;
-        }
-    }
 </script>
+
+    <!-- Firebase SDKs (v9 modular syntax via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+            authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+            projectId: "anti-cheating-remedial-quiz",
+            storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+            messagingSenderId: "979294386230",
+            appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+            measurementId: "G-84YB5CYGM8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global variables for tracking
+        let currentUser = null;
+        let cheatCount = 0;
+        let syncInterval = null;
+
+        // Make login function globally accessible
+        window.loginUser = function() {
+            const selectElement = document.getElementById('student-select');
+            const selectedValue = selectElement.value;
+
+            if (!selectedValue) {
+                alert("Please select your name from the list.");
+                return;
+            }
+
+            currentUser = selectedValue;
+            
+            // Switch views
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('content-section').style.display = 'block';
+            document.getElementById('display-name').textContent = currentUser;
+
+            // Start cheating detection (e.g., leaving the page/tab)
+            startAntiCheat();
+
+            // Start 5-minute Firebase sync interval (300,000 ms = 5 minutes)
+            syncInterval = setInterval(syncToFirebase, 300000);
+        }
+
+        function startAntiCheat() {
+            // Basic anti-cheat: increments when user switches tabs or minimizes the window
+            window.addEventListener('blur', () => {
+                if (currentUser) {
+                    cheatCount++;
+                    document.getElementById('cheat-display').textContent = `Cheat Count: ${cheatCount}`;
+                    document.getElementById('cheat-display').classList.add('cheat-warning');
+                }
+            });
+        }
+
+        async function syncToFirebase() {
+            // Only write to Firebase if cheatcount is greater than 0
+            if (currentUser && cheatCount > 0) {
+                try {
+                    // Changed collection name from "students" to "week 34"
+                    const docRef = doc(db, "week 34", currentUser);
+                    await setDoc(docRef, {
+                        name: currentUser,
+                        cheatcount: cheatCount,
+                        lastUpdated: new Date().toISOString()
+                    }, { merge: true }); // Merge ensures we don't overwrite other potential data entirely
+                    console.log(`Saved cheat count (${cheatCount}) to Firebase.`);
+                } catch (error) {
+                    console.error("Error saving to Firebase: ", error);
+                }
+            } else {
+                console.log("Cheat count is 0, skipping Firebase write to save credits.");
+            }
+        }
+
+        // Optional: Save one final time when the window is closed/unloaded, 
+        // ensuring any cheating right before exit is captured.
+        window.addEventListener('beforeunload', () => {
+            if (currentUser && cheatCount > 0) {
+                syncToFirebase();
+            }
+        });
+        
+        window.submitExam = function() {
+             if (confirm("Are you sure you want to finish and submit?")) {
+                 document.getElementById('status-msg').innerText = "Submitting...";
+                 // Trigger a final sync
+                 if(currentUser && cheatCount > 0) syncToFirebase();
+                 setTimeout(() => {
+                     document.getElementById('status-msg').style.color = "var(--secondary)";
+                     document.getElementById('status-msg').innerText = "✅ Submitted successfully! You can close this tab.";
+                 }, 1000);
+             }
+        }
+    </script>
 </body>
+</html>
