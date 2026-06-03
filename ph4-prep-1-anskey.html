@@ -3,110 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Exam 1: Answer Key</title>
+    <title>Week 34 - Answer Key</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary: #4a90e2;      
+            --secondary: #50e3c2;    
+            --accent: #f5a623;       
+            --dark: #2D3142;         
+            --light: #F7FFF7;        
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --correct-bg: #d4edda;
+            --correct-color: #155724;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--dark);
             margin: 0;
-            padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
+            padding: 40px 20px;
+            line-height: 1.6;
         }
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 4px solid white;
         }
-        h1 {
+
+        h1, h2, h3 {
+            color: var(--primary);
+            font-weight: 800;
             text-align: center;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
-            margin-bottom: 30px;
         }
+
+        h1 { font-size: 2.8rem; margin-bottom: 10px; }
+
         h2 {
-            color: #2980b9;
-            margin-top: 30px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px rgba(74, 144, 226, 0.2);
         }
+
         h3 {
-            color: #34495e;
-            margin-top: 20px;
+            color: var(--secondary);
+            font-size: 1.5rem;
+            border-bottom: 4px dashed var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+            text-align: left;
         }
-        ol {
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border-left: 6px solid var(--primary);
+        }
+
+        .answer-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .answer-list li {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 1.1rem;
+        }
+
+        .ans-highlight {
+            background: var(--correct-bg);
+            color: var(--correct-color);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .part3-group {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #eee;
+        }
+        
+        .part3-group:last-child {
+            border-bottom: none;
+        }
+
+        .sub-answer {
             margin-left: 20px;
+            color: #444;
+            font-weight: 600;
         }
-        li {
-            margin-bottom: 8px;
+
+        .sub-answer span {
+            color: var(--primary);
         }
-        .explanation {
-            color: #7f8c8d;
-            font-style: italic;
-        }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Mock Exam 1: Answer Key</h1>
+    <div class="container">
+        <header>
+            <h1>Teacher's Answer Key</h1>
+            <h2 style="font-size: 1.5rem; color: #7f8c8d; text-shadow: none; margin-top: 0;">Week 34 - Advanced Grammar Mastery</h2>
+        </header>
 
-    <h2>Part 1: Impersonal Passives</h2>
-    <ol start="1">
-        <li>B</li>
-        <li>C</li>
-        <li>A</li>
-        <li>B</li>
-        <li>B</li>
-        <li>C</li>
-        <li>A</li>
-    </ol>
+        <div class="section">
+            <h2>Part 1: Subject-Verb Agreement</h2>
+            
+            <h3>Warm-up: Basic Pronoun Rules</h3>
+            <ul class="answer-list">
+                <li>a. He ________ tennis every weekend. <span class="ans-highlight">plays</span></li>
+                <li>b. She ________ reading a book right now. <span class="ans-highlight">is</span></li>
+                <li>c. It ________ like it is going to rain soon. <span class="ans-highlight">looks</span></li>
+                <li>d. They ________ to the park every afternoon. <span class="ans-highlight">run</span></li>
+                <li>e. We ________ a lot of homework to finish today. <span class="ans-highlight">have</span></li>
+            </ul>
 
-    <h2>Part 2: Error Analysis</h2>
-    <ol start="8">
-        <li>B <span class="explanation">(should be "would")</span></li>
-        <li>B <span class="explanation">(remove "that")</span></li>
-        <li>B <span class="explanation">(should be "not to")</span></li>
-        <li>E <span class="explanation">(No error)</span></li>
-        <li>B <span class="explanation">(should be "freezes" - factual)</span></li>
-        <li>B <span class="explanation">(should be "had seen")</span></li>
-        <li>C <span class="explanation">(should be "should")</span></li>
-        <li>C <span class="explanation">(should be "the following month")</span></li>
-    </ol>
+            <h3>Advanced Challenge</h3>
+            <ul class="answer-list">
+                <li>1. The bouquet of yellow roses... <span class="ans-highlight">lends</span></li>
+                <li>2. My brother and my sister... <span class="ans-highlight">live</span></li>
+                <li>3. Either the shoes or the coat... <span class="ans-highlight">is</span></li>
+                <li>4. Everybody in the class... <span class="ans-highlight">has</span></li>
+                <li>5. Mathematics... <span class="ans-highlight">is</span></li>
+                <li>6. The committee... <span class="ans-highlight">is</span></li>
+                <li>7. Neither of the boys... <span class="ans-highlight">wants</span></li>
+                <li>8. A number of students... <span class="ans-highlight">are</span></li>
+                <li>9. The number of students... <span class="ans-highlight">is</span></li>
+                <li>10. The scientist, along with her... <span class="ans-highlight">is</span></li>
+            </ul>
+        </div>
 
-    <h2>Part 3: Dialogue Transformations</h2>
-    <ol start="16">
-        <li>The reporter asked the astronaut if he was feeling okay after the long journey.</li>
-        <li>The migrant replied that they hadn't slept well in days.</li>
-        <li>Then the migrant admitted that it was true that the travel had been very difficult.</li>
-        <li>The doctor advised them to rest in the shelter for at least two days.</li>
-        <li>Finally, the reporter asked where they would go next.</li>
-    </ol>
+        <div class="section">
+            <h2>Part 2: Word Formation</h2>
+            <ul class="answer-list">
+                <li>1. She made a very generous ________... <span class="ans-highlight">contribution</span></li>
+                <li>2. It is important to ________... <span class="ans-highlight">memorize</span></li>
+                <li>3. He spoke very ________... <span class="ans-highlight">confidently</span></li>
+                <li>4. The weather in this region is extremely ________... <span class="ans-highlight">changeable</span></li>
+            </ul>
+        </div>
 
-    <h2>Part 4: Reading Key</h2>
-    
-    <h3>Task A (True/False)</h3>
-    <ol start="21">
-        <li>False (F)</li>
-        <li>False (F)</li>
-        <li>True (T)</li>
-        <li>True (T)</li>
-        <li>False (F)</li>
-    </ol>
+        <div class="section">
+            <h2>Part 3: Impersonal Language</h2>
+            
+            <div class="part3-group">
+                <strong>1. People say that the children are afraid of ghosts.</strong>
+                <div class="sub-answer">It <span>is said that the children are afraid of ghosts.</span></div>
+                <div class="sub-answer">The children <span>are said to be afraid of ghosts.</span></div>
+            </div>
 
-    <h3>Task B (Fill in the Blanks)</h3>
-    <ol start="26">
-        <li>unprecedented</li>
-        <li>poverty, war</li>
-        <li>pervasive burden</li>
-        <li>accidentally</li>
-        <li>structural overhauls</li>
-    </ol>
-</div>
+            <div class="part3-group">
+                <strong>2. They suppose that this book will become a best seller.</strong>
+                <div class="sub-answer">It <span>is supposed that this book will become a best seller.</span></div>
+                <div class="sub-answer">This book <span>is supposed to become a best seller.</span></div>
+            </div>
 
+            <div class="part3-group">
+                <strong>3. People say that men drive better than women.</strong>
+                <div class="sub-answer">It <span>is said that men drive better than women.</span></div>
+                <div class="sub-answer">Men <span>are said to drive better than women.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>4. Some people believe that the world will end soon.</strong>
+                <div class="sub-answer">It <span>is believed that the world will end soon.</span></div>
+                <div class="sub-answer">The world <span>is believed to end soon.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>5. Everyone thinks that an engine failure was the cause of my car accident.</strong>
+                <div class="sub-answer">It <span>is thought that an engine failure was the cause of my car accident.</span></div>
+                <div class="sub-answer">An engine failure <span>is thought to have been the cause of my car accident.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>6. Her neighbors suppose that she moved here at the age of 25.</strong>
+                <div class="sub-answer">It <span>is supposed that she moved here at the age of 25.</span></div>
+                <div class="sub-answer">She <span>is supposed to have moved here at the age of 25.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>7. The police think that this man had robbed a bank.</strong>
+                <div class="sub-answer">It <span>is thought that this man had robbed a bank.</span></div>
+                <div class="sub-answer">This man <span>is thought to have robbed a bank.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>8. Many scientists believe that some planets are inhabited.</strong>
+                <div class="sub-answer">It <span>is believed that some planets are inhabited.</span></div>
+                <div class="sub-answer">Some planets <span>are believed to be inhabited.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>9. His friend said that Peter was the strongest boy in the class.</strong>
+                <div class="sub-answer">It <span>was said that Peter was the strongest boy in the class.</span></div>
+                <div class="sub-answer">Peter <span>was said to have been the strongest boy in the class.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>10. People say that the corona virus came from China.</strong>
+                <div class="sub-answer">It <span>is said that the corona virus came from China.</span></div>
+                <div class="sub-answer">The corona virus <span>is said to have come from China.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>11. People know that she is a good swimmer.</strong>
+                <div class="sub-answer">It <span>is known that she is a good swimmer.</span></div>
+                <div class="sub-answer">She <span>is known to be a good swimmer.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>12. They say that Francis is in hospital.</strong>
+                <div class="sub-answer">It <span>is said that Francis is in hospital.</span></div>
+                <div class="sub-answer">Francis <span>is said to be in hospital.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>13. They think that the children are in bed.</strong>
+                <div class="sub-answer">It <span>is thought that the children are in bed.</span></div>
+                <div class="sub-answer">The children <span>are thought to be in bed.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>14. People believe that the robber has worked in the bank.</strong>
+                <div class="sub-answer">It <span>is believed that the robber has worked in the bank.</span></div>
+                <div class="sub-answer">The robber <span>is believed to have worked in the bank.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>15. People believe that nuclear power stations are dangerous.</strong>
+                <div class="sub-answer">It <span>is believed that nuclear power stations are dangerous.</span></div>
+                <div class="sub-answer">Nuclear power stations <span>are believed to be dangerous.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>16. His colleagues thought that he was on holiday.</strong>
+                <div class="sub-answer">It <span>was thought that he was on holiday.</span></div>
+                <div class="sub-answer">He <span>was thought to be on holiday. (or 'to have been on holiday')</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>17. People know that cars pollute the environment.</strong>
+                <div class="sub-answer">It <span>is known that cars pollute the environment.</span></div>
+                <div class="sub-answer">Cars <span>are known to pollute the environment.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>18. They suppose that the new product will come out soon.</strong>
+                <div class="sub-answer">It <span>is supposed that the new product will come out soon.</span></div>
+                <div class="sub-answer">The new product <span>is supposed to come out soon.</span></div>
+            </div>
+
+            <div class="part3-group">
+                <strong>19. They believe that she will win a gold medal.</strong>
+                <div class="sub-answer">It <span>is believed that she will win a gold medal.</span></div>
+                <div class="sub-answer">She <span>is believed to win a gold medal.</span></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Part 4: Reported Speech</h2>
+            
+            <h3>Exercise 1: Punctuation</h3>
+            <ul class="answer-list">
+                <li>1. John said, "I am very happy to meet you."</li>
+                <li>2. The doctor said, "You should cut down on your salt intake."</li>
+                <li>3. Natasha explained, "I am here to learn, not to fool around."</li>
+                <li>4. "Pack your bags and get out of here!" screamed the landlord.</li>
+                <li>5. "I believe," Toshiko said, "that you are holding my bag."</li>
+                <li>6. "Can you tell me how to get to Route 17?" Atsuko asked.</li>
+                <li>7. "The fastest way out is through the library," Robert explained.</li>
+                <li>8. The professor said, "We will have a test on Friday."</li>
+                <li>9. Boris yelled, "Where are my new shoes?"</li>
+                <li>10. "I think that you are wrong," Oleg stated, "and I also feel that you don't understand the subject at all."</li>
+            </ul>
+
+            <br>
+            <h3>Exercise 4: Direct to Reported Speech (Lisa)</h3>
+            <ul class="answer-list">
+                <li>1. Lisa said that <span class="ans-highlight">they had to leave at 6:00.</span></li>
+                <li>2. Lisa said that <span class="ans-highlight">her birthday would be a special day.</span></li>
+                <li>3. Lisa said that <span class="ans-highlight">she might go to the movies after class.</span></li>
+                <li>4. Lisa said that <span class="ans-highlight">Letitia had to come to the party.</span></li>
+                <li>5. Lisa said that <span class="ans-highlight">she might not come with us to the restaurant.</span></li>
+                <li>6. Lisa said that <span class="ans-highlight">it would probably rain on Thursday.</span></li>
+                <li>7. Lisa said that <span class="ans-highlight">Paul wouldn't remember to call her.</span></li>
+                <li>8. Lisa said that <span class="ans-highlight">Julie could give her presentation after Hanna.</span></li>
+                <li>9. Lisa said that <span class="ans-highlight">Juan would never do it on time.</span></li>
+                <li>10. Lisa said that <span class="ans-highlight">I/he/she/we should buy a new pair of shoes for the dance.</span></li>
+            </ul>
+
+            <br>
+            <h3>Exercise 5: Direct to Reported Speech (Professor)</h3>
+            <ul class="answer-list">
+                <li>1. The professor said that <span class="ans-highlight">we/they would have a test on Monday.</span></li>
+                <li>2. The professor said that <span class="ans-highlight">we/they were going to study conditionals.</span></li>
+                <li>3. The professor told us <span class="ans-highlight">to study hard.</span></li>
+                <li>4. The professor said that <span class="ans-highlight">the exam was easy.</span></li>
+                <li>5. The professor said that <span class="ans-highlight">we should bring a dictionary to class.</span></li>
+                <li>6. The professor told us <span class="ans-highlight">not to cheat.</span></li>
+                <li>7. The professor told us <span class="ans-highlight">to leave when we were finished.</span></li>
+                <li>8. The professor said that <span class="ans-highlight">he/she was going to correct the tests on the weekend.</span></li>
+                <li>9. The professor said that <span class="ans-highlight">we could take the tests home.</span></li>
+                <li>10. The professor said that <span class="ans-highlight">the class would end on Wednesday, August 7.</span></li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
