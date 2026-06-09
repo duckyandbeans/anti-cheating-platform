@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Remedial Quiz</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --danger: #e74c3c;
+            --background: #ecf0f1;
+            --surface: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 100;
+            padding-top: 10px;
+        }
+
+        .cheat-warning {
+            color: var(--danger);
+            font-weight: bold;
+            animation: flash 1s infinite alternate;
+        }
+
+        @keyframes flash {
+            from { color: var(--danger); }
+            to { color: #c0392b; }
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .options-grid label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .error-fix-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #34495e; }
+        .submit-btn { background-color: var(--secondary); margin-top: 20px; width: 100%; font-size: 18px; }
+        .submit-btn:hover { background-color: #2ecc71; }
+        .submit-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        
+        .passage-box {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+        }
+
+        #content-section { display: none; }
+        .word-count { font-size: 0.9em; font-weight: bold; float: right; }
+    </style>
+</head>
+<body>
+
+    <div id="login-section" class="container">
+        <div style="text-align: center;">
+            <h2>English Assessment Form</h2>
+            <p>Select your class and name to begin. <strong>Note:</strong> Entering the exam will activate full-screen mode and anti-cheat tracking.</p>
+            
+            <select id="student-select" style="max-width: 400px; margin: 20px auto; display: block; font-size: 16px;">
+                <option value="">-- Select Student --</option>
+                <optgroup label="Class XI J">
+                    <option value="Gabby Huang - XI J">Gabby Huang</option>
+                </optgroup>
+                <optgroup label="Class XI E">
+                    <option value="Richard Ansle - XI E">Richard Ansle</option>
+                </optgroup>
+                
+            </select>
+
+            <button id="start-btn">Start Exam</button>
+            <p style="color: var(--danger); font-size: 14px; margin-top: 20px;">
+                ⚠️ Warning: Leaving the exam tab, opening notifications, or minimizing the window will be recorded as cheating.
+            </p>
+        </div>
+    </div>
+
+    <div id="content-section" class="container">
+        <div class="header-bar">
+            <div><strong>Student:</strong> <span id="display-name"></span></div>
+            <div id="cheat-display">Cheat Count: 0</div>
+        </div>
+
+        <form id="exam-form">
+            
+            <h3>Part 1: Impersonal Passive Form (Questions 1-7)</h3>
+            <p>Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+
+            <div class="question-block">
+                <p><strong>1.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture1.png" alt="Question 1 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture1.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q1" value="A" required> A. It has been suggested that the fire was being extinguished at the moment.</label>
+                    <label><input type="radio" name="q1" value="B"> B. It is believed that the firefighters extinguish the fire now.</label>
+                    <label><input type="radio" name="q1" value="C"> C. It was claimed that fire has extinguished at the moment.</label>
+                    <label><input type="radio" name="q1" value="D"> D. It is alleged that the fire had been extinguishing by firefighters.</label>
+                    <label><input type="radio" name="q1" value="E"> E. It is reported that the fire is being extinguished at the moment.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>2.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture2.jpg" alt="Question 2 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture2.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q2" value="A" required> A. It is estimated that the murderer has left the crime scene long before the police arrived.</label>
+                    <label><input type="radio" name="q2" value="B"> B. It is confirmed that the murderer left the crime scene long before the police arrived.</label>
+                    <label><input type="radio" name="q2" value="C"> C. It is reported that the murderer had left the crime scene long before the police arrived.</label>
+                    <label><input type="radio" name="q2" value="D"> D. It had been reported that the murderer left the scene long before the police arrived.</label>
+                    <label><input type="radio" name="q2" value="E"> E. It has been reported that the murderer has left the scene long before the police arrived.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>3.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture3.jpg" alt="Question 3 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture3.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q3" value="A" required> A. It is known that they had found a tablet that can stop the aging process.</label>
+                    <label><input type="radio" name="q3" value="B"> B. It has been known that a tablet is found that can stop the aging process.</label>
+                    <label><input type="radio" name="q3" value="C"> C. It is claimed that they found a tablet that can stop the aging process.</label>
+                    <label><input type="radio" name="q3" value="D"> D. It was confirmed that they have found a tablet that can stop the aging process.</label>
+                    <label><input type="radio" name="q3" value="E"> E. It has been alleged that they had found a tablet that can stop the aging process.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>4.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture4.jpg" alt="Question 4 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture4.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q4" value="A" required> A. It has been supposed that the coffee can cure cancer and rejuvenate human cell.</label>
+                    <label><input type="radio" name="q4" value="B"> B. It is claimed that the coffee can cure cancer and rejuvenate human cell.</label>
+                    <label><input type="radio" name="q4" value="C"> C. It is being rumoured that the coffee could cure cancer and rejuvenate human cell.</label>
+                    <label><input type="radio" name="q4" value="D"> D. It was known that the coffee could cure cancer and rejuvenate human cell.</label>
+                    <label><input type="radio" name="q4" value="E"> E. It had been reported that the coffee could cure cancer and rejuvenate human cell.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>5.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture5.jpg" alt="Question 5 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture5.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q5" value="A" required> A. It is rumoured that El Niño is hitting Southeast Asia with even larger scale.</label>
+                    <label><input type="radio" name="q5" value="B"> B. It is known that El Niño was hitting Southeast Asia with even larger scale.</label>
+                    <label><input type="radio" name="q5" value="C"> C. It is alleged that El Niño is hitting Southeast Asia with even larger scale.</label>
+                    <label><input type="radio" name="q5" value="D"> D. It is estimated that El Niño is hitting Southeast Asia with even larger scale.</label>
+                    <label><input type="radio" name="q5" value="E"> E. It is considered that El Niño will hit Southeast Asia with even larger scale.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>6.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture6.jpg" alt="Question 6 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture6.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q6" value="A" required> A. It is claimed that the dispenser dispenses both hot and cold water.</label>
+                    <label><input type="radio" name="q6" value="B"> B. It was rumoured that the dispenser dispended both hot and cold water.</label>
+                    <label><input type="radio" name="q6" value="C"> C. It has been reported that the dispenser is dispensing both hot and cold water.</label>
+                    <label><input type="radio" name="q6" value="D"> D. It had been estimated that the dispenser dispended both hot and cold water.</label>
+                    <label><input type="radio" name="q6" value="E"> E. It has been considered that the dispenser has been dispensing both hot and cold water.</label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>7.</strong> Based on the picture, choose the most appropriate sentence using the impersonal passive form!</p>
+                <img src="picture7.jpg" alt="Question 7 Image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'100\'><rect width=\'200\' height=\'100\' fill=\'#ddd\'/><text x=\'50\' y=\'55\' font-family=\'Arial\' font-size=\'14\'>picture7.jpg</text></svg>'">
+                <div class="options-grid">
+                    <label><input type="radio" name="q7" value="A" required> A. It is expected that Justin Bieber will always be in their hearts.</label>
+                    <label><input type="radio" name="q7" value="B"> B. It was known that Justin Bieber would always be in their hearts.</label>
+                    <label><input type="radio" name="q7" value="C"> C. It is reported that Justin Bieber will always have been in their hearts.</label>
+                    <label><input type="radio" name="q7" value="D"> D. It has been believed that Justin would always have been in their hearts.</label>
+                    <label><input type="radio" name="q7" value="E"> E. It is considered that Justin Bieber will always be in their hearts.</label>
+                </div>
+            </div>
+
+            <h3>Part 2: Error Analysis (Questions 8-15)</h3>
+            <p>Choose the right word or phrase that is considered as wrong from each sentence. If there is no error, choose option E! <strong>Then, fix the error in the input box provided.</strong></p>
+            
+            <div class="question-block">
+                <p><strong>8.</strong> <u>The director</u> <b>(A)</b> <u>said</u> <b>(B)</b> that the company would <u>implement</u> <b>(C)</b> the new policy <u>next quarter</u> <b>(D)</b> without any delays. (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q8_error" value="A" required> A</label>
+                        <label><input type="radio" name="q8_error" value="B"> B</label>
+                        <label><input type="radio" name="q8_error" value="C"> C</label>
+                        <label><input type="radio" name="q8_error" value="D"> D</label>
+                        <label><input type="radio" name="q8_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q8_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>9.</strong> <u>She</u> <b>(A)</b> <u>urged</u> <b>(B)</b> me that <u>she had been contemplating</u> <b>(C)</b> the proposal since <u>the previous week.</u> <b>(D)</b> (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q9_error" value="A" required> A</label>
+                        <label><input type="radio" name="q9_error" value="B"> B</label>
+                        <label><input type="radio" name="q9_error" value="C"> C</label>
+                        <label><input type="radio" name="q9_error" value="D"> D</label>
+                        <label><input type="radio" name="q9_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q9_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>10.</strong> <u>The supervisor</u> <b>(A)</b> <u>told the interns</u> <b>(B)</b> that they <u>must</u> <b>(C)</b> <u>submit the report by the following day</u> <b>(D)</b> without fail. (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q10_error" value="A" required> A</label>
+                        <label><input type="radio" name="q10_error" value="B"> B</label>
+                        <label><input type="radio" name="q10_error" value="C"> C</label>
+                        <label><input type="radio" name="q10_error" value="D"> D</label>
+                        <label><input type="radio" name="q10_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q10_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>11.</strong> <u>He</u> <b>(A)</b> <u>asked me</u> <b>(B)</b> <u>that whether</u> <b>(C)</b> I <u>had completed</u> <b>(D)</b> the preliminary analysis or not. (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q11_error" value="A" required> A</label>
+                        <label><input type="radio" name="q11_error" value="B"> B</label>
+                        <label><input type="radio" name="q11_error" value="C"> C</label>
+                        <label><input type="radio" name="q11_error" value="D"> D</label>
+                        <label><input type="radio" name="q11_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q11_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>12.</strong> <u>The professor</u> <b>(A)</b> <u>confirmed</u> <b>(B)</b> that water <u>boils</u> <b>(C)</b> at 100 degrees Celsius <u>in normal conditions.</u> <b>(D)</b> (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q12_error" value="A" required> A</label>
+                        <label><input type="radio" name="q12_error" value="B"> B</label>
+                        <label><input type="radio" name="q12_error" value="C"> C</label>
+                        <label><input type="radio" name="q12_error" value="D"> D</label>
+                        <label><input type="radio" name="q12_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q12_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>13.</strong> <u>She</u> <b>(A)</b> said that <u>she</u> <b>(B)</b> <u>could not attend</u> <b>(C)</b> the conference <u>yesterday</u> <b>(D)</b> due to unforeseen circumstances. (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q13_error" value="A" required> A</label>
+                        <label><input type="radio" name="q13_error" value="B"> B</label>
+                        <label><input type="radio" name="q13_error" value="C"> C</label>
+                        <label><input type="radio" name="q13_error" value="D"> D</label>
+                        <label><input type="radio" name="q13_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q13_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>14.</strong> <u>The manager</u> <b>(A)</b> <u>instructed</u> <b>(B)</b> that all employees <u>should</u> <b>(C)</b> to adhere to the updated regulations <u>immediately.</u> <b>(D)</b> (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q14_error" value="A" required> A</label>
+                        <label><input type="radio" name="q14_error" value="B"> B</label>
+                        <label><input type="radio" name="q14_error" value="C"> C</label>
+                        <label><input type="radio" name="q14_error" value="D"> D</label>
+                        <label><input type="radio" name="q14_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q14_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p><strong>15.</strong> <u>He suggested</u> <b>(A)</b> that <u>I to reconsider</u> <b>(B)</b> the <u>strategic</u> <b>(C)</b> decision <u>before making a final commitment.</u> <b>(D)</b> (No Error) <b>(E)</b></p>
+                <div class="error-fix-grid">
+                    <div class="options-grid">
+                        <label><input type="radio" name="q15_error" value="A" required> A</label>
+                        <label><input type="radio" name="q15_error" value="B"> B</label>
+                        <label><input type="radio" name="q15_error" value="C"> C</label>
+                        <label><input type="radio" name="q15_error" value="D"> D</label>
+                        <label><input type="radio" name="q15_error" value="E"> E (No Error)</label>
+                    </div>
+                    <div>
+                        <label><strong>Fix the error:</strong></label>
+                        <input type="text" name="q15_fix" placeholder="Type the correct word/phrase here">
+                    </div>
+                </div>
+            </div>
+
+            <h3>Part 3: Picture Description (Questions 16-20)</h3>
+            <img src="picture8.png" alt="Questions 16-20 Reference" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'150\\'><rect width=\\'300\\' height=\\'150\\' fill=\\'#ddd\\'/><text x=\\'100\\' y=\\'80\\' font-family=\\'Arial\\' font-size=\\'14\\'>picture8.jpg</text></svg>'">
+            <div class="question-block">
+                <p>Complete the sentences based on the picture above:</p>
+                <p><strong>16.</strong> The policeman <input type="text" name="q16" required></p>
+                <p><strong>17.</strong> The driver <input type="text" name="q17" required></p>
+                <p><strong>18.</strong> Then the driver <input type="text" name="q18" required></p>
+                <p><strong>19.</strong> Mr Thompson <input type="text" name="q19" required></p>
+                <p><strong>20.</strong> Mr Brown <input type="text" name="q20" required></p>
+            </div>
+
+            <h3>Part 4: Reading Comprehension (Questions 21-31)</h3>
+            <div class="passage-box">
+                <h4>The Ellis Island Experience</h4>
+                <p>
+                    KNOCKING ON AMERICA’S DOOR AT ELLIS ISLAND
+
+                    When Ellis Island opened as a new immigration point of entry on January 1, 1892, immigration to America had been underway for three hundred years, or, in other words, since the “discovery” of the New World. What singles out Ellis Island is the fact that today about 100 million Americans can trace their ancestry through this processing station.
+
+                    It is not numbers alone that make Ellis Island so special. Its location within the sight of the Statue of Liberty, which for a lot of immigrants was a moving symbol of freedom in whose name they left their native countries, as well as the New York waterfront evoked hopes of economic prosperity to those who left their homes because of poverty, unemployment, or even starvation.
+
+                    Out of 12 million immigrants who were processed on Ellis Island during the years of its operation 1892 - 1954, about 2% (240,000) were denied entry to the country and deported. Many more, however, (about 20%), were detained for days or weeks. Detainees lived in dormitories. They slept in high-tiered bunks, ate their meals at incredibly long tables in refectories that could feed 1,000 people at a time. Their children went to makeshift schools. They had hope, but they also experienced misgivings and uncertainty. The anxiety of detainees and unhappiness of the rejected earned Ellis Island a nickname: "Island of Tears."
+
+                    Even though there were immigration centres in other major cities such as Philadelphia, Boston, San Francisco, Miami and New Orleans, Ellis Island held a unique place. However, after its closure in 1954 it was neglected until the 1980s. Fortunately, this important chapter in American history was not lost thanks to a major renovation project, the largest in U.S. history, costing $160 million, which turned the old Registry Hall into the Ellis Island Immigration Museum. Each year 2 million tourists come to see the island on which the future of 12 million people was once decided.
+
+                    (Page 1)
+                </p>
+                <p>
+                    
+
+                    Work on Ellis Island continued from 9:00 in the morning to 7:00 in the evening seven days a week. Inspectors questioned 400 to 500 immigrants in any single day. But the immigration process did not begin on Ellis Island. It started in ports of embarkation where the so-called ship’s manifest logs were filled in for the immigrants. They included immigrants’ answers to twenty-nine questions such as name, occupation, and the amount of money they had.
+
+                    It was in the ship company’s interest that all the passengers aboard be granted entry. In case of deportation, the company had to pay for the trip back and later a $100 fine was imposed on it for each rejected applicant.
+
+                    Those immigrants who travelled in first or second class on steamships underwent the required immigration procedure during the crossing and once their ship anchored in New York, they simply disembarked, walked through Customs and proceeded to their destinations. Those who could afford a more expensive ticket were not considered likely "to become a public charge" in the new country.
+
+                    Third class passengers and those who, for the lack of money, travelled on the cheapest class of tickets, in so-called steerage (these were the lowest decks on ships which once housed steering mechanism but were turned into stuffy, packed dormitories with insufficient sanitary facilities when the sailing ships were upgraded to steamships,) as well as others who fell sick or showed signs of a serious illness during the voyage, were all directed to Ellis Island. They had to stay on board until Ellis Island was ready to process a new group of immigrants when harbour ferries carried them to the island.
+
+                    Dressed in their "Sunday best," immigrants finally disembarked and, carrying their possessions in bundles, trunks, and boxes, walked to the main building. The immigration procedure lasted about five hours. Immigrants had numbered tags pinned to their clothes with information about the manifest page and line number on which their names appeared. They could leave their luggage in the Baggage Room and then climbed up the steep stairs on their way to the Great Hall. Along the way they were examined by doctors and questioned by inspectors, who admitted or rejected their entry or decided that their cases required further investigation. The sick was sent to the island’s hospital. Those who were rejected could write appeals which were considered by the Commissioner.
+
+                    Doctors, and especially eye doctors, were feared most since the main reason for rejections were contagious diseases and other health problems. In the 19th century a serious eye illness, trachoma, which led to blindness and death, was common in Europe. If they discovered symptoms of that infection through turning the eyelid inside out with fingers or a button hook, the eye-doctors would mark the immigrant’s clothes with the letters "CT" in blue chalk. That was an almost certain sign of rejection. Some immigrants secretly wiped off the marks or turned their clothes inside out.
+
+                    In the peak years hundreds of thousands of immigrants arrived. In the record year - 1907 - their number exceeded one million. Most immigrants came from Italy, Russia, Hungary, Austria, Austria-Hungary (1892-1904), Germany, Ireland, Sweden, Greece, Norway, the Ottoman Empire, Scotland, the West Indies, Poland, Portugal, and France. In the 1920s, with the introduction of the Quota Laws and the National Origins Act, fewer and fewer immigrants came. In 1953 there were just 230 detained immigrants on Ellis Island. Given falling numbers it was decided to close the immigration offices, which happened on November 19, 1954.
+
+                </p>
+
+                    
+                <p>
+                    Fame awaited many immigrants behind the doors of Ellis Island. Careers as musicians, politicians, singers, composers, sportsmen, etc. awaited talented immigrants in their new country. The world of movies would not be what it is without Rudolph Valentino, Bob Hope, or Cary Grant, all of whom immigrated to the United States.
+
+                    A great star of silent movies, Rudolph Valentino, was born in Italy in 1895. He went to America at the age of 18 and was processed on Ellis Island. Cary Grant was two years younger when he arrived in the United States from England with a troupe of comedians and acrobats in 1920. Bob Hope moved from England with his family when he was only four years old.
+
+                    Though great and glamorous careers awaited all of them, they all began from scratch, personifying the myth of the American dream. Valentino started with odd jobs like a landscape gardener, a dishwasher and waiter, and a taxi driver, before he began working as a nightclub dancer and tango partner at dance halls and cabarets, which finally paved his way to the movie business. By 1920, when Cary Grant arrived in the U.S., Valentino had appeared in 17 films and was about to take up a role that earned him fame and saved Metro Pictures Corporation from bankruptcy: The Four Horsemen of the Apocalypse.
+
+                    Cary Grant first worked as a barker and stilt walker. He got his first real role in the Golden Dawn theatre in 1927. His characteristic style of elegance, wit and sophistication did not go unnoticed and he was given leading roles with such famed actresses of the time as Marlene Dietrich (in Blonde), Mae West (in She Done Him Wrong and I’m No Angel), Irene Dune (in The Awful Truth), Rosalind Russell (in His Girl Friday), and Katherine Hepburn (in Holiday).
+
+                    Bob Hope sold newspapers, worked as a delivery boy, soda jerk, shoe salesman, and even as a boxer, before he took dancing lessons and discovered he could entertain audiences. Equipped with a big cigar and bowler hat as his props, he toured the country with his comedy act in the early 1930s climbing his way to the top in vaudeville and then he was cast in leading roles in Broadway productions: Say When, Ziegfeld Follies, and Red, Hot and Blue.
+
+                    Sudden death from peritonitis and a perforated ulcer cut short Rudolph Valentino’s career in 1926 when he was just 31. A cult of personality formed around him after his premature death and he is still considered one of the most powerful actors of the silent movies.
+
+                    Bob Hope lived to be a hundred and all the way through his long career he maintained a prominent position as a comedian and entertainer. He was a radio and TV personality and had monthly comedy "specials" for NBC. He appeared in numerous films and made countless appearances for America’s military members. In recognition of his commitment, he was made "Honorary Veteran" by an act of Congress. Hope is mentioned in The Guinness Book of Records as "the most honoured entertainer in the world" with more than 2,000 awards and honours.
+
+                    Cary Grant was faithful to the image he created in his early career though his work with Alfred Hitchcock added a tinge of mystery and ambiguity to it. Grant was one of few actors of the time powerful enough to choose their own roles, directors, and co-stars.
+
+                </p>
+            </div>
+
+            <div class="question-block">
+                <p><strong>On the basis of the articles above, decide if the sentences are true (T) or false (F).</strong></p>
+                <p><strong>21.</strong> Inspectors on Ellis Island worked 10 hours per day Monday through Friday. 
+                    <select name="q21" required><option value="">Select</option><option value="T">True</option><option value="F">False</option></select></p>
+                <p><strong>22.</strong> Immigrants who were rejected had their tickets back home paid for.
+                    <select name="q22" required><option value="">Select</option><option value="T">True</option><option value="F">False</option></select></p>
+                <p><strong>23.</strong> Immigration procedures for first- and second-class passengers were carried out aboard the ships.
+                    <select name="q23" required><option value="">Select</option><option value="T">True</option><option value="F">False</option></select></p>
+                <p><strong>24.</strong> Inspectors feared that poor and sick immigrants might become a financial burden for the country.
+                    <select name="q24" required><option value="">Select</option><option value="T">True</option><option value="F">False</option></select></p>
+                <p><strong>25.</strong> Eye doctors were feared most because their examination was painful.
+                    <select name="q25" required><option value="">Select</option><option value="T">True</option><option value="F">False</option></select></p>
+            </div>
+
+            <div class="question-block">
+                <p><strong>Fill in the blanks with information from the text. Use no more than three words for each gap.</strong></p>
+                <p><strong>26.</strong> Because so many people were heartbroken after being denied entry, Ellis Island was commonly referred to as the <input type="text" name="q26" required style="width: 200px;">.</p>
+                <p><strong>27.</strong> Shipping companies were highly motivated to ensure passengers passed inspection because they were forced to pay a <input type="text" name="q27" required style="width: 200px;"> for every person rejected.</p>
+                <p><strong>28.</strong> Unlike those in third class, people traveling in <input type="text" name="q28" required style="width: 200px;"> had their immigration paperwork processed while they were still at sea.</p>
+                <p><strong>29.</strong> Medical examiners would use <input type="text" name="q29" required style="width: 200px;"> to mark the clothing of any immigrant they suspected of having a contagious disease.</p>
+                <p><strong>30.</strong> Before finding fame in Hollywood, the actor Cary Grant earned a living working as a <input type="text" name="q30" required style="width: 200px;">.</p>
+            </div>
+
+            <div class="question-block">
+                <p><strong>31. Writing Task: The Ellis Island Experience</strong></p>
+                <p>Write a formal report of 250 words describing the process of immigration at Ellis Island based on the provided articles. First, explain the "push factors". Next, describe the medical inspection process. Finally, mention famous immigrants. <em>You must use impersonal language and at least two examples of reported speech. Avoid using personal pronouns.</em></p>
+                <span class="word-count" id="word-count-display">0 words</span>
+                <textarea id="q31" name="q31" rows="10" placeholder="Begin typing your report here..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="final-submit-btn">Submit Exam</button>
+            <p id="status-msg" style="text-align: center; font-weight: bold; margin-top: 15px;"></p>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+            authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+            projectId: "anti-cheating-remedial-quiz",
+            storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+            messagingSenderId: "979294386230",
+            appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+            measurementId: "G-84YB5CYGM8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Global variables for tracking
+        let currentUser = null;
+        let cheatCount = 0;
+        let syncInterval = null;
+        let wakeLock = null;
+        
+        // NEW FLAGS: to manage the submit state and prevent false cheating flags
+        let isExamFinished = false; 
+        let confirmSubmit = false; 
+
+        // Function to remove punctuation and convert to lowercase
+        function sanitizeInput(text) {
+            if (!text) return "";
+            return text.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+        }
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            const selectElement = document.getElementById('student-select');
+            const selectedValue = selectElement.value;
+
+            if (!selectedValue) {
+                // We can still use alert here because they haven't entered full screen yet
+                alert("Please select your name and class from the list.");
+                return;
+            }
+
+            currentUser = selectedValue;
+            
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (err) {
+                console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+            }
+
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.warn(`Error attempting to enable WakeLock: ${err.message}`);
+            }
+            
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('content-section').style.display = 'block';
+            document.getElementById('display-name').textContent = currentUser;
+
+            startAntiCheat();
+            syncInterval = setInterval(syncToFirebase, 300000);
+        });
+
+        document.getElementById('exam-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); 
+
+            if (isExamFinished) return; // Prevent anything if already finished
+
+            // Validate word count 
+            const text = document.getElementById('q31').value;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            
+            if (words < 100 || words > 500) {
+                // FIXED: Replaced alert() with an on-page text warning
+                document.getElementById('status-msg').style.color = "var(--danger)";
+                document.getElementById('status-msg').innerText = `❌ Question 31 must be between 100 and 500 words. You currently have ${words} words.`;
+                
+                // Reset the confirm button if they had clicked it previously
+                confirmSubmit = false;
+                document.getElementById('final-submit-btn').innerText = "Submit Exam";
+                document.getElementById('final-submit-btn').style.backgroundColor = "var(--secondary)";
+                return;
+            }
+
+            // FIXED: Two-Click Confirmation replaces the browser confirm() popup
+            if (!confirmSubmit) {
+                confirmSubmit = true;
+                const btn = document.getElementById('final-submit-btn');
+                btn.innerText = "Are you sure? Click again to confirm submission.";
+                btn.style.backgroundColor = "#e67e22"; // Changes to warning orange
+                document.getElementById('status-msg').innerText = ""; // Clear errors
+                return; // Stop here and wait for the second click
+            }
+
+            // --- IF WE REACH THIS POINT, IT'S THE SECOND CLICK ---
+            
+            // Turn off anti-cheat tracking IMMEDIATELY
+            isExamFinished = true; 
+            
+            document.getElementById('status-msg').style.color = "var(--primary)";
+            document.getElementById('status-msg').innerText = "Submitting data...";
+            document.getElementById('final-submit-btn').disabled = true; 
+            
+            // Gather all form data
+            const formData = new FormData(event.target);
+            const examAnswers = {};
+
+            for (let [key, value] of formData.entries()) {
+                const inputElement = event.target.elements[key];
+                if (key !== 'q31' && inputElement && inputElement.type === 'text') {
+                    examAnswers[key] = sanitizeInput(value.toString());
+                } else {
+                    examAnswers[key] = value;
+                }
+            }
+
+            try {
+                const docRef = doc(db, "ujian susulan", currentUser);
+                await setDoc(docRef, {
+                    name: currentUser,
+                    cheatcount: cheatCount,
+                    answers: examAnswers,
+                    lastUpdated: new Date().toISOString(),
+                    status: "Submitted"
+                }, { merge: true });
+
+                document.getElementById('status-msg').style.color = "var(--secondary)";
+                document.getElementById('status-msg').innerText = "✅ Submitted successfully! You can close this tab.";
+                
+                const elements = document.getElementById("exam-form").elements;
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].disabled = true;
+                }
+
+                if (syncInterval) clearInterval(syncInterval);
+
+            } catch (error) {
+                console.error("Error submitting exam:", error);
+                document.getElementById('status-msg').style.color = "var(--danger)";
+                document.getElementById('status-msg').innerText = "❌ Error submitting. Please check your connection and try again.";
+                document.getElementById('final-submit-btn').disabled = false;
+                isExamFinished = false; // Re-enable if it failed to send
+            }
+        });
+
+        document.getElementById('q31').addEventListener('input', () => {
+            const text = document.getElementById('q31').value;
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+            const display = document.getElementById('word-count-display');
+            display.innerText = words + " words";
+            
+            if(words < 100 || words > 250) {
+                display.style.color = 'var(--danger)';
+            } else {
+                display.style.color = 'var(--secondary)';
+            }
+        });
+
+        // --- CORE FUNCTIONS ---
+        function startAntiCheat() {
+            window.addEventListener('blur', () => {
+                // FIXED: Only count cheats if the exam is NOT finished
+                if (currentUser && !isExamFinished) { 
+                    cheatCount++;
+                    document.getElementById('cheat-display').textContent = `Cheat Count: ${cheatCount}`;
+                    document.getElementById('cheat-display').classList.add('cheat-warning');
+                }
+            });
+
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible' && !isExamFinished) {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } catch (err) {
+                        console.log("Could not re-activate wake lock", err);
+                    }
+                }
+            });
+        }
+
+        async function syncToFirebase() {
+            if (currentUser && cheatCount > 0 && !isExamFinished) {
+                try {
+                    const docRef = doc(db, "ujian susulan", currentUser);
+                    await setDoc(docRef, {
+                        name: currentUser,
+                        cheatcount: cheatCount,
+                        lastUpdated: new Date().toISOString()
+                    }, { merge: true });
+                } catch (error) {
+                    console.error("Error saving to Firebase: ", error);
+                }
+            }
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (currentUser && cheatCount > 0 && !isExamFinished) {
+                syncToFirebase();
+            }
+        });
+
+    </script>
+</body>
+</html>
