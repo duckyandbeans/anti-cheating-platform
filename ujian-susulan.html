@@ -488,7 +488,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Added getDoc to fetch existing cheat counts if they refresh
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
@@ -509,11 +510,9 @@
         let syncInterval = null;
         let wakeLock = null;
         
-        // NEW FLAGS: to manage the submit state and prevent false cheating flags
         let isExamFinished = false; 
         let confirmSubmit = false; 
 
-        // Function to remove punctuation and convert to lowercase
         function sanitizeInput(text) {
             if (!text) return "";
             return text.toLowerCase().replace(/[^\w\s]/gi, '').trim();
@@ -525,13 +524,30 @@
             const selectedValue = selectElement.value;
 
             if (!selectedValue) {
-                // We can still use alert here because they haven't entered full screen yet
                 alert("Please select your name and class from the list.");
                 return;
             }
 
             currentUser = selectedValue;
             
+            // --- NEW: RECOVER STATE ON REFRESH ---
+            // Before starting, check if they already have a cheat tally in the database
+            try {
+                const docRef = doc(db, "ujian susulan", currentUser);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists() && docSnap.data().cheatcount) {
+                    cheatCount = docSnap.data().cheatcount; // Restore their previous count
+                    document.getElementById('cheat-display').textContent = `Cheat Count: ${cheatCount}`;
+                    if (cheatCount > 0) {
+                        document.getElementById('cheat-display').classList.add('cheat-warning');
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching existing data:", error);
+            }
+            // ------------------------------------
+
             try {
                 if (document.documentElement.requestFullscreen) {
                     await document.documentElement.requestFullscreen();
@@ -559,44 +575,36 @@
         document.getElementById('exam-form').addEventListener('submit', async (event) => {
             event.preventDefault(); 
 
-            if (isExamFinished) return; // Prevent anything if already finished
+            if (isExamFinished) return; 
 
-            // Validate word count 
             const text = document.getElementById('q31').value;
             const words = text.trim().split(/\s+/).filter(word => word.length > 0).length;
             
-            if (words < 100 || words > 500) {
-                // FIXED: Replaced alert() with an on-page text warning
+            if (words < 100 || words > 150) {
                 document.getElementById('status-msg').style.color = "var(--danger)";
-                document.getElementById('status-msg').innerText = `❌ Question 31 must be between 100 and 500 words. You currently have ${words} words.`;
+                document.getElementById('status-msg').innerText = `❌ Question 31 must be between 100 and 150 words. You currently have ${words} words.`;
                 
-                // Reset the confirm button if they had clicked it previously
                 confirmSubmit = false;
                 document.getElementById('final-submit-btn').innerText = "Submit Exam";
                 document.getElementById('final-submit-btn').style.backgroundColor = "var(--secondary)";
                 return;
             }
 
-            // FIXED: Two-Click Confirmation replaces the browser confirm() popup
             if (!confirmSubmit) {
                 confirmSubmit = true;
                 const btn = document.getElementById('final-submit-btn');
                 btn.innerText = "Are you sure? Click again to confirm submission.";
-                btn.style.backgroundColor = "#e67e22"; // Changes to warning orange
-                document.getElementById('status-msg').innerText = ""; // Clear errors
-                return; // Stop here and wait for the second click
+                btn.style.backgroundColor = "#e67e22"; 
+                document.getElementById('status-msg').innerText = ""; 
+                return; 
             }
 
-            // --- IF WE REACH THIS POINT, IT'S THE SECOND CLICK ---
-            
-            // Turn off anti-cheat tracking IMMEDIATELY
             isExamFinished = true; 
             
             document.getElementById('status-msg').style.color = "var(--primary)";
             document.getElementById('status-msg').innerText = "Submitting data...";
             document.getElementById('final-submit-btn').disabled = true; 
             
-            // Gather all form data
             const formData = new FormData(event.target);
             const examAnswers = {};
 
@@ -610,6 +618,7 @@
             }
 
             try {
+                // Ensure saving to the correct teacher collection
                 const docRef = doc(db, "ujian susulan", currentUser);
                 await setDoc(docRef, {
                     name: currentUser,
@@ -634,7 +643,7 @@
                 document.getElementById('status-msg').style.color = "var(--danger)";
                 document.getElementById('status-msg').innerText = "❌ Error submitting. Please check your connection and try again.";
                 document.getElementById('final-submit-btn').disabled = false;
-                isExamFinished = false; // Re-enable if it failed to send
+                isExamFinished = false; 
             }
         });
 
@@ -644,7 +653,7 @@
             const display = document.getElementById('word-count-display');
             display.innerText = words + " words";
             
-            if(words < 100 || words > 250) {
+            if(words < 100 || words > 150) {
                 display.style.color = 'var(--danger)';
             } else {
                 display.style.color = 'var(--secondary)';
@@ -654,11 +663,13 @@
         // --- CORE FUNCTIONS ---
         function startAntiCheat() {
             window.addEventListener('blur', () => {
-                // FIXED: Only count cheats if the exam is NOT finished
                 if (currentUser && !isExamFinished) { 
                     cheatCount++;
                     document.getElementById('cheat-display').textContent = `Cheat Count: ${cheatCount}`;
                     document.getElementById('cheat-display').classList.add('cheat-warning');
+                    
+                    // --- NEW: INSTANT FIREBASE SYNC ON CHEAT ---
+                    syncToFirebase();
                 }
             });
 
@@ -676,6 +687,7 @@
         async function syncToFirebase() {
             if (currentUser && cheatCount > 0 && !isExamFinished) {
                 try {
+                    // Update to match Teacher Dashboard collection
                     const docRef = doc(db, "ujian susulan", currentUser);
                     await setDoc(docRef, {
                         name: currentUser,
