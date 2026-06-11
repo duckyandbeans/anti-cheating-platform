@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Evaluation Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #2c3e50;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        button.refresh-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        button.refresh-btn:hover {
+            background-color: #1a252f;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        tr:hover {
+            background-color: #f1f4f6;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .level-c2-dist { background-color: #d4af37; }
+        .level-c2-adv { background-color: var(--success); }
+        .level-c1 { background-color: var(--primary-blue); }
+        .level-b2 { background-color: #e67e22; }
+        .level-below { background-color: var(--danger); }
+
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: opacity 0.3s;
+        }
+
+        .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        .cheats-warning {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="header-actions">
+            <h1>Evaluation Results Dashboard</h1>
+            <button class="refresh-btn" onclick="loadResults()">Refresh Data</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Teacher Name</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Proficiency Level</th>
+                    <th>Cheat Flags</th>
+                    <th>Date Taken</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+                <tr>
+                    <td colspan="7" class="empty-state">Loading results...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        // Added getDocs and deleteDoc to handle reading lists and removing items
+        import { getFirestore, collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Your exact Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+            authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+            projectId: "anti-cheating-remedial-quiz",
+            storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+            messagingSenderId: "979294386230",
+            appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+            measurementId: "G-84YB5CYGM8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Map the level text to a CSS class for color coding
+        function getBadgeClass(levelText) {
+            if (!levelText) return 'level-below';
+            if (levelText.includes("C2 Mastery")) return 'level-c2-dist';
+            if (levelText.includes("C2 Proficiency")) return 'level-c2-adv';
+            if (levelText.includes("C1 Advanced")) return 'level-c1';
+            if (levelText.includes("B2/C1")) return 'level-b2';
+            return 'level-below';
+        }
+
+        // Format ISO timestamp into a readable date string
+        function formatDate(isoString) {
+            if (!isoString) return "Unknown";
+            const date = new Date(isoString);
+            return date.toLocaleString();
+        }
+
+        // Fetch and display results
+        window.loadResults = async function() {
+            const tbody = document.getElementById('results-body');
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Loading results...</td></tr>';
+
+            try {
+                // Fetch from the collection you used to save the final scores
+                const querySnapshot = await getDocs(collection(db, "teachereval_evalResults"));
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No evaluations found.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                querySnapshot.forEach((documentSnap) => {
+                    const data = documentSnap.data();
+                    const docId = documentSnap.id;
+                    const badgeClass = getBadgeClass(data.level);
+                    const cheatDisplay = data.cheats > 0 
+                        ? `<span class="cheats-warning">${data.cheats}</span>` 
+                        : "0";
+
+                    html += `
+                        <tr id="row-${docId}">
+                            <td><strong>${data.name || 'Unknown'}</strong></td>
+                            <td>${data.score || 0}</td>
+                            <td>${data.percentage || 0}%</td>
+                            <td><span class="badge ${badgeClass}">${data.level || 'Unassessed'}</span></td>
+                            <td>${cheatDisplay}</td>
+                            <td>${formatDate(data.timestamp)}</td>
+                            <td>
+                                <button class="delete-btn" onclick="deleteRecord('${docId}', '${data.name}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error fetching results: ", error);
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state" style="color:var(--danger)">Failed to load data. Check console.</td></tr>';
+                Swal.fire('Error', 'Could not load database records.', 'error');
+            }
+        };
+
+        // Delete a specific record
+        window.deleteRecord = async function(docId, teacherName) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete the evaluation log for ${teacherName}. This cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#2c3e50',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // Delete the document from Firestore
+                        await deleteDoc(doc(db, "teachereval_evalResults", docId));
+                        
+                        // Remove the row from the HTML table instantly
+                        const row = document.getElementById(`row-${docId}`);
+                        if (row) row.remove();
+
+                        Swal.fire('Deleted!', 'The record has been permanently deleted.', 'success');
+                        
+                        // If table is now empty, show empty state
+                        const tbody = document.getElementById('results-body');
+                        if (tbody.children.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No evaluations found.</td></tr>';
+                        }
+                    } catch (error) {
+                        console.error("Error deleting document: ", error);
+                        Swal.fire('Error', 'Failed to delete the record. You might lack permissions.', 'error');
+                    }
+                }
+            });
+        };
+
+        // Load data initially when page loads
+        document.addEventListener('DOMContentLoaded', loadResults);
+    </script>
+</body>
+</html>
