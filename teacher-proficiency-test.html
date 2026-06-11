@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Proficiency Evaluation: C1/C2 Level</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #004a99;
+            --dark-navy: #0a1118;
+            --stripe-light: #f4f8fb;
+            --stripe-blue: #e8f1f9;
+            --border-color: #d1d9e0;
+            --success: #1e7e34;
+            --error: #bd2130;
+            --text-main: #212529;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: #ffffff;
+            margin: 0; padding: 0;
+        }
+
+        /* LOGIN GATE */
+        #login-gate {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ffffff;
+            background-image: linear-gradient(135deg, var(--stripe-light) 25%, transparent 25%, transparent 50%, var(--stripe-light) 50%, var(--stripe-light) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        .login-box {
+            background: #ffffff; padding: 50px; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-top: 6px solid var(--primary-blue);
+            width: 90%; max-width: 420px; text-align: center;
+        }
+
+        .login-box h1 { background: none !important; color: var(--dark-navy) !important; border: none !important; margin-top: 0; font-size: 28px; }
+
+        .input-group { text-align: left; margin-bottom: 25px; }
+        .input-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #495057; }
+        .input-group input { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; }
+
+        #start-btn {
+            width: 100%; padding: 16px; background: var(--dark-navy); color: #ffffff;
+            border: none; border-radius: 8px; font-size: 18px; font-weight: 700; cursor: pointer;
+        }
+
+        /* TEST CONTENT CONTAINER */
+        .container { max-width: 950px; margin: 40px auto; padding: 50px; background: white; }
+        #test-content { display: none; opacity: 0; transition: opacity 1.2s ease-in-out; }
+
+        h1 {
+            background-color: var(--dark-navy); color: white; padding: 45px 20px; text-align: center;
+            border-radius: 12px; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 3px;
+            border-bottom: 6px solid var(--primary-blue);
+        }
+
+        h3 { color: var(--primary-blue); border-left: 6px solid var(--primary-blue); padding-left: 20px; margin-top: 70px; font-weight: 700; }
+
+        .section-box { background-color: #ffffff; padding: 35px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 40px; }
+
+        /* ZEBRA STRIPING */
+        .question { padding: 20px; border-radius: 8px; margin-bottom: 2px; }
+        .question:nth-child(even) { background-color: var(--stripe-blue); }
+
+        input[type="text"] {
+            border: none; border-bottom: 2px solid var(--border-color);
+            background: transparent; padding: 5px 12px; font-size: 16px;
+            color: var(--primary-blue); font-weight: 700; text-align: center;
+        }
+
+        input.correct { border-bottom: 2px solid var(--success) !important; background-color: #d4edda !important; color: var(--success); }
+        input.incorrect { border-bottom: 2px solid var(--error) !important; background-color: #f8d7da !important; color: var(--error); }
+
+        .input-small { width: 70px; }
+        .input-medium { width: 180px; }
+        .input-large { width: 420px; }
+
+        .transformation-word { float: right; font-weight: 800; color: var(--primary-blue); background: #eee; padding: 0 10px; }
+        .word-box { text-align: center; font-weight: 600; border: 2px dashed var(--primary-blue); padding: 25px; margin: 30px 0; background-color: var(--stripe-light); border-radius: 12px; color: var(--primary-blue); }
+
+        .score-display { background: #ffffff; padding: 18px 25px; border-radius: 15px; border: 2px solid var(--primary-blue); text-align: center; font-weight: 800; margin-bottom: 30px; }
+
+        #final-submit-btn {
+            display: block; width: 100%; padding: 25px; background: var(--primary-blue); color: white;
+            border: none; border-radius: 15px; font-size: 22px; font-weight: bold; cursor: pointer; margin-top: 60px;
+        }
+        
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .mcq-grid { grid-template-columns: 1fr; } .input-large { width: 100%; } }
+
+        .mcq-select {
+        border: 2px solid var(--border-color);
+        border-radius: 5px;
+        padding: 5px;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold;
+        color: var(--primary-blue);
+        cursor: pointer;
+        background: white;
+    }
+    /* Premium Floating Dashboard */
+    #exam-dashboard {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        display: none; /* Controlled by JS */
+        flex-direction: column;
+        gap: 15px;
+        z-index: 10001;
+        perspective: 1000px;
+    }
+
+    .dash-item {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px); /* Blur background behind the box */
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-left: 5px solid var(--primary-blue);
+        padding: 12px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 180px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: slideInDash 0.8s ease-out;
+    }
+
+    @keyframes slideInDash {
+        from { transform: translateX(50px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .dash-icon {
+        font-size: 24px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .dash-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dash-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #777;
+        font-weight: 800;
+    }
+
+    .dash-value {
+        font-size: 20px;
+        font-weight: 900;
+        color: var(--dark-navy);
+        font-family: 'Courier New', monospace; /* Monospaced keeps numbers from jumping */
+    }
+
+    /* Security Warning State */
+    .cheat-warning {
+        border-left-color: var(--error) !important;
+        background: rgba(255, 230, 230, 0.95) !important;
+    }
+
+    .cheat-warning .dash-value {
+        color: var(--error);
+    }
+
+    /* Low Time State (Last 5 Mins) */
+    .low-time {
+        border-color: var(--error) !important;
+        animation: blink-red 1.5s infinite;
+    }
+
+    @keyframes blink-red {
+        0% { box-shadow: 0 0 0 rgba(189, 33, 48, 0.4); }
+        50% { box-shadow: 0 0 20px rgba(189, 33, 48, 0.4); }
+        100% { box-shadow: 0 0 0 rgba(189, 33, 48, 0); }
+    }
+
+    /* Interactive hover */
+    .dash-item:hover {
+        transform: scale(1.05) translateX(-5px);
+        background: #ffffff;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+    .instruction-text {
+        background-color: var(--stripe-light);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--dark-navy);
+        line-height: 1.6;
+    }
+
+    .instruction-text strong {
+        color: var(--dark-navy);
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 1px;
+    }
+    </style>
+</head>
+<body>
+    <!-- FLOATING DASHBOARD -->
+    <div id="exam-dashboard">
+        <!-- Timer Item -->
+        <div class="dash-item" id="timer-display">
+            <div class="dash-icon">⏳</div>
+            <div class="dash-info">
+                <span class="dash-label">Time Remaining</span>
+                <span class="dash-value" id="time-left">60:00</span>
+            </div>
+        </div>
+
+        <!-- Cheat Counter Item -->
+        <div class="dash-item" id="cheat-indicator">
+            <div class="dash-icon">⚠️</div>
+            <div class="dash-info">
+                <span class="dash-label">Security Exits</span>
+                <span class="dash-value" id="cheat-count">0</span>
+            </div>
+        </div>
+    </div>
+    <!-- LOGIN GATE -->
+    <div id="login-gate">
+        <div class="login-box">
+            <h1>Teacher Portal</h1>
+            <p>Enter details to begin Proficiency Evaluation.</p>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="student-name" placeholder="Name">
+            </div>
+            <div class="input-group">
+                <label>WhatsApp Number</label>
+                <input type="text" id="student-whatsapp" placeholder="+62...">
+            </div>
+            <button onclick="accessExam()" id="start-btn">Access Evaluation</button>
+        </div>
+    </div>
+
+    <!-- MAIN TEST CONTENT -->
+
+    <div id="test-content">
+        <div class="container">
+            <h1>Teacher Proficiency Evaluation</h1>
+            <div class="score-display">Total Marks: <span id="current-score">0</span> / 100</div>
+
+            <!-- SECTION 1 -->
+            <h3>1. Use of English: Word Formation</h3>
+            <div class="section-box">
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px;">
+                    <strong>Instructions:</strong> Read the three narrative passages below. For questions <b>1-15</b>, use the word given in capitals in brackets to form a new word that fits logically and grammatically into the space provided. You must ensure your spelling is 100% accurate. 
+                    <br><em>Example: (GO) &rarr; UNDERGONE</em>
+                </p>
+                <div class="section-box">
+                <p style="text-align: justify;">
+                    General Autos has (1) <input type="text" class="input-medium" data-answer-id="eval-1"> <strong>(GO)</strong> quite a transformation since their first effort attracted such (2) <input type="text" class="input-medium" data-answer-id="eval-2"> <strong>(FAVOUR)</strong> comment. Their latest effort, the XR1200 (3) <input type="text" class="input-medium" data-answer-id="eval-3"> <strong>(CONVERT)</strong>, went into production last month. It represents a (4) <input type="text" class="input-medium" data-answer-id="eval-4"> <strong>(REVOLT)</strong> new approach to car design, ensuring the XR1200 (5) <input type="text" class="input-medium" data-answer-id="eval-5"> <strong>(LAST)</strong> almost anything else on the road.
+                </p>
+                <p style="text-align: justify;">
+                    The RNLI has had an extremely (6) <input type="text" class="input-medium" data-answer-id="eval-6"> <strong>(SIGNIFY)</strong> impact on maritime safety. Given the vast (7) <input type="text" class="input-medium" data-answer-id="eval-7"> <strong>(BROAD)</strong> of the coastline, such an (8) <input type="text" class="input-medium" data-answer-id="eval-8"> <strong>(VALUE)</strong> service is vital. The crews are (9) <input type="text" class="input-medium" data-answer-id="eval-9"> <strong>(KNOW)</strong> for their (10) <input type="text" class="input-medium" data-answer-id="eval-10"> <strong>(SELF)</strong>.
+                </p>
+                <p style="text-align: justify;">
+                    Manufacturers use many (11) <input type="text" class="input-medium" data-answer-id="eval-11"> <strong>(ADD)</strong> in processed food, which can do (12) <input type="text" class="input-medium" data-answer-id="eval-12"> <strong>(REPAIR)</strong> damage to health. While rumours are often (13) <input type="text" class="input-medium" data-answer-id="eval-13"> <strong>(SUBSTANCE)</strong>, if we (14) <input type="text" class="input-medium" data-answer-id="eval-14"> <strong>(LARGE)</strong> our view, we see the risk. After all, a diamond is truly (15) <input type="text" class="input-medium" data-answer-id="eval-15"> <strong>(DESTROY)</strong>.
+                </p>
+            </div>
+            </div>
+            
+
+            <!-- SECTION 2 -->
+            <h3>2. Use of English: Key Word Transformations</h3>
+            <div class="section-box">
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px;">
+                    <strong>Instructions:</strong> For questions <b>16-25</b>, complete the second sentence so that it has a similar meaning to the first sentence, using the word given in brackets. 
+                    <br><strong>Rules:</strong>
+                    <br>• Do <b>not</b> change the word given.
+                    <br>• You must use between <b>three and eight words</b>, including the word given.
+                    <br>• Contractions (e.g., <em>don't</em>) count as two words.
+                </p>
+                <div class="section-box">
+                <div class="question">16. We need to do two hours' work before we can take a break. (been)<br> We can't take a break until we <input type="text" class="input-large" data-answer-id="eval-16"> two hours.</div>
+                <div class="question">17. I was just about to ask Amy to marry me... (verge)<br> I was just <input type="text" class="input-large" data-answer-id="eval-17"> Amy to marry me...</div>
+                <div class="question">18. We were meant to be 12 for dinner... (meant)<br> There <input type="text" class="input-large" data-answer-id="eval-18"> 12 for dinner...</div>
+                <div class="question">19. Letting Brittany walk home on her own was a mistake. (have)<br> You <input type="text" class="input-large" data-answer-id="eval-19"> Brittany walk home on her own.</div>
+                <div class="question">20. I'm sure only my dad's advice prevented me from leaving. (it)<br> I'm sure that <input type="text" class="input-large" data-answer-id="eval-20"> my dad's advice, I would have left.</div>
+                <div class="question">21. 'I haven't made firm decisions yet,' said Laurence. (options open)<br> Laurence said he <input type="text" class="input-large" data-answer-id="eval-21"> at that time.</div>
+                <div class="question">22. Although Rudy didn't want to play cricket, he agreed. ( dead set agaisnt)<br> Despite <input type="text" class="input-large" data-answer-id="eval-22"> cricket, Rudy agreed in the end.</div>
+                <div class="question">23. I wish coffee didn't affect me. (effect)<br> If <input type="text" class="input-large" data-answer-id="eval-23"> me.</div>
+                <div class="question">24. Paul and Pete share so many similar interests. (common)<br> Paul <input type="text" class="input-large" data-answer-id="eval-24"> Pete.</div>
+                <div class="question">25. 'I don't think we're going to survive,' I said. (tale)<br> I told David I thought we <input type="text" class="input-large" data-answer-id="eval-25"> , but we did.</div>
+            </div>
+            </div>
+            
+
+            <!-- SECTION 3: Open Cloze -->
+             <h3>3. Use of English: Open Cloze</h3>
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px;">
+                    <strong>Instructions:</strong> Read the text below and think of the <b>one word</b> which best fits each gap (<b>26-40</b>). This section tests your understanding of grammar, prepositions, and sentence structure. Use only one word in each gap.
+                </p>
+            <div class="section-box">
+                <p>
+                    We assume the best way to decide is to (26) <input type="text" class="input-small" data-answer-id="eval-26"> ages taking (27) <input type="text" class="input-small" data-answer-id="eval-27"> account info before we arrive (28) <input type="text" class="input-small" data-answer-id="eval-28"> a conclusion. We weigh evidence (29) <input type="text" class="input-small" data-answer-id="eval-29"> the belief that instant decisions are unreliable. However, from (30) <input type="text" class="input-small" data-answer-id="eval-30"> to time, our subconscious does a better job (31) <input type="text" class="input-small" data-answer-id="eval-31"> a moment than our conscious mind. Evelyn Harrison blurted (32) <input type="text" class="input-small" data-answer-id="eval-32"> that a statue was fake. It came (33) <input type="text" class="input-small" data-answer-id="eval-33"> a shock, but it cast doubt (34) <input type="text" class="input-small" data-answer-id="eval-34"> the piece. Most experts have come (35) <input type="text" class="input-small" data-answer-id="eval-35"> to her position. How did she tell the (36) <input type="text" class="input-small" data-answer-id="eval-36"> quickly? Her subconscious saw what (37) <input type="text" class="input-small" data-answer-id="eval-37"> the notice of her conscious mind. We are rarely, (38) <input type="text" class="input-small" data-answer-id="eval-38"> ever, aware of it. Seldom (39) <input type="text" class="input-small" data-answer-id="eval-39"> a volcano erupted like Krakatoa. (40) <input type="text" class="input-small" data-answer-id="eval-40"> did we realise we were next.
+                </p>
+            </div>
+
+            <!-- SECTION 4: Phrasals -->
+            <h3>4. Lexis: Phrasal Verbs and Idiomatic Expressions</h3>
+                
+            <div class="section-box">
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px;">
+                    <strong>Instructions:</strong> Complete the sentences below (<b>41-60</b>) by providing the correct preposition, particle, or verb to form a recognized phrasal verb or idiom. Pay close attention to the context of the entire sentence.
+                </p>
+                <div class="question">41. He comes <input type="text" class="input-small" data-answer-id="eval-41"> with funny things.</div>
+                <div class="question">42. Plant species will die <input type="text" class="input-small" data-answer-id="eval-42"> .</div>
+                <div class="question">43. You must knuckle <input type="text" class="input-small" data-answer-id="eval-43"> to pass.</div>
+                <div class="question">44. You've taken the machine <input type="text" class="input-small" data-answer-id="eval-44"> .</div>
+                <div class="question">45. Something has cropped <input type="text" class="input-small" data-answer-id="eval-45"> at work.</div>
+                <div class="question">46. Dimitris <input type="text" class="input-small" data-answer-id="eval-46"> to his guns.</div>
+                <div class="question">47. Matt finally decided to <input type="text" class="input-small" data-answer-id="eval-47"> clean.</div>
+                <div class="question">48. Jill <input type="text" class="input-small" data-answer-id="eval-48"> cars inside out.</div>
+                <div class="question">49. I wouldn't write <input type="text" class="input-small" data-answer-id="eval-49"> his career yet.</div>
+                <div class="question">50. It didn't take long to cotton <input type="text" class="input-small" data-answer-id="eval-50"> to the fact.</div>
+                <div class="question">51. How do you intend to drum <input type="text" class="input-small" data-answer-id="eval-51"> support?</div>
+                <div class="question">52. <input type="text" class="input-medium" data-answer-id="eval-52"> down on crime is a priority.</div>
+                <div class="question">53. The report <input type="text" class="input-medium" data-answer-id="eval-53"> over the problem.</div>
+                <div class="question">54. Shopkeepers have <input type="text" class="input-medium" data-answer-id="eval-54"> up windows.</div>
+                <div class="question">55. I <input type="text" class="input-medium" data-answer-id="eval-55"> him down in the end.</div>
+                <div class="question">56. Let's <input type="text" class="input-small" data-answer-id="eval-56"> through the details.</div>
+                <div class="question">57. My lessons came to an <input type="text" class="input-medium" data-answer-id="eval-57"> halt.</div>
+                <div class="question">58. This trophy takes <input type="text" class="input-small" data-answer-id="eval-58"> of place.</div>
+                <div class="question">59. I'm glad we're on the same <input type="text" class="input-medium" data-answer-id="eval-59"> .</div>
+                <div class="question">60. That block is a <input type="text" class="input-small" data-answer-id="eval-60"> on the landscape.</div>
+            </div>
+
+            <!-- SECTION 5 -->
+            <h3>5. Lexis: Multiple Choice Selection</h3>
+            <div class="section-box">
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px;">
+                    <strong>Instructions:</strong> For questions <b>61-80</b>, read the sentence and select the most appropriate option (A, B, C, or D) from the dropdown menu. Only one option is correct based on nuanced meaning and standard collocations.
+                </p>
+                <div class="mcq-grid">
+                    <!-- Q61 -->
+                    <div class="section-box">
+                    <!-- Q61-Q70 -->
+                    <div class="question">
+                        61. Nobody has any firm information, so we can only <select class="mcq-select" data-answer-id="eval-61"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> on what caused the accident. <br>
+                        <small>(A: guess | B: contemplate | C: speculate | D: assume)</small>
+                    </div>
+                    <div class="question">
+                        62. Cars have been banned from the city centre, which makes the area much safer for <select class="mcq-select" data-answer-id="eval-62"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>. <br>
+                        <small>(A: passersby | B: onlookers | C: pedestrians | D: footmen)</small>
+                    </div>
+                    <div class="question">
+                        63. There has been a real boom in <select class="mcq-select" data-answer-id="eval-63"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> electronics over the last three decades. <br>
+                        <small>(A: consumer | B: customer | C: buyer | D: client)</small>
+                    </div>
+                    <div class="question">
+                        64. When I realised that I'd left my homework at home, I quickly <select class="mcq-select" data-answer-id="eval-64"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> back to get it. <br>
+                        <small>(A: crept | B: dashed | C: crawled | D: drifted)</small>
+                    </div>
+                    <div class="question">
+                        65. I know it's got his name on the cover, but he didn't write it himself; he used a <select class="mcq-select" data-answer-id="eval-65"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>. <br>
+                        <small>(A: correspondent | B: model | C: ghostwriter | D: fellow)</small>
+                    </div>
+                    <div class="question">
+                        66. The text doesn't give you the answer explicitly - you have to <select class="mcq-select" data-answer-id="eval-66"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> it from the evidence. <br>
+                        <small>(A: convert | B: grasp | C: reckon | D: deduce)</small>
+                    </div>
+                    <div class="question">
+                        67. I couldn't decide what to write about, when I suddenly <select class="mcq-select" data-answer-id="eval-67"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> upon the idea of doing writer's block. <br>
+                        <small>(A: thought | B: chanced | C: hit | D: arrived)</small>
+                    </div>
+                    <div class="question">
+                        68. My jeans <select class="mcq-select" data-answer-id="eval-68"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> in the wash and they're too small for me now. <br>
+                        <small>(A: reduced | B: deteriorated | C: shrank | D: diminished)</small>
+                    </div>
+                    <div class="question">
+                        69. Would you like to arrange to pay the monthly fees by direct <select class="mcq-select" data-answer-id="eval-69"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>? <br>
+                        <small>(A: debt | B: debit | C: deposit | D: dividend)</small>
+                    </div>
+                    <div class="question">
+                        70. The insects looked so horrible, I <select class="mcq-select" data-answer-id="eval-70"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> with disgust as I tried to force them down. <br>
+                        <small>(A: gloated | B: grinned | C: grimaced | D: chuckled)</small>
+                    </div>
+                    
+                    <!-- Q71-Q80 -->
+                    <div class="question">
+                        71. Has Britain's influence in the world <select class="mcq-select" data-answer-id="eval-71"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> since the Second World War? <br>
+                        <small>(A: decayed | B: worsened | C: declined | D: devastated)</small>
+                    </div>
+                    <div class="question">
+                        72. Da Vinci's Mona Lisa is <select class="mcq-select" data-answer-id="eval-72"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>; if it was destroyed no amount of money could replace it. <br>
+                        <small>(A: priceless | B: worthless | C: valueless | D: invaluable)</small>
+                    </div>
+                    <div class="question">
+                        73. Good hairdressers are a bit thin on the <select class="mcq-select" data-answer-id="eval-73"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> round here. <br>
+                        <small>(A: ground | B: land | C: floor | D: earth)</small>
+                    </div>
+                    <div class="question">
+                        74. Why don't you <select class="mcq-select" data-answer-id="eval-74"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> a proposal at the next staff meeting? <br>
+                        <small>(A: chair | B: table | C: desk | D: board)</small>
+                    </div>
+                    <div class="question">
+                        75. Teenagers who start smoking often do so as a result of peer <select class="mcq-select" data-answer-id="eval-75"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select>. <br>
+                        <small>(A: force | B: stress | C: pressure | D: push)</small>
+                    </div>
+                    <div class="question">
+                        76. That's a <select class="mcq-select" data-answer-id="eval-76"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> new Rolls Royce parked outside! <br>
+                        <small>(A: brand | B: model | C: make | D: form)</small>
+                    </div>
+                    <div class="question">
+                        77. The typical <select class="mcq-select" data-answer-id="eval-77"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> family consists of two parents and two children. <br>
+                        <small>(A: atomic | B: nuclear | C: central | D: main)</small>
+                    </div>
+                    <div class="question">
+                        78. Tony doesn't really fancy going out tonight and <select class="mcq-select" data-answer-id="eval-78"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> do I, to be honest. <br>
+                        <small>(A: neither | B: nor | C: either | D: also)</small>
+                    </div>
+                    <div class="question">
+                        79. I do find <select class="mcq-select" data-answer-id="eval-79"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> hard to believe that time travel will ever be possible. <br>
+                        <small>(A: that | B: this | C: it | D: there)</small>
+                    </div>
+                    <div class="question">
+                        80. <select class="mcq-select" data-answer-id="eval-80"><option value="">?</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select> as we wanted to take the flat, we couldn't arrange a mortgage in time. <br>
+                        <small>(A: So | B: Even | C: Very | D: Much)</small>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- SECTION 6 -->
+            <h3>6. Advanced Lexis: Polysemy & Definitions</h3>
+            <div class="section-box">
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 10px;">
+                    <strong>Part A (81-90):</strong> Think of <b>one word only</b> which can be used appropriately in all three sentences. This tests your knowledge of polysemous words (words with multiple meanings).
+                </p>
+                <div class="question">
+                81. Have you ever seen Ivor doing an <b>[...]</b> of Mike? / I'm going to wear my new suit to make a good <b>[...]</b>. / We were under the <input type="text" class="input-medium" data-answer-id="eval-81"> that the order would be delivered today.
+            </div>
+
+            <div class="question">
+                82. I don't know what the <b>[...]</b> for the council's decision was. / I've been promoted on a temporary <b>[...]</b>. / On the <input type="text" class="input-medium" data-answer-id="eval-82"> of your interview, we are happy to offer you the job.
+            </div>
+
+            <div class="question">
+                83. It is hoped that the current peace <b>[...]</b> will bring the war to an end. / By a <b>[...]</b> of elimination we found the suspect. / I was in the <input type="text" class="input-medium" data-answer-id="eval-83"> of cooking dinner when she rang.
+            </div>
+
+            <div class="question">
+                84. He's actually quite a household <b>[...]</b> in the world of fittings. / It was very <b>[...]</b> of you to admit you were wrong. / There's no need to make such a <input type="text" class="input-medium" data-answer-id="eval-84"> thing out of this.
+            </div>
+
+            <div class="question">
+                85. I'll be with you in a <b>[...]</b> of days. / That's not a fact, it's a <b>[...]</b> of opinion. / No <input type="text" class="input-medium" data-answer-id="eval-85"> how much you try, you'll never change my mind.
+            </div>
+
+            <div class="question">
+                86. You'd better get your <b>[...]</b> together and start learning your lines. / They were caught in the <b>[...]</b> of handing over the drugs. / Angie was just putting on an <input type="text" class="input-medium" data-answer-id="eval-86"> – she wasn't really upset.
+            </div>
+
+            <div class="question">
+                87. We're going to be in <b>[...]</b> trouble if anyone catches us. / There was <b>[...]</b> silence for a second, then everyone started laughing. / Turn left, and the cathedral's <input type="text" class="input-medium" data-answer-id="eval-87"> ahead.
+            </div>
+
+            <div class="question">
+                88. I hope the judge makes an <b>[...]</b> of him and throws him in jail. / Could you give me a more specific <b>[...]</b>? / As a teacher, you have to set an <input type="text" class="input-medium" data-answer-id="eval-88"> to the children.
+            </div>
+
+            <div class="question">
+                89. Simon, this is Angela, my <b>[...]</b> half. / Let's play draughts or, <b>[...]</b> yet, chess. / Don't you think you had <input type="text" class="input-medium" data-answer-id="eval-89"> think about this a bit more carefully?
+            </div>
+
+            <div class="question">
+                90. You're cutting it <b>[...]</b>, aren't you? The meeting's starting. / Make sure you read the <b>[...]</b> print before you sign. / There's a <input type="text" class="input-medium" data-answer-id="eval-90"> line between business and corruption.
+            </div>
+
+            <hr style="margin: 30px 0; border: 0; border-top: 2px solid var(--stripe-blue);">
+            
+            <p style="font-size: 0.9em; color: #666; margin-bottom: 20px; font-style: italic;">
+                Provide the single-word term. <b>Clue:</b> The first letter and the number of letters remaining are provided.
+            </p>
+                <p class="instruction-text" style="color: #444; font-size: 0.95em; margin-bottom: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <strong>Part B (91-100):</strong> Provide the correct academic term for the definition or dialogue gap. 
+                    <br><b>Clue:</b> The first letter is provided, and each underscore ( _ ) represents one missing letter.
+                </p>
+                
+            <!-- 91-100 WITH CLUES -->
+            <div class="question">
+                91. A doctor who has specialized in one specific area of medicine:<br>
+                <b>C _ _ _ _ _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-91">
+            </div>
+
+            <div class="question">
+                92. Someone who relies on you for financial support (e.g., a child):<br>
+                <b>D _ _ _ _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-92">
+            </div>
+
+            <div class="question">
+                93. Someone who did your job before you started doing it:<br>
+                <b>P _ _ _ _ _ _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-93">
+            </div>
+
+            <div class="question">
+                94. A relative of someone from a previous generation (e.g., a great-grandchild):<br>
+                <b>D _ _ _ _ _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-94">
+            </div>
+
+            <div class="question">
+                95. Someone who is very lively, confident, and enjoys social situations:<br>
+                <b>E _ _ _ _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-95">
+            </div>
+
+            <div class="question">
+                96. <b>Jenny:</b> "Hi Penny! Long time no <b>S _ _</b> <input type="text" class="input-medium" data-answer-id="eval-96">! How have you been?"
+            </div>
+
+            <div class="question">
+                97. <b>Jenny:</b> "I heard the work is very stressful. Is it getting on <b>T _ _</b> <input type="text" class="input-medium" data-answer-id="eval-97"> of you?"
+            </div>
+
+            <div class="question">
+                98. <b>Penny:</b> "The truth is I'm going to have to cut back in the very <b>N _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-98"> future."
+            </div>
+
+            <div class="question">
+                99. <b>Jenny:</b> "We're having a party Friday. You're in for a <b>T _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-99"> if you make it!"
+            </div>
+
+            <div class="question">
+                100. "<b>L _ _ _ _ _</b> <input type="text" class="input-medium" data-answer-id="eval-100"> did we realise we were next on the list."
+            </div>
+        </div>
+            </div>
+
+            
+
+
+            <button onclick="checkAnswers()" id="final-submit-btn">Finish & Grade Evaluation</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // 1. ADDED 'setDoc' to the imports below
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+            authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+            projectId: "anti-cheating-remedial-quiz",
+            storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+            messagingSenderId: "979294386230",
+            appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+            measurementId: "G-84YB5CYGM8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let timeLeft = 3600; 
+        let cheatCount = 0;
+        let timerInterval;
+        let wakeLock = null;
+
+        async function accessExam() {
+                const nameEl = document.getElementById('student-name');
+                const whatsappEl = document.getElementById('student-whatsapp');
+                
+                if (!nameEl || !whatsappEl) {
+                    console.error("Login input fields not found!");
+                    return;
+                }
+
+                const name = nameEl.value.trim();
+                const whatsapp = whatsappEl.value.trim();
+
+                if (!name || !whatsapp) {
+                    Swal.fire('Required', 'Please enter your name and WhatsApp number.', 'warning');
+                    return;
+                }
+
+                const startBtn = document.getElementById('start-btn');
+                if (startBtn) {
+                    startBtn.innerText = "Connecting...";
+                    startBtn.disabled = true;
+                }
+
+                const studentKey = `eval_${whatsapp.replace(/\s+/g, '')}`; 
+                sessionStorage.setItem('activeStudent', name);
+                sessionStorage.setItem('studentKey', studentKey);
+
+                // Persistent Cheat Count
+                cheatCount = parseInt(localStorage.getItem(`${studentKey}_cheats`)) || 0;
+                
+                // SAFE UPDATE: Check if element exists before setting innerText
+                const cheatDisplay = document.getElementById('cheat-count');
+                if (cheatDisplay) {
+                    cheatDisplay.innerText = cheatCount;
+                }
+
+                try {
+                    await addDoc(collection(db, "teachereval_examSessions"), {
+                        teacherName: name, 
+                        whatsapp: whatsapp, 
+                        startTime: new Date().toISOString()
+                    });
+
+                    const gate = document.getElementById('login-gate');
+                    const content = document.getElementById('test-content');
+                    const dash = document.getElementById('exam-dashboard');
+
+                    if (gate) gate.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (gate) gate.style.display = 'none';
+                        if (content) {
+                            content.style.display = 'block';
+                            setTimeout(() => content.style.opacity = '1', 50);
+                        }
+                        if (dash) {
+                            dash.style.display = 'flex';
+                        }
+                        
+                        startTimer();
+                        startAntiCheat(studentKey);
+                        requestWakeLock();
+                    }, 800);
+
+                } catch (e) { 
+                    console.error("Firebase Error:", e);
+                    Swal.fire('Connection Error', 'Check your internet and try again.', 'error'); 
+                    if (startBtn) {
+                        startBtn.innerText = "Access Exam";
+                        startBtn.disabled = false;
+                    }
+                }
+            }  
+
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                const display = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                
+                const timerEl = document.getElementById('time-left');
+                if(timerEl) timerEl.innerText = display;
+
+                if (timeLeft <= 300) document.getElementById('timer-display').classList.add('low-time');
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    checkAnswers(); 
+                }
+            }, 1000);
+        }
+
+        function startAntiCheat(key) {
+            window.addEventListener('blur', () => {
+                cheatCount++;
+                localStorage.setItem(`${key}_cheats`, cheatCount); 
+                document.getElementById('cheat-count').innerText = cheatCount;
+                
+                // THIS LINE: Adds the red warning style
+                document.getElementById('cheat-indicator').classList.add('cheat-warning');
+                
+                syncCheatToFirebase(key);
+            });
+        }
+
+        async function syncCheatToFirebase(key) {
+            const name = sessionStorage.getItem('activeStudent');
+            if (!name) return;
+            try {
+                await setDoc(doc(db, "week 34", key), {
+                    name: name,
+                    cheatcount: cheatCount,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+            } catch (e) { console.error("Sync failed", e); }
+        }
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) { console.log("WakeLock failed"); }
+        }
+
+    // Global variable to prevent double-submit
+        let isEvaluationLocked = false;
+
+        async function checkAnswers() {
+        if (isEvaluationLocked) return;
+
+        Swal.fire({ 
+            title: 'Calculating Results...', 
+            html: 'Analyzing morphological and syntactic precision...',
+            didOpen: () => { Swal.showLoading() }, 
+            allowOutsideClick: false 
+        });
+
+        try {
+            const evalSnap = await getDoc(doc(db, "answerKeys", "evalTest"));
+            const keys = evalSnap.data();
+            
+            let score = 0;
+            const inputs = document.querySelectorAll('input[data-answer-id], select[data-answer-id]');
+            const total = inputs.length;
+
+            inputs.forEach(input => {
+                const qId = input.getAttribute('data-answer-id');
+                const studentAns = input.value.trim().toLowerCase();
+                const correctVal = (keys[qId] || "").toString().toLowerCase();
+                const validOptions = correctVal.split('/').map(opt => opt.trim());
+
+                if (studentAns !== "" && validOptions.includes(studentAns)) {
+                    input.classList.add('correct');
+                    input.classList.remove('incorrect');
+                    score++;
+                } else {
+                    input.classList.add('incorrect');
+                    input.classList.remove('correct');
+                }
+
+                if (input.tagName === 'INPUT') input.readOnly = true;
+                else if (input.tagName === 'SELECT') input.disabled = true;
+            });
+
+            const percent = Math.round((score / total) * 100);
+            
+            // --- PROFICIENCY LEVEL LOGIC ---
+            let level = "";
+            let description = "";
+            let color = "";
+
+            if (percent >= 95) {
+                level = "C2 Mastery (Distinction)";
+                description = "Exceptional near-native proficiency. Fully capable of leading A-Level Literature and advanced academic discourse.";
+                color = "#d4af37"; // Gold
+            } else if (percent >= 85) {
+                level = "C2 Proficiency (Advanced)";
+                description = "High operational command of complex structures and idioms. Suitable for C1/C2 curriculum leadership.";
+                color = "var(--success)";
+            } else if (percent >= 70) {
+                level = "C1 Advanced (Competent)";
+                description = "Strong academic English capability. Minor inconsistencies in high-level nuance but structurally sound.";
+                color = "var(--primary-blue)";
+            } else if (percent >= 55) {
+                level = "B2/C1 Threshold";
+                description = "Good functional English. May require further idiomatic and morphological development for senior high school levels.";
+                color = "#e67e22"; // Orange
+            } else {
+                level = "Below Proficiency Threshold";
+                description = "Significant linguistic gaps detected. Further professional development in academic English is recommended.";
+                color = "var(--error)";
+            }
+
+            // Lock and Cleanup
+            isEvaluationLocked = true;
+            clearInterval(timerInterval);
+            const submitBtn = document.getElementById('final-submit-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Evaluation Locked";
+                submitBtn.style.background = "#666";
+            }
+
+            // Save to Firebase
+            await addDoc(collection(db, "teachereval_evalResults"), {
+                name: sessionStorage.getItem('activeStudent'),
+                score: score,
+                percentage: percent,
+                level: level,
+                cheats: cheatCount,
+                timestamp: new Date().toISOString()
+            });
+
+            // FINAL PROFICIENCY ALERT
+            Swal.fire({
+                title: 'Evaluation Results',
+                html: `
+                    <div style="text-align: left; padding: 15px; border-radius: 10px; background: #f9f9f9; border: 1px solid #eee;">
+                        <p style="margin-bottom:5px;">Score: <span style="font-weight:800;">${score} / ${total}</span></p>
+                        <p style="font-size: 1.5em; font-weight: 900; color: ${color}; margin: 10px 0;">${level}</p>
+                        <hr>
+                        <p style="font-size: 0.9em; color: #444; line-height: 1.5;">${description}</p>
+                        <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; font-size: 0.85em; color: #666;">
+                            <b>Security Note:</b> ${cheatCount} page exit(s) recorded during this session.
+                        </div>
+                    </div>
+                `,
+                icon: percent >= 70 ? 'success' : 'warning',
+                confirmButtonColor: 'var(--primary-blue)',
+                confirmButtonText: 'Review My Answers'
+            });
+
+            document.getElementById('current-score').innerText = score;
+
+        } catch (e) { 
+            console.error(e);
+            Swal.fire('Error', 'Grading failed. Contact administrator.', 'error'); 
+        }
+    }
+
+        window.accessExam = accessExam;
+        window.checkAnswers = checkAnswers;
+    </script>
+</body>
+</html>
