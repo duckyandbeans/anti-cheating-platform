@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking & Oral Fluency Evaluation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-blue: #004a99;
+            --dark-navy: #0a1118;
+            --stripe-light: #f4f8fb;
+            --stripe-blue: #e8f1f9;
+            --border-color: #d1d9e0;
+            --success: #1e7e34;
+            --success-hover: #155a24;
+            --error: #bd2130;
+            --text-main: #212529;
+            --youtube-color: #ff0000;
+            --youtube-hover: #cc0000;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: #ffffff;
+            margin: 0; padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* LOGIN GATE OVERLAY */
+        #login-gate {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #ffffff;
+            background-image: linear-gradient(135deg, var(--stripe-light) 25%, transparent 25%, transparent 50%, var(--stripe-light) 50%, var(--stripe-light) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease-in-out;
+        }
+
+        .login-box {
+            background: #ffffff; padding: 50px; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-top: 6px solid var(--primary-blue);
+            width: 90%; max-width: 440px; text-align: center;
+        }
+
+        .login-box h1 { color: var(--dark-navy); margin-top: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+        .login-box p { color: #666; font-size: 15px; margin-bottom: 30px; }
+
+        .input-group { text-align: left; margin-bottom: 22px; }
+        .input-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #495057; }
+        .input-group input { width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 16px; transition: border-color 0.2s; }
+        .input-group input:focus { border-color: var(--primary-blue); outline: none; }
+
+        #start-btn {
+            width: 100%; padding: 16px; background: var(--dark-navy); color: #ffffff;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s;
+        }
+        #start-btn:hover { background: var(--primary-blue); }
+
+        /* MAIN APP CONTAINER */
+        .container { 
+            max-width: 750px; 
+            width: 100%; 
+            margin: 40px auto; 
+            padding: 50px; 
+            background: white; 
+            display: none; 
+            opacity: 0; 
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        h2.section-title {
+            color: var(--dark-navy);
+            font-size: 24px;
+            font-weight: 700;
+            border-left: 6px solid var(--primary-blue);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* STORY BLOCK STYLING */
+        .story-box {
+            border-left: 6px solid var(--primary-blue);
+            padding: 25px 30px;
+            background-color: var(--stripe-light);
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+
+        .story-box h3 {
+            margin-top: 0;
+            color: var(--dark-navy);
+            text-align: center;
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .story-box p {
+            line-height: 1.8;
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+
+        .story-box p:last-child { margin-bottom: 0; }
+
+        /* VIDEO CONTAINER SYSTEM */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            background-color: var(--dark-navy);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        .live-preview { transform: scaleX(-1); }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .eval-btn {
+            color: white; border: none; padding: 14px 24px;
+            font-size: 0.95rem; font-weight: 600; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s ease; flex: 1;
+            text-align: center; text-decoration: none;
+        }
+
+        .start-rec-btn { background-color: var(--primary-blue); }
+        .start-rec-btn:hover { background-color: #003366; }
+
+        .stop-btn { background-color: var(--error); }
+        .stop-btn:hover { background-color: #901924; }
+
+        .download-btn { background-color: var(--success); }
+        .download-btn:hover { background-color: var(--success-hover); }
+
+        .youtube-link-btn { 
+            background-color: var(--youtube-color);
+            display: inline-flex; justify-content: center; align-items: center;
+        }
+        .youtube-link-btn:hover { background-color: var(--youtube-hover); }
+
+        .eval-btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+
+        /* VERIFICATION SUBMISSION FORM */
+        .submission-section {
+            border-top: 2px solid var(--border-color);
+            padding-top: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .submission-section label { font-weight: 700; font-size: 1.05rem; color: var(--dark-navy); }
+
+        input[type="url"] {
+            width: 100%; padding: 16px; border: 2px solid var(--border-color);
+            border-radius: 8px; font-size: 1rem; color: var(--dark-navy);
+            transition: border-color 0.2s;
+        }
+        input[type="url"]:focus { border-color: var(--primary-blue); outline: none; }
+
+        .status-msg { font-size: 0.95rem; text-align: center; font-weight: 600; margin-top: 5px; }
+        .success-text { color: var(--success); }
+        .error-text { color: var(--error); }
+    </style>
+</head>
+<body>
+
+    <div id="login-gate">
+        <div class="login-box">
+            <h1>Speaking Test</h1>
+            <p>Please enter your profile credentials to access the video evaluation system.</p>
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="teacher-name" placeholder="Enter full name">
+            </div>
+            <div class="input-group">
+                <label>WhatsApp Number</label>
+                <input type="text" id="teacher-whatsapp" placeholder="0...">
+            </div>
+            <button id="start-btn">Access Speaking Test</button>
+        </div>
+    </div>
+
+    <div class="container" id="main-workspace">
+        <h2 class="section-title">Oral Fluency Assessment</h2>
+        <p style="margin-bottom: 25px; color: #555;">Please read the passage below aloud. Use the built-in recorder to record your reading, review and download the video, upload it to YouTube as an unlisted video, and submit the YouTube link for evaluation.</p>
+        
+        <div class="story-box">
+            <h3>Magic Show</h3>
+            <p>“Come on! It’s starting!” Greg, my neighbor, hollered from the sidewalk.</p>
+            <p>“What’s starting?” I said. Behind him, groups of kids hurried down the street.</p>
+            <p>We’d moved to the neighborhood just weeks before. I was shy; a bookworm, waiting for school to start. Greg was the only kid I’d met.</p>
+            <p>“The magic show!” said Greg, exasperated. “At Mr. Hale’s house!”</p>
+            <p>At the end of the Hales’ dirt driveway, rows of kids were seated on the grass.</p>
+            <p>White-haired and very thin, Mr. Hale wore a black top-hat and tails. In his hand he gripped a wand, producing doves from an urn. He asked for a volunteer to be sawed in half. I raised my hand. No one breathed.</p>
+            <p>“Just relax,” Mr. Hale whispered. “There’s nothing to it.” I got into the box and held my breath.</p>
+            <p>A collective gasp went up. And when I emerged in one piece, I was a star.</p>
+        </div>
+
+        <div class="video-container">
+            <video id="preview" class="live-preview" autoplay muted></video>
+            
+            <div id="recordingControls" class="btn-group">
+                <button id="startBtn" class="eval-btn start-rec-btn">Start Recording</button>
+                <button id="stopBtn" class="eval-btn stop-btn" disabled>Stop Recording</button>
+            </div>
+
+            <div id="postRecordingActions" class="btn-group" style="display: none;">
+                <button id="downloadBtn" class="eval-btn download-btn">Download Video</button>
+                <a id="youtubeBtn" class="eval-btn youtube-link-btn" href="https://www.youtube.com/upload" target="_blank" rel="noopener noreferrer" style="color: white;">
+                    Go to YouTube Upload
+                </a>
+            </div>
+        </div>
+
+        <div class="submission-section">
+            <label for="ytLink">Paste your Unlisted YouTube Link here:</label>
+            <input type="url" id="ytLink" placeholder="https://www.youtube.com/watch?v=..." required>
+            <button id="submitBtn" class="eval-btn start-rec-btn" style="margin-top: 10px; max-width: 320px; align-self: center;">Submit Verification Link</button>
+            <div id="status" class="status-msg"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Connecting directly to your project's configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+            authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+            projectId: "anti-cheating-remedial-quiz",
+            storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+            messagingSenderId: "979294386230",
+            appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+            measurementId: "G-84YB5CYGM8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Core UI State management cache
+        let storedName = "";
+        let storedWhatsapp = "";
+        let stream;
+        let recorder;
+        let chunks = [];
+        let recordedBlobUrl = null;
+        let currentExtension = 'mp4';
+
+        // DOM elements binding profile
+        const loginGate = document.getElementById('login-gate');
+        const mainWorkspace = document.getElementById('main-workspace');
+        const startGateBtn = document.getElementById('start-btn');
+        const nameInput = document.getElementById('teacher-name');
+        const whatsappInput = document.getElementById('teacher-whatsapp');
+
+        const preview = document.getElementById('preview');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const recordingControls = document.getElementById('recordingControls');
+        const postRecordingActions = document.getElementById('postRecordingActions');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const ytLinkInput = document.getElementById('ytLink');
+        const statusDiv = document.getElementById('status');
+
+        // Gating Engine Process Logic
+        startGateBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            const whatsapp = whatsappInput.value.trim();
+
+            if (!name || !whatsapp) {
+                Swal.fire('Identity Required', 'Please input your Name and WhatsApp contact parameters before entering.', 'warning');
+                return;
+            }
+
+            // Lock and cache identity state strings
+            storedName = name;
+            storedWhatsapp = whatsapp;
+            startGateBtn.disabled = true;
+            startGateBtn.innerText = "Initializing Video Core...";
+
+            // Clear Gate and smooth transition to Workspace Layout
+            loginGate.style.opacity = '0';
+            setTimeout(() => {
+                loginGate.style.display = 'none';
+                mainWorkspace.style.display = 'block';
+                setTimeout(() => mainWorkspace.style.opacity = '1', 50);
+                
+                // Prompt hardware components dynamically on authentication clearance
+                initHardwareStreams();
+            }, 600);
+        });
+
+        // Hardware access pipeline logic
+        async function initHardwareStreams() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                preview.srcObject = stream;
+            } catch (err) {
+                console.error("Hardware streaming allocation failure: ", err);
+                statusDiv.textContent = "Hardware Flag: System requires Camera and Microphone profile access rules.";
+                statusDiv.className = "status-msg error-text";
+            }
+        }
+
+        // Native encoding profile checking mechanism
+        function getSupportedMimeType() {
+            const types = [
+                'video/mp4;codecs=h264,aac',
+                'video/mp4;codecs=h264',
+                'video/mp4',
+                'video/webm;codecs=h264', 
+                'video/webm'              
+            ];
+            for (let type of types) {
+                if (MediaRecorder.isTypeSupported(type)) return type;
+            }
+            return '';
+        }
+
+        // Media Recording Actions
+        startBtn.addEventListener('click', () => {
+            chunks = [];
+            if (preview.src) {
+                URL.revokeObjectURL(preview.src);
+                preview.removeAttribute('src');
+                preview.removeAttribute('controls');
+                preview.muted = true;
+                preview.classList.add('live-preview');
+                preview.srcObject = stream;
+                preview.play();
+            }
+
+            const mimeType = getSupportedMimeType();
+            recorder = new MediaRecorder(stream, { mimeType: mimeType });
+            
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunks.push(e.data);
+            };
+
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: recorder.mimeType });
+                recordedBlobUrl = URL.createObjectURL(blob);
+                currentExtension = recorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
+                
+                preview.srcObject = null;
+                preview.src = recordedBlobUrl;
+                preview.classList.remove('live-preview');
+                preview.muted = false;
+                preview.controls = true;
+                
+                recordingControls.style.display = 'none';
+                postRecordingActions.style.display = 'flex';
+                
+                statusDiv.textContent = "Review compilation finalized. Export locally and mount profile to YouTube.";
+                statusDiv.className = "status-msg";
+            };
+
+            recorder.start();
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            postRecordingActions.style.display = 'none';
+            statusDiv.textContent = "Recording ongoing... Speak text clearly.";
+            statusDiv.className = "status-msg";
+        });
+
+        stopBtn.addEventListener('click', () => {
+            recorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!recordedBlobUrl) return;
+            const a = document.createElement('a');
+            a.href = recordedBlobUrl;
+            a.download = `oral-fluency-assessment.${currentExtension}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // Combined Context DB Submission Logic
+        submitBtn.addEventListener('click', async () => {
+            const urlValue = ytLinkInput.value.trim();
+            if (!urlValue) {
+                statusDiv.textContent = "Input constraint mismatch. Valid verification URL required.";
+                statusDiv.className = "status-msg error-text";
+                return;
+            }
+
+            submitBtn.disabled = true;
+            statusDiv.textContent = "Syncing tracking details with data infrastructure database...";
+            statusDiv.className = "status-msg";
+
+            try {
+                // Packing the data payload explicitly with username and whatsapp parameter values
+                await addDoc(collection(db, "teacherevallink"), {
+                    teacherName: storedName,
+                    whatsapp: storedWhatsapp,
+                    youtubeUrl: urlValue,
+                    submittedAt: new Date().toISOString()
+                });
+
+                statusDiv.textContent = "Data tracking frame successfully saved down.";
+                statusDiv.className = "status-msg success-text";
+                ytLinkInput.value = '';
+
+                Swal.fire('Submission Complete', "You're all set! Your video has been submitted successfully.", 'success');
+
+                recordingControls.style.display = 'flex';
+                postRecordingActions.style.display = 'none';
+            } catch (error) {
+                console.error("Database interaction fault line discovered: ", error);
+                statusDiv.textContent = "Infrastructure sync mismatch fault. Verify configurations.";
+                statusDiv.className = "status-msg error-text";
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
