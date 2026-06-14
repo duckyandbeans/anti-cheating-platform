@@ -1,96 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Exam Portal</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .error { color: #ef4444; display: none; margin-top: 10px; }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Proficiency Assessment Portal</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa, #dbe9f4);
+        color: #333;
+        scroll-behavior: smooth;
+    }
+
+    header {
+        background-color: #0b4f8a;
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    header h1 {
+        margin-bottom: 10px;
+    }
+
+    header p {
+        font-size: 18px;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 40px 20px;
+    }
+
+    .instructions {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+    }
+
+    .instructions h2 {
+        color: #0b4f8a;
+        margin-bottom: 20px;
+    }
+
+    .instructions ul {
+        margin-left: 20px;
+        line-height: 1.8;
+    }
+
+    .instruction-item {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.8s ease;
+        margin-bottom: 15px;
+    }
+
+    .instruction-item.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .declaration {
+        margin-top: 30px;
+        padding: 20px;
+        background: #eef5fc;
+        border-radius: 10px;
+    }
+
+    .button-section {
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .btn {
+        display: inline-block;
+        margin: 10px;
+        padding: 15px 30px;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        transition: 0.3s;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .btn.enabled {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .quiz-btn {
+        background-color: #0b4f8a;
+    }
+
+    .quiz-btn:hover {
+        background-color: #083b67;
+    }
+
+    .speaking-btn {
+        background-color: #2d9c5b;
+    }
+
+    .speaking-btn:hover {
+        background-color: #237a46;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+</style>
 </head>
+
 <body>
-    <div class="login-card">
-        <h1> Login</h1>
-        <select id="sClass">
-            <option value="">Select Class...</option>
-            <option value="XI D">XI D</option>
-            <option value="XI E">XI E</option>
-            <option value="XI H">XI H</option>
-            <option value="XI I">XI I</option>
-            <option value="XII H">XII H</option>
-            <option value="XII I">XII I</option>
-        </select>
-        <input type="number" id="sNo" placeholder="Attendance Number">
-        <input type="text" id="sName" placeholder="Full Name">
-        <input type="tel" id="accessCode" placeholder="Teacher Code (4 Digits)" style="text-align:center; font-size:1.2rem; letter-spacing:3px;">
-        <button onclick="attemptLogin()">Enter</button>
-        <div id="errorMsg" class="error"></div>
+
+<header>
+    <h1>SMA SWASTA CINTA BUDAYA / CHONG WEN</h1>
+    <p>English Proficiency Assessment Portal for ESL Teacher Candidates</p>
+</header>
+
+<div class="container">
+
+    <div class="instructions">
+        <h2>Assessment Instructions</h2>
+
+        <ul>
+            <li class="instruction-item">
+                The assessment consists of two components:
+                a 100-question English Proficiency Test and a Speaking Test.
+            </li>
+
+            <li class="instruction-item">
+                Ensure that you have a stable internet connection before beginning.
+            </li>
+
+            <li class="instruction-item">
+                Please mute all notifications on your devices to avoid interruptions during the assessments.
+            </li>
+
+            <li class="instruction-item">
+                Complete the assessments independently without assistance from other people or external resources.
+            </li>
+
+            <li class="instruction-item">
+                During the English Proficiency Test, candidates should remain on the examination tab.
+                The testing platform may record instances of leaving the exam page.
+            </li>
+
+            <li class="instruction-item">
+                You may complete the English Proficiency Test in your current room or location.
+            </li>
+
+            <li class="instruction-item">
+                Once you have completed the proficiency test and are ready to begin the Speaking Test,
+                please move to another room or any quiet space available to you to ensure that your
+                recording is clear and free from background noise and distractions.
+            </li>
+
+            <li class="instruction-item">
+                Allocate sufficient uninterrupted time to complete both components of the assessment.
+            </li>
+
+            <li class="instruction-item">
+                After moving to a quiet environment, proceed to the Speaking Test and follow the recording instructions provided.
+            </li>
+        </ul>
+
+        <div class="declaration">
+            <label>
+                <input type="checkbox" id="agree">
+                I have read and understood the instructions above and agree to comply with the assessment procedures.
+            </label>
+        </div>
     </div>
 
+    <div class="button-section">
+        <a href="https://duckyandbeans.github.io/anti-cheating-platform/teacher-proficiency-test.html"
+           target="_blank"
+           class="btn quiz-btn"
+           id="quizBtn">
+           Start English Proficiency Test
+        </a>
+
+        <a href="https://duckyandbeans.github.io/anti-cheating-platform/teacher-speaking-test.html"
+           target="_blank"
+           class="btn speaking-btn"
+           id="speakingBtn">
+           Start Speaking Test
+        </a>
+    </div>
+
+</div>
+
+<footer>
+    © 2026 SMA Swasta Cinta Budaya / Chong Wen
+</footer>
+
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
-      authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
-      projectId: "anti-cheating-remedial-quiz",
-      storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
-      messagingSenderId: "979294386230",
-      appId: "1:979294386230:web:7f9ff3e377d4da20cd4097"
-    };
-    try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
-function loginStudent() {
-    // 1. Get the values from your input fields
-    // (Make sure your HTML inputs have these IDs, e.g., id="studentName")
-    var name = document.getElementById("studentName").value;
-    var studentClass = document.getElementById("studentClass").value;
+    // Smooth reveal animation
+    const items = document.querySelectorAll('.instruction-item');
 
-    // 2. Validation: Make sure they actually typed something
-    if (name.trim() === "" || studentClass.trim() === "") {
-        alert("Please enter your name and class.");
-        return;
-    }
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                entry.target.classList.add('show');
+            }
+        });
+    }, {
+        threshold: 0.3
+    });
 
-    // 3. Save to Local Storage
-    // This stores the data in the browser indefinitely
-    localStorage.setItem("xitp_student_name", name);
-    localStorage.setItem("xitp_student_class", studentClass);
+    items.forEach(item => observer.observe(item));
 
-    // 4. Redirect to the quiz selection or first quiz
-    window.location.href = "xitp1.html"; 
-}
-    async function attemptLogin() {
-        const cls = document.getElementById('sClass').value;
-        const no = document.getElementById('sNo').value;
-        const name = document.getElementById('sName').value;
-        const code = document.getElementById('accessCode').value;
-        const err = document.getElementById('errorMsg');
+    // Enable buttons only after declaration
+    const checkbox = document.getElementById('agree');
+    const quizBtn = document.getElementById('quizBtn');
+    const speakingBtn = document.getElementById('speakingBtn');
 
-        if(!cls || !no || !name || !code) return showErr("Fill all fields.");
-
-        try {
-            const doc = await db.collection('active_exam_codes').doc(code).get();
-            if (!doc.exists) return showErr("Invalid Code.");
-            
-            const data = doc.data();
-            if (Date.now() - data.timestamp > 3600000) return showErr("Code Expired.");
-
-            // SAVE DATA
-            sessionStorage.setItem('student_class', cls);
-            sessionStorage.setItem('student_no', no);
-            sessionStorage.setItem('student_name', name);
-            sessionStorage.setItem('exam_code', code); // <--- CRITICAL: Save Code
-
-            window.location.href = data.targetFile;
-
-        } catch (e) { showErr(e.message); }
-    }
-    
-    function showErr(msg) { document.getElementById('errorMsg').innerText = msg; document.getElementById('errorMsg').style.display='block'; }
+    checkbox.addEventListener('change', function() {
+        if(this.checked){
+            quizBtn.classList.add('enabled');
+            speakingBtn.classList.add('enabled');
+        } else {
+            quizBtn.classList.remove('enabled');
+            speakingBtn.classList.remove('enabled');
+        }
+    });
 </script>
+
 </body>
 </html>
