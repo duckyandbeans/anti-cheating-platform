@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Speaking Test Submissions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --navy: #0a1118;
+            --blue: #004a99;
+            --light: #f4f8fb;
+            --success: #1e7e34;
+            --error: #bd2130;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light);
+            margin: 0;
+            padding: 40px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 24px;
+        }
+
+        .refresh-btn {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            background: var(--navy);
+            color: white;
+            padding: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        tr:hover { background: #fcfdfe; }
+
+        .teacher-info b { display: block; color: var(--navy); font-size: 15px; }
+        .teacher-info span { color: #666; font-size: 13px; }
+
+        .yt-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .yt-link:hover { text-decoration: underline; }
+
+        .btn-view {
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 12px;
+        }
+
+        .btn-delete {
+            background: white;
+            color: var(--error);
+            border: 1px solid var(--error);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover { background: var(--error); color: white; }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+
+        /* Video Preview Styles */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Speaking Test Submissions</h1>
+        <button class="refresh-btn" onclick="loadSubmissions()">🔄 Refresh Data</button>
+    </header>
+
+    <table id="results-table">
+        <thead>
+            <tr>
+                <th>Submission Date</th>
+                <th>Teacher Details</th>
+                <th>Video Link</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            <!-- Dynamic Content -->
+        </tbody>
+    </table>
+    <div id="loading" class="empty-state">Loading submissions...</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+        authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+        projectId: "anti-cheating-remedial-quiz",
+        storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+        messagingSenderId: "979294386230",
+        appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+        measurementId: "G-84YB5CYGM8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Helper: Extract YouTube ID from various URL formats
+    function getYouTubeID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    async function loadSubmissions() {
+        const tbody = document.getElementById('table-body');
+        const loading = document.getElementById('loading');
+        
+        try {
+            // Querying newest first
+            const q = query(collection(db, "teacherevallink"), orderBy("submittedAt", "desc"));
+            const snapshot = await getDocs(q);
+            
+            tbody.innerHTML = "";
+            loading.style.display = "none";
+
+            if (snapshot.empty) {
+                loading.innerText = "No submissions found.";
+                loading.style.display = "block";
+                return;
+            }
+
+            snapshot.forEach((submission) => {
+                const data = submission.data();
+                const id = submission.id;
+                const date = new Date(data.submittedAt).toLocaleString();
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td class="teacher-info">
+                        <b>${data.teacherName}</b>
+                        <span>WA: ${data.whatsapp}</span>
+                    </td>
+                    <td>
+                        <a href="${data.youtubeUrl}" target="_blank" class="yt-link">Open YouTube ↗</a>
+                    </td>
+                    <td>
+                        <button class="btn-view" onclick="previewVideo('${data.youtubeUrl}', '${data.teacherName}')">Watch</button>
+                        <button class="btn-delete" onclick="deleteEntry('${id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (e) {
+            console.error(e);
+            loading.innerText = "Error loading data. Check console.";
+        }
+    }
+
+    // Function to show video in SweetAlert2 Modal
+    window.previewVideo = (url, name) => {
+        const videoId = getYouTubeID(url);
+        if (!videoId) {
+            Swal.fire('Invalid Link', 'Could not parse a valid YouTube ID from the link provided.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: `Viewing: ${name}`,
+            html: `
+                <div class="video-wrapper">
+                    <iframe src="https://www.youtube.com/embed/${videoId}" 
+                            frameborder="0" allowfullscreen></iframe>
+                </div>
+            `,
+            width: 800,
+            showCloseButton: true,
+            confirmButtonColor: '#0a1118',
+            confirmButtonText: 'Close Player'
+        });
+    };
+
+    // Function to delete record
+    window.deleteEntry = async (id) => {
+        const result = await Swal.fire({
+            title: 'Delete record?',
+            text: "This action cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#bd2130',
+            cancelButtonColor: '#666',
+            confirmButtonText: 'Yes, delete it'
+        });
+
+        if (result.isConfirmed) {
+            await deleteDoc(doc(db, "teacherevallink", id));
+            Swal.fire('Deleted', 'The record has been removed.', 'success');
+            loadSubmissions();
+        }
+    };
+
+    // Initial Load
+    window.loadSubmissions = loadSubmissions;
+    loadSubmissions();
+
+</script>
+</body>
+</html>
