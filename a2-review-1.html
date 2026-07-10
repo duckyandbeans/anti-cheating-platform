@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family, Friends &amp; Free Time — English Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --pink-bg: #FFE9F3;
+    --pink-bg-2: #FFF4FA;
+    --pink-mid: #FFB3D6;
+    --pink-deep: #FF5FA2;
+    --pink-deeper: #E8398F;
+    --plum: #6B2452;
+    --plum-soft: #9A4A78;
+    --yellow: #FFD166;
+    --mint: #8FE3C4;
+    --white: #FFFFFF;
+    --serious-bg: #FBEFF4;
+    --serious-border: #D98CB3;
+    --shadow: 0 8px 24px rgba(232, 57, 143, 0.18);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Quicksand', sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, #FFD9EC 0%, transparent 45%),
+      radial-gradient(circle at 90% 20%, #FFE1F0 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, #FFD9EC 0%, transparent 50%),
+      var(--pink-bg);
+    color:var(--plum);
+    min-height:100vh;
+    padding:20px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  h1,h2,h3{font-family:'Baloo 2', sans-serif; margin:0;}
+  .app-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;flex-wrap:wrap;gap:10px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-emoji{font-size:34px;}
+  .brand-title{font-family:'Baloo 2';font-weight:800;font-size:22px;color:var(--pink-deeper);}
+  .brand-sub{font-size:12px;color:var(--plum-soft);font-weight:600;}
+  
+  .card{
+    background:var(--white);
+    border-radius:26px;
+    box-shadow:var(--shadow);
+    padding:28px 26px;
+    margin-bottom:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card.fun::before{
+    content:"";
+    position:absolute; top:-40px; right:-40px;
+    width:140px;height:140px;border-radius:50%;
+    background:radial-gradient(circle, var(--pink-mid) 0%, transparent 70%);
+    opacity:.5;
+  }
+  .card.serious{
+    background:var(--serious-bg);
+    border:2px dashed var(--serious-border);
+  }
+  .serious-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--plum);color:#fff;font-family:'Baloo 2';font-weight:700;
+    font-size:12px;letter-spacing:.04em;padding:5px 12px;border-radius:999px;
+    margin-bottom:12px;
+  }
+  .fun-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--yellow);color:var(--plum);font-family:'Baloo 2';font-weight:700;
+    font-size:12px;letter-spacing:.04em;padding:5px 12px;border-radius:999px;
+    margin-bottom:12px;
+  }
+
+  /* Progress trail — signature element */
+  .trail{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:22px; padding:14px 10px; background:var(--white);
+    border-radius:20px; box-shadow:var(--shadow);
+  }
+  .stamp{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px; background:var(--pink-bg-2); border:2.5px solid var(--pink-mid);
+    color:var(--pink-mid); transition:all .35s; position:relative;
+  }
+  .stamp.done{
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-deeper));
+    border-color:var(--pink-deeper); color:#fff; transform:scale(1.12);
+    box-shadow:0 0 0 4px rgba(255,95,162,.18);
+  }
+  .stamp.current{border-color:var(--yellow); box-shadow:0 0 0 4px rgba(255,209,102,.35);}
+  .trail-line{flex:1;height:3px;background:var(--pink-bg-2);margin:0 4px;border-radius:2px;overflow:hidden;}
+  .trail-line-fill{height:100%;background:var(--pink-deep);width:0%;transition:width .4s;}
+
+  .mascot-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .mascot{font-size:40px;}
+  .speech{
+    background:var(--pink-bg-2); border-radius:16px 16px 16px 4px; padding:8px 14px;
+    font-weight:600; font-size:14px; color:var(--plum-soft);
+  }
+
+  .section-title{font-size:26px;color:var(--pink-deeper);margin-bottom:4px;}
+  .section-sub{font-size:14px;color:var(--plum-soft);font-weight:600;margin-bottom:18px;}
+
+  .wordbank{
+    background:var(--pink-bg-2); border-radius:14px; padding:12px 16px; margin-bottom:20px;
+    font-size:13.5px; font-weight:600; color:var(--plum-soft); line-height:1.9;
+  }
+  .wordbank b{color:var(--pink-deeper);font-family:'Baloo 2';}
+  .wb-item{
+    display:inline-block; background:#fff; border:1.5px solid var(--pink-mid); border-radius:999px;
+    padding:2px 10px; margin:2px 4px 2px 0;
+  }
+
+  .q-block{margin-bottom:22px; padding-bottom:20px; border-bottom:1.5px dashed #F3D3E3;}
+  .q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .q-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:26px;height:26px;border-radius:50%;background:var(--pink-deep);color:#fff;
+    font-family:'Baloo 2';font-weight:700;font-size:13px;margin-right:8px;flex-shrink:0;
+  }
+  .serious .q-num{background:var(--plum);}
+  .q-text{font-weight:600;font-size:15.5px;line-height:1.6;display:flex;align-items:flex-start;}
+  .q-text-inner{flex:1;}
+  .fill-input{
+    border:none;border-bottom:2.5px solid var(--pink-deep);background:transparent;
+    font-family:'Quicksand';font-weight:700;font-size:15px;color:var(--pink-deeper);
+    padding:2px 6px;width:180px;outline:none;
+  }
+  .serious .fill-input{border-bottom-color:var(--plum);color:var(--plum);}
+  .fill-input:focus{background:var(--pink-bg-2);border-radius:6px;}
+
+  .options{margin-top:10px;display:flex;flex-direction:column;gap:8px;padding-left:34px;}
+  .opt{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;
+    border:2px solid #F3D3E3;cursor:pointer;font-weight:600;font-size:14.5px;transition:all .15s;
+  }
+  .opt:hover{border-color:var(--pink-mid);background:var(--pink-bg-2);}
+  .opt.selected{border-color:var(--pink-deep);background:#FFE3F1;}
+  .serious .opt.selected{border-color:var(--plum);background:#F0DDE9;}
+  .opt input{accent-color:var(--pink-deep);}
+
+  .btn{
+    font-family:'Baloo 2';font-weight:700;font-size:16px;border:none;border-radius:999px;
+    padding:13px 30px;cursor:pointer;transition:transform .15s, box-shadow .15s;
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-deeper));
+    color:#fff;box-shadow:0 6px 16px rgba(232,57,143,.35);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(0);}
+  .btn.secondary{
+    background:#fff;color:var(--pink-deeper);border:2.5px solid var(--pink-deep);
+    box-shadow:none;
+  }
+  .btn.small{padding:8px 18px;font-size:13px;}
+  .btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:8px;}
+  .btn-row.between{justify-content:space-between;}
+
+  .start-hero{text-align:center;padding:20px 10px;}
+  .start-hero .big-emoji{font-size:64px;}
+  .start-hero h1{font-size:30px;color:var(--pink-deeper);margin:10px 0 4px;}
+  .start-hero p{color:var(--plum-soft);font-weight:600;font-size:14.5px;max-width:480px;margin:0 auto 18px;}
+  .info-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:22px;}
+  .chip{
+    background:var(--pink-bg-2);border-radius:999px;padding:8px 16px;font-size:13px;
+    font-weight:700;color:var(--plum-soft);display:flex;align-items:center;gap:6px;
+  }
+  input.name-input{
+    width:100%;max-width:320px;padding:13px 18px;border-radius:999px;
+    border:2.5px solid var(--pink-mid);font-family:'Quicksand';font-weight:700;
+    font-size:15px;text-align:center;outline:none;margin-bottom:16px;color:var(--plum);
+  }
+  input.name-input:focus{border-color:var(--pink-deep);}
+
+  .teacher-link{
+    display:block;text-align:center;margin-top:10px;font-size:12.5px;
+    color:var(--plum-soft);font-weight:600;text-decoration:underline;cursor:pointer;
+  }
+
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(107,36,82,.45);display:flex;
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal{background:#fff;border-radius:22px;padding:28px;max-width:380px;width:100%;box-shadow:var(--shadow);}
+  .modal h3{color:var(--pink-deeper);margin-bottom:14px;}
+  .modal input{
+    width:100%;padding:11px 14px;border-radius:12px;border:2px solid var(--pink-mid);
+    font-family:'Quicksand';font-weight:600;margin-bottom:12px;outline:none;
+  }
+  .modal .err{color:#E03131;font-size:12.5px;font-weight:700;margin-bottom:10px;}
+
+  .results-hero{text-align:center;}
+  .results-hero .score-circle{
+    width:150px;height:150px;border-radius:50%;margin:10px auto 18px;
+    background:conic-gradient(var(--pink-deep) var(--pct,0%), #F3D3E3 0);
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .results-hero .score-circle::before{
+    content:"";position:absolute;inset:12px;border-radius:50%;background:#fff;
+  }
+  .results-hero .score-num{position:relative;font-family:'Baloo 2';font-weight:800;font-size:30px;color:var(--pink-deeper);}
+  .badge{
+    display:inline-block;background:var(--yellow);color:var(--plum);font-family:'Baloo 2';
+    font-weight:700;padding:6px 16px;border-radius:999px;font-size:13.5px;margin-bottom:6px;
+  }
+  .section-score-row{
+    display:flex;justify-content:space-between;align-items:center;padding:10px 0;
+    border-bottom:1px dashed #F3D3E3;font-weight:700;font-size:14px;
+  }
+  .section-score-row:last-child{border-bottom:none;}
+  .bar-bg{flex:1;height:10px;background:#F3D3E3;border-radius:6px;margin:0 12px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg, var(--pink-mid), var(--pink-deep));border-radius:6px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #F3D3E3;}
+  th{color:var(--pink-deeper);font-family:'Baloo 2';font-size:12.5px;}
+  .attempt-row{cursor:pointer;}
+  .attempt-row:hover{background:var(--pink-bg-2);}
+  .pill-small{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;}
+  .pill-good{background:#DFF5EA;color:#1E8A5B;}
+  .pill-mid{background:#FFF1D6;color:#B4780A;}
+  .pill-low{background:#FFE1E1;color:#C92A2A;}
+
+  .review-heading{font-family:'Baloo 2';font-size:19px;color:var(--pink-deeper);margin:24px 0 4px;}
+  .review-sub{font-size:12.5px;color:var(--plum-soft);font-weight:600;margin-bottom:14px;}
+  .review-card{
+    background:var(--serious-bg); border:2px dashed var(--serious-border); border-radius:16px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .review-tag{
+    display:inline-block; font-family:'Baloo 2'; font-weight:700; font-size:11px;
+    background:var(--plum); color:#fff; padding:3px 10px; border-radius:999px; margin-bottom:8px;
+  }
+  .review-q{font-weight:700;font-size:14px;margin-bottom:6px;line-height:1.5;}
+  .review-your{color:#C92A2A;font-weight:700;font-size:13.5px;text-decoration:line-through;}
+  .review-correct{color:#1E8A5B;font-weight:700;font-size:13.5px;}
+  .review-line{font-size:13.5px;margin-bottom:4px;}
+  .review-expl{
+    font-size:12.5px; color:var(--plum-soft); font-weight:600; background:#fff;
+    border-radius:10px; padding:8px 10px; margin-top:6px; line-height:1.6;
+  }
+  .review-expl b{color:var(--pink-deeper);}
+  .perfect-msg{
+    text-align:center;font-weight:700;color:var(--plum-soft);padding:14px;
+    background:var(--pink-bg-2);border-radius:16px;
+  }
+  .quote-banner{
+    background:linear-gradient(135deg, var(--pink-deep), var(--pink-deeper));
+    color:#fff; border-radius:16px; padding:14px 20px; margin-bottom:18px;
+    font-family:'Baloo 2'; font-weight:700; font-size:15px; text-align:center;
+    box-shadow:var(--shadow); letter-spacing:.01em;
+  }
+  .quote-banner .quote-label{display:block;font-size:10.5px;opacity:.85;letter-spacing:.08em;margin-bottom:4px;font-family:'Quicksand';}
+  .story-box{
+    background:var(--white); border:2px solid var(--pink-mid); border-radius:16px;
+    padding:18px 20px; margin-bottom:18px; white-space:pre-line; line-height:1.9;
+    font-size:14.5px; font-weight:600; color:var(--plum);
+  }
+  .story-box .story-title{font-family:'Baloo 2';color:var(--pink-deeper);font-size:17px;margin-bottom:8px;}
+  .translate-area{
+    width:100%; min-height:220px; border-radius:16px; border:2.5px solid var(--pink-mid);
+    padding:14px 16px; font-family:'Quicksand'; font-weight:600; font-size:14.5px;
+    color:var(--plum); outline:none; resize:vertical;
+  }
+  .translate-area:focus{border-color:var(--pink-deep);background:var(--pink-bg-2);}
+  .submit-lock{
+    background:var(--serious-bg); border:2px dashed var(--serious-border); border-radius:14px;
+    padding:10px 16px; margin-top:14px; font-weight:700; font-size:13.5px; color:var(--plum);
+    text-align:center;
+  }
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none !important;}
+  .opt.correct-opt{border-color:#2F9E5B;background:#E6F7EE;color:#1E8A5B;}
+  .opt.wrong-opt{border-color:#E03131;background:#FFE9E9;color:#C92A2A;}
+  .opt.locked{cursor:default;}
+  .feedback-line{font-weight:700;font-size:13.5px;margin:8px 0 4px 34px;}
+  .feedback-line.right{color:#2F9E5B;}
+  .feedback-line.wrong{color:#E03131;}
+
+  .flashcard{width:100%;max-width:440px;height:230px;margin:20px auto;perspective:1200px;cursor:pointer;}
+  .flashcard-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;}
+  .flashcard-inner.flipped{transform:rotateY(180deg);}
+  .flashcard-face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    padding:22px;box-shadow:var(--shadow);
+  }
+  .flashcard-front{background:linear-gradient(135deg, var(--pink-deep), var(--pink-deeper));color:#fff;}
+  .flashcard-back{background:#fff;border:3px solid var(--mint);color:var(--plum);transform:rotateY(180deg);}
+  .flash-label{font-family:'Baloo 2';font-size:11px;letter-spacing:.12em;opacity:.85;margin-bottom:10px;}
+  .flash-text{font-weight:700;font-size:16.5px;line-height:1.5;}
+  .flash-answer{color:#1E8A5B;font-size:20px;}
+  .flash-hint{margin-top:16px;font-size:11.5px;opacity:.85;}
+  .flash-expl{margin-top:12px;font-size:12.5px;font-weight:600;color:var(--plum-soft);}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--plum); color:#fff; font-family:'Baloo 2'; font-weight:700; font-size:14px;
+    padding:12px 22px; border-radius:999px; box-shadow:var(--shadow); opacity:0;
+    transition:opacity .4s, transform .4s; z-index:100; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .skip-highlight{
+    animation:skipPulse 1.6s ease; border-radius:14px;
+  }
+  @keyframes skipPulse{
+    0%{box-shadow:0 0 0 4px rgba(255,209,102,.9); background:#FFF6DE;}
+    100%{box-shadow:0 0 0 0 rgba(255,209,102,0); background:transparent;}
+  }
+  footer{text-align:center;font-size:11.5px;color:var(--plum-soft);opacity:.7;margin-top:20px;}
+  .hidden{display:none !important;}
+  @media(max-width:520px){
+    .options{padding-left:0;}
+    .card{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="app-header">
+    <div class="brand">
+      <div class="brand-emoji">🎀</div>
+      <div>
+        <div class="brand-title">Family, Friends &amp; Free Time</div>
+        <div class="brand-sub">A cute little English quiz · Units 3 &amp; 6</div>
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="card">
+    <div class="start-hero">
+      <div class="big-emoji">🐰🌸</div>
+      <h1>Ready for a sparkly quiz?</h1>
+      <p>First, you'll practice Sections A &amp; B with instant answers and flashcards until you get every question right. Then the real exam begins — you have up to 35 minutes, and once you're done, you'll do one final review pass (checking off each part) before you can submit. The last part is a short story to translate. 🌷</p>
+      <div class="info-chips">
+        <div class="chip">🧠 practice first</div>
+        <div class="chip">⏳ 35 min, no ticking clock</div>
+        <div class="chip">📝 80 questions + 1 story</div>
+      </div>
+      <input id="studentName" class="name-input" placeholder="Type your name here 🌷" />
+      <div>
+        <button class="btn" onclick="startQuiz()">Let's go! 💗</button>
+      </div>
+      <div class="teacher-link" onclick="openTeacherModal()">I'm the teacher / parent →</div>
+      <div class="teacher-link" onclick="openScoreLookup()">📄 Check my previous scores →</div>
+    </div>
+  </div>
+
+  <!-- PRACTICE / MASTERY PHASE (Sections A & B, before the timed exam) -->
+  <div id="practicePhase" class="hidden">
+    <div id="practiceContainer"></div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="trail" id="trail"></div>
+    <div id="sectionContainer"></div>
+  </div>
+
+  <!-- FINAL REVIEW CHECKLIST -->
+  <div id="finalReviewScreen" class="hidden"></div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="hidden card">
+    <div class="results-hero">
+      <div class="badge">🎉 All done!</div>
+      <h1 id="resultsName" style="color:var(--pink-deeper);font-size:22px;"></h1>
+      <div class="score-circle" id="scoreCircle"><div class="score-num" id="scoreNum">0%</div></div>
+      <p id="benchmarkNote" style="font-weight:700;color:var(--plum-soft);max-width:420px;margin:0 auto 18px;"></p>
+    </div>
+    <div id="sectionScores"></div>
+    <div id="reviewSection"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:20px;">
+      <button class="btn secondary" onclick="location.reload()">Take it again 🌸</button>
+    </div>
+  </div>
+
+  <!-- TEACHER LOGIN MODAL -->
+  <div id="teacherModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>👩‍🏫 Teacher / Parent Login</h3>
+      <input id="teacherUser" placeholder="Username" />
+      <input id="teacherPass" type="password" placeholder="Password" />
+      <div id="teacherErr" class="err hidden">Incorrect username or password.</div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeTeacherModal()">Cancel</button>
+        <button class="btn small" onclick="checkTeacherLogin()">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT SCORE LOOKUP MODAL -->
+  <div id="scoreLookupModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>📄 Check my previous scores</h3>
+      <input id="lookupName" placeholder="Type your name exactly as before" />
+      <div id="lookupErr" class="err hidden"></div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeScoreLookup()">Cancel</button>
+        <button class="btn small" onclick="doScoreLookup()">Look up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT MY-SCORES SCREEN -->
+  <div id="myScoresScreen" class="hidden"></div>
+
+  <!-- TEACHER DASHBOARD -->
+  <div id="teacherDash" class="hidden card">
+    <h2 style="color:var(--pink-deeper);">📊 Results Dashboard</h2>
+    <p style="font-weight:600;color:var(--plum-soft);font-size:13.5px;">Benchmark: A2. Sections A, B, C4 &amp; D are "focus mode" (memory recall) — weight these most heavily when judging understanding.</p>
+    <div id="attemptsList"></div>
+    <div id="attemptDetail"></div>
+    <div class="btn-row" style="justify-content:flex-start;"><button class="btn secondary small" onclick="location.reload()">Log out</button></div>
+  </div>
+
+  <footer>🌸 Family, Friends &amp; Free Time — English Practice Quiz</footer>
+</div>
+
+<script>
+/* ---------------- FIREBASE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+  authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+  projectId: "anti-cheating-remedial-quiz",
+  storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+  messagingSenderId: "979294386230",
+  appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+  measurementId: "G-84YB5CYGM8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ---------------- QUIZ DATA ---------------- */
+const quizData = [
+{id:'A', label:'A', title:'When Do We Use This Tense?', icon:'⏰', mode:'serious', type:'mcq',
+ intro:'Focus mode — no guessing games! Show what you really know about when to use each tense.',
+ questions:[
+  {q:'When do we use the Present Simple?', options:['For an action happening right now','For habits, routines, and facts that are always true','For an action that finished at a specific time in the past','For an action that started in the past and is still important now'], answer:1,
+   expl:'Present Simple dipakai untuk kebiasaan, rutinitas, dan fakta yang selalu benar — bukan untuk aksi yang sedang terjadi sekarang, aksi yang sudah selesai di masa lalu, atau aksi yang dimulai di masa lalu dan berlanjut sampai sekarang.'},
+  {q:'When do we use the Present Continuous?', options:['For things happening right now or around this time','For general facts and habits','For finished past actions','For life experiences without a specific time'], answer:0,
+   expl:'Present Continuous dipakai untuk sesuatu yang sedang terjadi sekarang atau di sekitar waktu ini — bukan untuk fakta umum, aksi yang sudah selesai, atau pengalaman hidup.'},
+  {q:'When do we use the Past Simple?', options:['For actions happening now','For finished actions at a specific time in the past (yesterday, last week...)','For actions that continue into the present','For future plans'], answer:1,
+   expl:'Past Simple dipakai untuk aksi yang sudah selesai pada waktu tertentu di masa lalu (misalnya "yesterday", "last week") — bukan untuk aksi sekarang atau rencana masa depan.'},
+  {q:'When do we use the Present Perfect?', options:['For actions finished at a stated past time','For life experiences, or actions with a result that matters now (no specific past time given)','For actions happening at this exact moment','For habits only'], answer:1,
+   expl:'Present Perfect dipakai untuk pengalaman hidup atau aksi yang hasilnya masih penting sekarang, tanpa menyebutkan waktu spesifik di masa lalu. Kalau ada waktu spesifik (misalnya "yesterday"), kita harus pakai Past Simple, bukan Present Perfect.'},
+  {q:'Which tense usually goes with time words like yesterday, last week, two days ago, in 2010?', options:['Present Simple','Present Continuous','Past Simple','Present Perfect'], answer:2,
+   expl:'Kata waktu seperti "yesterday", "last week", "two days ago" menunjukkan waktu spesifik di masa lalu, jadi jawabannya adalah Past Simple.'},
+  {q:'Which tense usually goes with words like already, just, ever, never, yet, since, for?', options:['Present Simple','Present Continuous','Past Simple','Present Perfect'], answer:3,
+   expl:'Kata-kata seperti "already", "just", "ever", "never", "yet", "since", "for" adalah penanda khas Present Perfect, karena kata-kata ini tidak menyebutkan waktu spesifik di masa lalu.'}
+ ]},
+{id:'B', label:'B', title:'Parts of Speech', icon:'🔎', mode:'serious', type:'mcq',
+ intro:'Focus mode — what part of speech is each word?',
+ questions:[
+  {q:'rarely', options:['Noun','Verb','Adjective','Adverb'], answer:3,
+   expl:'"Rarely" menjelaskan seberapa sering sesuatu terjadi (artinya "jarang"), jadi kata ini adalah adverb (kata keterangan), bukan kata benda/kerja/sifat.'},
+  {q:'friendly', options:['Noun','Verb','Adjective','Adverb'], answer:2,
+   expl:'"Friendly" menjelaskan sifat seseorang (artinya "ramah"), jadi ini adalah adjective (kata sifat) — meskipun berakhiran "-ly" seperti adverb pada umumnya, kata ini tetap adjective, bukan adverb.'},
+  {q:'discussion', options:['Noun','Verb','Adjective','Adverb'], answer:0,
+   expl:'"Discussion" adalah nama untuk sebuah kegiatan (artinya "diskusi"), jadi kata ini adalah noun (kata benda), bentuk kata benda dari verb "discuss".'},
+  {q:'helpful', options:['Noun','Verb','Adjective','Adverb'], answer:2,
+   expl:'"Helpful" menjelaskan sifat seseorang atau sesuatu (artinya "suka menolong/berguna"), jadi ini adalah adjective (kata sifat).'},
+  {q:'realise', options:['Noun','Verb','Adjective','Adverb'], answer:1,
+   expl:'"Realise" adalah sebuah aksi (artinya "menyadari"), jadi kata ini adalah verb (kata kerja).'}
+ ]},
+{id:'C1', label:'C1', title:'Phrasal Verbs', icon:'🌸', mode:'fun', type:'fill',
+ wordbank:['take up','dressed up','look after','going out with','get on','brought up','hang around with','bring up','laze around','going on'],
+ questions:[
+  {q:'My grandmother helps ___ my baby brother while my parents are at work.', answer:'look after',
+   expl:'"Look after" berarti merawat/menjaga seseorang. Cocok untuk konteks nenek menjaga adik bayi.'},
+  {q:"What's ___? Why is everyone shouting?", answer:'going on',
+   expl:'"What\'s going on?" adalah ungkapan untuk bertanya "ada apa?" / apa yang sedang terjadi.'},
+  {q:'I decided to ___ playing the guitar this year.', answer:'take up',
+   expl:'"Take up" berarti mulai melakukan sebuah hobi atau kegiatan baru.'},
+  {q:'On rainy Sundays we just ___ at home and watch movies.', answer:'laze around',
+   expl:'"Laze around" berarti bersantai/malas-malasan tanpa melakukan apa-apa.'},
+  {q:'She was ___ in a small village in the countryside.', answer:'brought up',
+   expl:'"Bring up" berarti membesarkan seseorang; karena kalimatnya pasif dan lampau, bentuknya menjadi "was brought up".'},
+  {q:'He likes to ___ his old friends from primary school.', answer:'hang around with', aliases:['hang out with'],
+   expl:'"Hang around with" (atau "hang out with") berarti menghabiskan waktu bersama teman.'},
+  {q:"My sister doesn't ___ well with our neighbour's dog — they always bark at each other!", answer:'get on', aliases:['get on well'],
+   expl:'"Get on well with" berarti akur/rukun dengan seseorang atau hewan.'},
+  {q:'For the school party, we all ___ in fancy costumes.', answer:'dressed up',
+   expl:'"Dress up" berarti berpakaian dengan kostum atau pakaian bagus untuk acara khusus.'},
+  {q:"Please don't ___ that topic at dinner — it always causes an argument.", answer:'bring up',
+   expl:'"Bring up" di sini berarti mengangkat/memulai suatu topik pembicaraan.'},
+  {q:'My cousin started ___ a boy from her class.', answer:'going out with',
+   expl:'"Go out with" berarti berpacaran atau kencan dengan seseorang.'}
+ ]},
+{id:'C2', label:'C2', title:'Phrases', icon:'💗', mode:'fun', type:'fill',
+ wordbank:['agree with','at present','belong to','have a great time','in love with','look like','talk to','think about','go horse-riding','write a blog'],
+ questions:[
+  {q:'I really ___ my mum — everyone says we have the same eyes.', answer:'look like',
+   expl:'"Look like" berarti terlihat mirip/serupa dengan seseorang secara fisik.'},
+  {q:'We ___ at the beach last weekend; it was so much fun.', answer:'had a great time',
+   expl:'"Have a great time" berarti bersenang-senang / menikmati waktu dengan sangat baik.'},
+  {q:"This bicycle doesn't ___ me, it's my brother's.", answer:'belong to',
+   expl:'"Belong to" berarti menjadi milik seseorang.'},
+  {q:"I don't ___ you — I think the movie was actually boring.", answer:'agree with',
+   expl:'"Agree with" berarti setuju dengan pendapat seseorang.'},
+  {q:'She wants to ___ about her travels so other people can read it.', answer:'write a blog',
+   expl:'"Write a blog" berarti menulis blog/catatan online.'},
+  {q:'My uncle is ___ a woman he met on holiday.', answer:'in love with',
+   expl:'"In love with" berarti jatuh cinta / mencintai seseorang.'},
+  {q:'___, I am not a member of any sports club, but I want to join one.', answer:'at present',
+   expl:'"At present" berarti saat ini / sekarang.'},
+  {q:'If you have a problem, you should ___ your parents about it.', answer:'talk to',
+   expl:'"Talk to" berarti berbicara dengan seseorang.'},
+  {q:'On our farm holiday, we got to ___ for the first time.', answer:'go horse-riding',
+   expl:'"Go horse-riding" berarti berkuda / naik kuda.'},
+  {q:'I need to ___ what career I want before I finish school.', answer:'think about',
+   expl:'"Think about" berarti memikirkan tentang sesuatu.'}
+ ]},
+{id:'C3', label:'C3', title:'Adverbs', icon:'⭐', mode:'fun', type:'fill',
+ wordbank:['occasionally','rarely','regularly','indoors','outdoors','recently'],
+ questions:[
+  {q:"I go swimming ___ every Tuesday and Friday — it's part of my routine.", answer:'regularly',
+   expl:'"Regularly" berarti secara teratur/rutin — cocok karena disebutkan sebagai bagian dari rutinitas.'},
+  {q:'He almost never eats vegetables; he ___ touches them.', answer:'rarely',
+   expl:'"Rarely" berarti jarang — cocok dengan "almost never" di kalimat sebelumnya.'},
+  {q:"It's raining, so let's play ___ instead of in the garden.", answer:'indoors',
+   expl:'"Indoors" berarti di dalam ruangan — lawan dari "in the garden" (di luar).'},
+  {q:"We've ___ started a new hobby — we only began last month.", answer:'recently',
+   expl:'"Recently" berarti baru-baru ini — cocok karena hobinya baru dimulai bulan lalu.'},
+  {q:'She does not visit often, just ___, maybe once or twice a year.', answer:'occasionally',
+   expl:'"Occasionally" berarti sesekali — cocok dengan "once or twice a year".'}
+ ]},
+{id:'C4', label:'C4', title:'Word Formation', icon:'🧁', mode:'serious', type:'fill',
+ intro:'Focus mode — write the correct form of the word shown in brackets.',
+ questions:[
+  {q:'My little sister is very (HELP) ___ around the house.', answer:'helpful',
+   expl:'Kata setelah "very" menjelaskan sifat, jadi butuh adjective: "helpful" (suka membantu), dari kata dasar "help".'},
+  {q:'There was a big (DISCUSS) ___ about the school trip.', answer:'discussion',
+   expl:'Setelah "a big" butuh noun (kata benda): "discussion" (diskusi), bentuk kata benda dari verb "discuss".'},
+  {q:'Please keep your room (TIDY) ___.', answer:'tidy',
+   expl:'Setelah "keep your room" butuh adjective yang menjelaskan kondisi kamar: "tidy" (rapi) — kata ini sudah berupa adjective.'},
+  {q:'He always speaks very (PERSONAL) ___ about his feelings.', answer:'personally',
+   expl:'Kata ini menjelaskan verb "speaks", jadi butuh adverb: "personally" (secara pribadi), dari adjective "personal".'},
+  {q:'My brother is a great (ACT) ___ in the school play.', answer:'actor',
+   expl:'Setelah "a great" butuh noun untuk orang: "actor" (aktor), dari verb "act".'},
+  {q:'She has a real talent for (PAINT) ___.', answer:'painting',
+   expl:'Setelah "talent for" butuh noun (gerund): "painting" (melukis/lukisan), dari verb "paint".'},
+  {q:'This photo was taken by a professional (PHOTOGRAPH) ___.', answer:'photographer',
+   expl:'Setelah "a professional" butuh noun untuk orang: "photographer" (fotografer), dari kata dasar "photograph".'},
+  {q:'The competition was very (COMPETE) ___ this year.', answer:'competitive',
+   expl:'Setelah "very" butuh adjective: "competitive" (kompetitif/ketat), dari verb "compete".'},
+  {q:'That clown is a wonderful (ENTERTAIN) ___.', answer:'entertainer',
+   expl:'Setelah "a wonderful" butuh noun untuk orang: "entertainer" (penghibur), dari verb "entertain".'},
+  {q:'My neighbours are always so (FRIEND) ___ to everyone.', answer:'friendly',
+   expl:'Setelah "so" butuh adjective: "friendly" (ramah), dari kata dasar "friend".'},
+  {q:'I love stamp (COLLECT) ___; I have hundreds of them.', answer:'collecting',
+   expl:'"Stamp collecting" adalah frasa noun (gerund) yang berarti "mengoleksi perangko", dari verb "collect".'},
+  {q:"It's not a real animal, it's (REAL) ___.", answer:'unreal',
+   expl:'Butuh adjective dengan makna berlawanan dari "real": "unreal" (tidak nyata), memakai awalan negatif "un-".'},
+  {q:"They've been (HAPPY) ___ married for ten years now.", answer:'happily',
+   expl:'Kata ini menjelaskan "married" (seperti kata kerja/adjective hasil), jadi butuh adverb: "happily" (dengan bahagia), dari adjective "happy".'},
+  {q:'His room is always so (MESS) ___.', answer:'messy',
+   expl:'Setelah "so" butuh adjective: "messy" (berantakan), dari noun "mess".'},
+  {q:"She's very (ART) ___ — she can draw anything.", answer:'artistic',
+   expl:'Setelah "very" butuh adjective: "artistic" (berjiwa seni), dari noun "art".'}
+ ]},
+{id:'D', label:'D', title:'Mixed Tenses', icon:'🎯', mode:'serious', type:'fill',
+ intro:'Focus mode! Put the verb in brackets into the correct tense.',
+ questions:[
+  {q:'My family usually (HAVE) ___ dinner together at 7 p.m.', answer:'has',
+   expl:'Kata "usually" menandakan kebiasaan → Present Simple. Subjek "my family" dianggap tunggal, jadi verbnya "has".'},
+  {q:'Look! The children (PLAY) ___ in the garden right now.', answer:'are playing',
+   expl:'"Look!" dan "right now" menandakan sesuatu sedang terjadi saat ini → Present Continuous ("are playing").'},
+  {q:'We (VISIT) ___ our grandparents last weekend.', answer:'visited',
+   expl:'"Last weekend" adalah waktu spesifik di masa lalu → Past Simple ("visited").'},
+  {q:'She (NEVER / BE) ___ to London before.', answer:'has never been',
+   expl:'"Never" + "before" tanpa waktu spesifik menandakan pengalaman hidup → Present Perfect ("has never been").'},
+  {q:"He (WATCH) ___ TV at the moment, so don't disturb him.", answer:'is watching',
+   expl:'"At the moment" menandakan aksi sedang berlangsung sekarang → Present Continuous ("is watching").'},
+  {q:'My cousin (COLLECT) ___ stamps since she was seven.', answer:'has collected',
+   expl:'"Since she was seven" menandakan aksi dimulai di masa lalu dan berlanjut sampai sekarang → Present Perfect ("has collected").'},
+  {q:'They (GO) ___ to the cinema three days ago.', answer:'went',
+   expl:'"Three days ago" adalah waktu spesifik di masa lalu → Past Simple ("went").'},
+  {q:'Water (BOIL) ___ at 100 degrees Celsius.', answer:'boils',
+   expl:'Ini adalah fakta ilmiah yang selalu benar → Present Simple ("boils").'},
+  {q:"I (JUST / FINISH) ___ my homework — I'm free now!", answer:'have just finished',
+   expl:'"Just" menandakan aksi baru saja selesai dan hasilnya terasa sekarang → Present Perfect ("have just finished").'},
+  {q:'My dad (FIX) ___ the car when I left the house.', answer:'was fixing',
+   expl:'Aksi ini sedang berlangsung di masa lalu ketika aksi lain ("I left") terjadi → Past Continuous ("was fixing"). Ini bentuk khusus untuk aksi yang sedang berjalan di tengah cerita masa lalu.'},
+  {q:'We (NOT / SEE) ___ that film yet.', answer:"haven't seen", aliases:['have not seen'],
+   expl:'"Yet" dalam kalimat negatif menandakan Present Perfect ("haven\'t seen") — belum terjadi sampai sekarang.'},
+  {q:'She (JOIN) ___ the art club last month.', answer:'joined',
+   expl:'"Last month" adalah waktu spesifik di masa lalu → Past Simple ("joined").'},
+  {q:'Listen! Someone (SING) ___ in the next room.', answer:'is singing',
+   expl:'"Listen!" menandakan sesuatu sedang terjadi saat ini → Present Continuous ("is singing").'},
+  {q:'My grandmother (TELL) ___ me stories every Sunday.', answer:'tells',
+   expl:'"Every Sunday" menandakan kebiasaan rutin → Present Simple ("tells").'},
+  {q:'I (LOSE) ___ my keys yesterday, but I found them later.', answer:'lost',
+   expl:'"Yesterday" adalah waktu spesifik di masa lalu → Past Simple ("lost").'},
+  {q:'He (NEVER / TRY) ___ horse-riding — he wants to try it this year.', answer:'has never tried',
+   expl:'"Never" tanpa waktu spesifik menandakan pengalaman hidup → Present Perfect ("has never tried").'},
+  {q:'Right now, my sister (READ) ___ a magazine in her room.', answer:'is reading',
+   expl:'"Right now" menandakan aksi sedang terjadi → Present Continuous ("is reading").'},
+  {q:'We (LIVE) ___ in this house since 2019.', answer:'have lived',
+   expl:'"Since 2019" menandakan aksi dimulai di masa lalu dan berlanjut sampai sekarang → Present Perfect ("have lived").'},
+  {q:'My friends (PLAY) ___ football every Saturday.', answer:'play',
+   expl:'"Every Saturday" menandakan kebiasaan rutin → Present Simple ("play").'},
+  {q:'Yesterday, my uncle (TAKE) ___ up a new hobby: photography.', answer:'took',
+   expl:'"Yesterday" adalah waktu spesifik di masa lalu → Past Simple ("took").'},
+  {q:'Look at the sky — it (RAIN) ___ heavily now.', answer:'is raining',
+   expl:'"Look" dan "now" menandakan aksi sedang terjadi → Present Continuous ("is raining").'},
+  {q:'She (ALREADY / PRACTISE) ___ the piano twice today.', answer:'has already practised', aliases:['has already practiced'],
+   expl:'"Already" + "today" (hari yang belum berakhir) menandakan Present Perfect ("has already practised").'},
+  {q:'Last summer, we (GO) ___ camping with the whole family.', answer:'went',
+   expl:'"Last summer" adalah waktu spesifik di masa lalu → Past Simple ("went").'},
+  {q:'My best friend (NOT / LIKE) ___ classical music at all.', answer:"doesn't like", aliases:['does not like'],
+   expl:'Ini adalah fakta/preferensi yang berlaku umum sekarang → Present Simple negatif ("doesn\'t like").'},
+  {q:'The children (DRESS) ___ up in costumes for the party right now.', answer:'are dressing',
+   expl:'"Right now" menandakan aksi sedang terjadi → Present Continuous ("are dressing").'},
+  {q:"I (WRITE) ___ my blog every week — it's my hobby.", answer:'write',
+   expl:'"Every week" menandakan kebiasaan rutin → Present Simple ("write").'},
+  {q:'He (BREAK) ___ his arm two months ago while skateboarding.', answer:'broke',
+   expl:'"Two months ago" adalah waktu spesifik di masa lalu → Past Simple ("broke").'},
+  {q:'We (NOT / DECIDE) ___ yet where to go on holiday this year.', answer:"haven't decided", aliases:['have not decided'],
+   expl:'"Yet" dalam kalimat negatif menandakan Present Perfect ("haven\'t decided") — belum diputuskan sampai sekarang.'},
+  {q:'My grandparents (GET) ___ married in 1975.', answer:'got',
+   expl:'"In 1975" adalah waktu spesifik di masa lalu → Past Simple ("got").'}
+ ]},
+{id:'E', label:'E', title:'Translation Challenge', icon:'📖', mode:'serious', type:'translate',
+ intro:'Focus mode — take your time on this one! Read the short story below and translate it into English, sentence by sentence, in your own words.',
+ storyTitle:'Kelinci yang Sombong',
+ storyText:`Di sebuah hutan yang tenang, hiduplah seekor kelinci yang sangat bangga dengan kecepatannya. Ia selalu mengejek seekor kura-kura yang berjalan pelan. Suatu hari, kura-kura menantang kelinci untuk balapan. Kelinci tertawa dan menerima tantangan itu.
+
+Ketika lomba dimulai, kelinci berlari sangat cepat dan segera meninggalkan kura-kura jauh di belakang. Karena merasa yakin akan menang, kelinci memutuskan untuk beristirahat sebentar di bawah pohon yang teduh. Namun, ia tertidur pulas.
+
+Sementara itu, kura-kura terus berjalan pelan tapi pasti. Ketika kelinci terbangun, ia terkejut melihat kura-kura sudah hampir sampai di garis akhir. Kelinci berlari secepat mungkin, tetapi terlambat. Kura-kura menang, dan kelinci pun belajar bahwa sombong dan terburu-buru bisa membuatmu kalah.`,
+ questions:[
+  {q:'translation', placeholder:'Write your English translation here...'}
+ ]}
+];
+
+/* ---------------- STATE ---------------- */
+let studentName = '';
+let currentSectionIdx = 0;
+let userAnswers = {}; // key: sectionId_qIdx -> value
+let startTime = null;
+const AUTO_SUBMIT_SECONDS = 35*60;
+const FIRST_TIMED_SECTION_IDX = 2; // sections A(0) & B(1) are the untimed mastery-practice phase
+let submitted = false;
+let autoSubmitTimer = null;
+let warningTimers = [];
+let reviewChecks = {}; // sectionId -> boolean, for the final-review checklist
+
+// practice-phase (mastery loop) state
+let currentPracticeRoundQuestions = [];
+let currentPracticeRoundNum = 1;
+let currentFlashWrong = [];
+let currentFlashRound = 1;
+let flashIndex = 0;
+let practiceAttempts = 0;
+let practiceInitialWrongCount = 0;
+
+/* ---------------- HELPERS ---------------- */
+function norm(s){
+  return (s||'').toString().trim().toLowerCase().replace(/['’]/g,"'").replace(/[.!?]/g,'').replace(/\s+/g,' ');
+}
+function isCorrectFill(q, val){
+  const n = norm(val);
+  if(!n) return false;
+  if(n === norm(q.answer)) return true;
+  if(q.aliases && q.aliases.some(a=>norm(a)===n)) return true;
+  return false;
+}
+
+/* ---------------- START ---------------- */
+function startQuiz(){
+  const name = document.getElementById('studentName').value.trim();
+  if(!name){ document.getElementById('studentName').style.borderColor = '#E03131'; document.getElementById('studentName').placeholder='Please type your name! 🌷'; return; }
+  studentName = name;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('practicePhase').classList.remove('hidden');
+  const pool = [];
+  [quizData[0], quizData[1]].forEach(sec=>{
+    sec.questions.forEach((q, qi)=>{
+      pool.push({sectionId:sec.id, sectionTitle:sec.title, qIndex:qi, q:q.q, options:q.options, answer:q.answer, expl:q.expl});
+    });
+  });
+  renderPracticeRound(pool, 1);
+}
+
+function beginTimedExam(){
+  document.getElementById('practicePhase').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  startTime = Date.now();
+  autoSubmitTimer = setTimeout(()=>{ if(!submitted) finishQuiz(true); }, AUTO_SUBMIT_SECONDS*1000);
+  warningTimers.push(setTimeout(()=> showToast("⏳ 5 minutes left — wrap up soon!"), (AUTO_SUBMIT_SECONDS-300)*1000));
+  warningTimers.push(setTimeout(()=> showToast("⏳ 1 minute left!"), (AUTO_SUBMIT_SECONDS-60)*1000));
+  renderTrail();
+  renderSection(FIRST_TIMED_SECTION_IDX);
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.classList.add('show'); }, 10);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4500);
+}
+
+/* ---- PRACTICE / MASTERY LOOP (Sections A & B) ---- */
+function renderPracticeRound(questions, roundNum, preserveScroll){
+  currentPracticeRoundQuestions = questions;
+  currentPracticeRoundNum = roundNum;
+  const scrollY = preserveScroll ? window.scrollY : 0;
+  const container = document.getElementById('practiceContainer');
+  let html = `<div class="card serious">`;
+  html += `<div class="serious-tag">🎯 ${roundNum===1?'Practice':'Review Round '+roundNum} — instant feedback</div>`;
+  html += `<div class="section-title">⏰🔎 Tense Usage &amp; Parts of Speech</div>`;
+  html += `<div class="section-sub">${roundNum===1?"Answer every question below — you'll see right away if you're right or wrong, with an explanation.":"Try these again. You need to get every one correct before moving to the timed exam."}</div>`;
+
+  questions.forEach((q, idx)=>{
+    const key = q.sectionId+'_'+q.qIndex;
+    const chosen = userAnswers[key];
+    html += `<div class="q-block" id="pq-${key}">`;
+    html += `<div class="q-text"><span class="q-num">${idx+1}</span><span class="q-text-inner">${q.q}</span></div>`;
+    html += `<div class="options">`;
+    q.options.forEach((opt, oi)=>{
+      let cls = 'opt';
+      let clickAttr = '';
+      if(chosen !== undefined){
+        cls += ' locked';
+        if(oi === q.answer) cls += ' correct-opt';
+        else if(oi === chosen) cls += ' wrong-opt';
+      } else {
+        clickAttr = `onclick="answerPractice('${key}', ${oi})"`;
+      }
+      html += `<label class="${cls}" ${clickAttr}><span>${String.fromCharCode(97+oi)}) ${opt}</span></label>`;
+    });
+    html += `</div>`;
+    if(chosen !== undefined){
+      const isRight = chosen === q.answer;
+      html += `<div class="feedback-line ${isRight?'right':'wrong'}">${isRight ? '✅ Correct!' : '❌ Not quite — correct answer: <b>'+q.options[q.answer]+'</b>'}</div>`;
+      if(q.expl) html += `<div class="review-expl"><b>Kenapa:</b> ${q.expl}</div>`;
+    }
+    html += `</div>`;
+  });
+
+  const answeredCount = questions.filter(q=>userAnswers[q.sectionId+'_'+q.qIndex]!==undefined).length;
+  html += `<div class="btn-row" style="justify-content:center;margin-top:14px;">
+    <button class="btn" onclick="finishPracticeRound()" ${answeredCount<questions.length?'disabled':''}>Continue →</button>
+  </div>`;
+  html += `</div>`;
+  container.innerHTML = html;
+  if(preserveScroll){ window.scrollTo(0, scrollY); }
+  else { window.scrollTo({top:0, behavior:'smooth'}); }
+}
+
+function answerPractice(key, oi){
+  userAnswers[key] = oi;
+  renderPracticeRound(currentPracticeRoundQuestions, currentPracticeRoundNum, true);
+}
+
+function finishPracticeRound(){
+  const wrong = currentPracticeRoundQuestions.filter(q => userAnswers[q.sectionId+'_'+q.qIndex] !== q.answer);
+  practiceAttempts++;
+  if(currentPracticeRoundNum === 1) practiceInitialWrongCount = wrong.length;
+  if(wrong.length === 0){
+    showPracticeMasteryDone();
+  } else {
+    renderFlashcards(wrong, currentPracticeRoundNum);
+  }
+}
+
+function renderFlashcards(wrongQs, roundNum){
+  currentFlashWrong = wrongQs;
+  currentFlashRound = roundNum;
+  flashIndex = 0;
+  renderFlashcardCard();
+}
+
+function renderFlashcardCard(){
+  const total = currentFlashWrong.length;
+  const q = currentFlashWrong[flashIndex];
+  const html = `<div class="card fun">
+    <div class="fun-tag">🗂️ Flashcards — memorize these! (${flashIndex+1}/${total})</div>
+    <div class="section-title">Tap the card to flip</div>
+    <div class="section-sub">Cover it, say the answer out loud in your head, then flip to check yourself.</div>
+    <div class="flashcard" onclick="flipFlashcard()">
+      <div class="flashcard-inner" id="flashcardInner">
+        <div class="flashcard-face flashcard-front">
+          <div class="flash-label">QUESTION</div>
+          <div class="flash-text">${q.q}</div>
+          <div class="flash-hint">tap to reveal ✨</div>
+        </div>
+        <div class="flashcard-face flashcard-back">
+          <div class="flash-label">CORRECT ANSWER</div>
+          <div class="flash-text flash-answer">${q.options[q.answer]}</div>
+          <div class="flash-expl">${q.expl||''}</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center;gap:14px;">
+      <button class="btn secondary small" onclick="prevFlashcard()" ${flashIndex===0?'disabled':''}>← Prev</button>
+      <button class="btn secondary small" onclick="nextFlashcard()" ${flashIndex===total-1?'disabled':''}>Next →</button>
+    </div>
+    <div class="btn-row" style="justify-content:center;margin-top:10px;">
+      <button class="btn" onclick="startReviewRound()">I'm ready — retake these ${total} 💪</button>
+    </div>
+  </div>`;
+  document.getElementById('practiceContainer').innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function flipFlashcard(){
+  document.getElementById('flashcardInner').classList.toggle('flipped');
+}
+function nextFlashcard(){ if(flashIndex < currentFlashWrong.length-1){ flashIndex++; renderFlashcardCard(); } }
+function prevFlashcard(){ if(flashIndex > 0){ flashIndex--; renderFlashcardCard(); } }
+
+function startReviewRound(){
+  currentFlashWrong.forEach(q => delete userAnswers[q.sectionId+'_'+q.qIndex]);
+  renderPracticeRound(currentFlashWrong, currentFlashRound+1);
+}
+
+function showPracticeMasteryDone(){
+  const html = `<div class="card fun" style="text-align:center;">
+    <div class="mascot" style="font-size:52px;">🎉🐰</div>
+    <div class="section-title">You've mastered Sections A &amp; B!</div>
+    <p style="font-weight:600;color:var(--plum-soft);">It took ${practiceAttempts} round${practiceAttempts>1?'s':''} to get every answer correct — great persistence! Now let's move on to the timed exam.</p>
+    <button class="btn" onclick="beginTimedExam()">Start the timed exam →</button>
+  </div>`;
+  document.getElementById('practiceContainer').innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function elapsedSeconds(){ return Math.floor((Date.now()-startTime)/1000); }
+
+/* ---- FINAL REVIEW CHECKLIST ---- */
+function goToFinalReview(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.remove('hidden');
+  renderFinalReview();
+}
+
+function renderFinalReview(){
+  const timedSections = quizData.slice(FIRST_TIMED_SECTION_IDX);
+  let html = `<div class="card serious">`;
+  html += `<div class="serious-tag">🎯 Final review — one more pass before you submit</div>`;
+  html += `<div class="section-title">📋 Check each part before you submit</div>`;
+  html += `<div class="section-sub">"Take your time, do not rush." Go back into any section to double-check your answers, then tick its box once you're happy with it. All boxes need to be checked before you can submit.</div>`;
+
+  timedSections.forEach((sec, i)=>{
+    const idx = FIRST_TIMED_SECTION_IDX + i;
+    let answered = 0, total = sec.questions.length;
+    sec.questions.forEach((q, qi)=>{
+      const v = userAnswers[sec.id+'_'+qi];
+      if(sec.type === 'mcq'){ if(v !== undefined) answered++; }
+      else { if(v && v.toString().trim()) answered++; }
+    });
+    const checked = !!reviewChecks[sec.id];
+    html += `<div class="review-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div class="review-tag">${sec.mode==='serious'?'🎯':'🌸'} Section ${sec.label} — ${sec.title}</div>
+        <div class="review-line">${answered}/${total} answered</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn secondary small" onclick="goEditSection(${idx})">Check this part</button>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleReviewCheck('${sec.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--pink-deep);">
+          Reviewed
+        </label>
+      </div>
+    </div>`;
+  });
+
+  const allChecked = timedSections.every(sec => reviewChecks[sec.id]);
+  html += `<div class="btn-row" style="justify-content:center;margin-top:16px;">
+    <button class="btn" onclick="confirmFinalSubmit()" ${allChecked?'':'disabled'}>🎉 Submit quiz!</button>
+  </div>`;
+  if(!allChecked){
+    html += `<div class="submit-lock">✅ Tick every "Reviewed" box above to unlock submitting.</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('finalReviewScreen').innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleReviewCheck(sectionId, isChecked){
+  reviewChecks[sectionId] = isChecked;
+  renderFinalReview();
+}
+
+function goEditSection(idx){
+  reviewChecks[quizData[idx].id] = false; // re-tick required after editing
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderSection(idx);
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ setTimeout(()=>scrollToQuestion(missingKey), 60); }
+}
+
+function confirmFinalSubmit(){
+  if(confirm("Ready to submit your quiz? You can't change answers after this! 🌸")){
+    finishQuiz(false);
+  }
+}
+
+/* ---------------- TRAIL ---------------- */
+function renderTrail(){
+  const trail = document.getElementById('trail');
+  trail.innerHTML = '';
+  quizData.forEach((sec, i)=>{
+    const stamp = document.createElement('div');
+    stamp.className = 'stamp' + (i < currentSectionIdx ? ' done' : '') + (i===currentSectionIdx ? ' current':'');
+    stamp.textContent = i < currentSectionIdx ? '✓' : sec.icon;
+    stamp.title = sec.title;
+    trail.appendChild(stamp);
+    if(i < quizData.length-1){
+      const line = document.createElement('div');
+      line.className = 'trail-line';
+      const fill = document.createElement('div');
+      fill.className = 'trail-line-fill';
+      fill.style.width = (i < currentSectionIdx ? '100%':'0%');
+      line.appendChild(fill);
+      trail.appendChild(line);
+    }
+  });
+}
+
+/* ---------------- RENDER SECTION ---------------- */
+const funMascots = ['🐰','🐱','🦊','🐻','🐼'];
+const funLines = ["You've got this, sparkle star!", "Ooh, fun ones ahead!", "Fill in the blanks, cutie!", "Almost there, keep glowing!"];
+
+function renderSection(idx){
+  currentSectionIdx = idx;
+  renderTrail();
+  const sec = quizData[idx];
+  const container = document.getElementById('sectionContainer');
+  const isSerious = sec.mode === 'serious';
+
+  let html = `<div class="card ${isSerious?'serious':'fun'}">`;
+  if(isSerious){
+    html += `<div class="serious-tag">🎯 FOCUS MODE — memory check</div>`;
+  } else {
+    html += `<div class="mascot-row"><div class="mascot">${funMascots[idx % funMascots.length]}</div><div class="speech">${funLines[idx % funLines.length]}</div></div>`;
+    html += `<div class="fun-tag">✨ Section ${sec.label}</div>`;
+  }
+  html += `<div class="section-title">${sec.icon} ${sec.title}</div>`;
+  if(sec.intro) html += `<div class="section-sub">${sec.intro}</div>`;
+
+  if(sec.wordbank){
+    html += `<div class="wordbank"><b>Word bank:</b><br>` + sec.wordbank.map(w=>`<span class="wb-item">${w}</span>`).join('') + `</div>`;
+  }
+
+  if(sec.type === 'translate'){
+    html += `<div class="quote-banner"><span class="quote-label">QUOTE OF THE DAY</span>"Take your time, do not rush."</div>`;
+    html += `<div class="story-box"><div class="story-title">📖 ${sec.storyTitle}</div>${sec.storyText}</div>`;
+    const key = sec.id+'_0';
+    const val = userAnswers[key] || '';
+    html += `<div class="q-block" id="q_${key}"><textarea class="translate-area" data-key="${key}" oninput="saveFill(this)" placeholder="${sec.questions[0].placeholder}">${val}</textarea></div>`;
+  } else {
+
+  sec.questions.forEach((q, qi)=>{
+    const key = sec.id+'_'+qi;
+    html += `<div class="q-block" id="q_${key}">`;
+    if(sec.type === 'mcq'){
+      html += `<div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${q.q}</span></div>`;
+      html += `<div class="options">`;
+      q.options.forEach((opt, oi)=>{
+        const selected = userAnswers[key] === oi;
+        html += `<label class="opt ${selected?'selected':''}" onclick="selectMcq('${key}', ${oi}, this)">
+          <input type="radio" name="${key}" ${selected?'checked':''} style="display:none;">
+          <span>${String.fromCharCode(97+oi)}) ${opt}</span>
+        </label>`;
+      });
+      html += `</div>`;
+    } else {
+      const parts = q.q.split('___');
+      const val = userAnswers[key] || '';
+      html += `<div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${parts[0]}<input class="fill-input" data-key="${key}" oninput="saveFill(this)" value="${val.replace(/"/g,'&quot;')}" placeholder="type here">${parts[1]||''}</span></div>`;
+    }
+    html += `</div>`;
+  });
+  }
+
+  html += `<div class="btn-row between">`;
+  html += idx > FIRST_TIMED_SECTION_IDX ? `<button class="btn secondary" onclick="renderSection(${idx-1})">← Back</button>` : `<span></span>`;
+  html += idx < quizData.length-1
+    ? `<button class="btn" onclick="attemptNext(${idx})">Next section →</button>`
+    : `<button class="btn" onclick="attemptGoFinalReview()">📋 Go to final review →</button>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  container.innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function findFirstUnanswered(sec){
+  for(let qi=0; qi<sec.questions.length; qi++){
+    const key = sec.id+'_'+qi;
+    const v = userAnswers[key];
+    if(sec.type === 'mcq'){ if(v === undefined) return key; }
+    else { if(!v || !v.toString().trim()) return key; }
+  }
+  return null;
+}
+
+function scrollToQuestion(key){
+  const el = document.getElementById('q_'+key);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.classList.add('skip-highlight');
+  setTimeout(()=> el.classList.remove('skip-highlight'), 1600);
+}
+
+function attemptNext(idx){
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  renderSection(idx+1);
+}
+
+function attemptGoFinalReview(){
+  const missingKey = findFirstUnanswered(quizData[quizData.length-1]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  goToFinalReview();
+}
+
+function selectMcq(key, oi, el){
+  userAnswers[key] = oi;
+  const parent = el.parentElement;
+  [...parent.children].forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function saveFill(el){
+  userAnswers[el.dataset.key] = el.value;
+}
+
+/* ---------------- SCORING & FINISH ---------------- */
+function finishQuiz(autoSubmitted){
+  if(submitted) return;
+  submitted = true;
+  clearTimeout(autoSubmitTimer);
+  warningTimers.forEach(t=>clearTimeout(t));
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+
+  const sectionResults = {};
+  const wrongList = [];
+  let translationText = '';
+  let totalCorrect = 0, totalQ = 0;
+
+  quizData.forEach(sec=>{
+    if(sec.type === 'translate'){
+      translationText = (userAnswers[sec.id+'_0'] || '').trim();
+      return; // not auto-graded — reviewed manually by the teacher
+    }
+    if(sec.id === 'A' || sec.id === 'B'){
+      return; // handled by the untimed mastery-practice phase, always 100% by the time the exam starts
+    }
+    let correct = 0;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key];
+      let isRight = false;
+      if(sec.type === 'mcq'){ isRight = (val === q.answer); }
+      else { isRight = isCorrectFill(q, val); }
+      if(isRight){
+        correct++;
+      } else {
+        let questionText, yourAnswerText, correctAnswerText;
+        if(sec.type === 'mcq'){
+          questionText = q.q;
+          yourAnswerText = (val === undefined || val === null) ? '(no answer)' : q.options[val];
+          correctAnswerText = q.options[q.answer];
+        } else {
+          questionText = q.q.replace('___', '_____');
+          yourAnswerText = (val && val.trim()) ? val : '(no answer)';
+          correctAnswerText = q.answer;
+        }
+        wrongList.push({
+          section: sec.title, mode: sec.mode,
+          questionText, yourAnswerText, correctAnswerText,
+          expl: q.expl || ''
+        });
+      }
+    });
+    sectionResults[sec.id] = {title:sec.title, correct, total:sec.questions.length, mode:sec.mode};
+    totalCorrect += correct;
+    totalQ += sec.questions.length;
+  });
+
+  const pct = Math.round((totalCorrect/totalQ)*100);
+  const timeTakenSec = Math.round((Date.now()-startTime)/1000);
+
+  let benchmarkNote = '';
+  if(pct >= 80) benchmarkNote = "Excellent! This is well above the A2 benchmark — she's showing strong, confident understanding. 🌟";
+  else if(pct >= 65) benchmarkNote = "Great job! This meets the A2 benchmark. A little more practice on the lower-scoring sections will help her move toward B1. 💪";
+  else if(pct >= 50) benchmarkNote = "Good effort — this is close to the A2 benchmark. Focus on the sections below to help her get there. 📚";
+  else benchmarkNote = "This is below the A2 benchmark right now. That's totally okay — use the section breakdown to target review. 🌷";
+
+  // Render results
+  document.getElementById('resultsName').textContent = `Amazing work, ${studentName}! 🎉`;
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct+'%');
+  document.getElementById('scoreNum').textContent = pct+'%';
+  document.getElementById('benchmarkNote').textContent = (autoSubmitted ? "⏰ Time was up at 35 minutes, so this includes only what was answered. " : "") + benchmarkNote;
+  document.getElementById('benchmarkNote').textContent += ` (Sections A & B aren't included in this score — she mastered them to 100% in the practice phase before the timed exam, taking ${practiceAttempts} round${practiceAttempts>1?'s':''}.)`;
+
+  let rowsHtml = '';
+  Object.values(sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    rowsHtml += `<div class="section-score-row">
+      <span>${r.mode==='serious'?'🎯':'🌸'} ${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  document.getElementById('sectionScores').innerHTML = rowsHtml;
+
+  // Wrong-answer review with Indonesian explanations
+  let reviewHtml = '';
+  if(wrongList.length === 0){
+    reviewHtml = `<div class="review-heading">📝 Review</div><div class="perfect-msg">Perfect score — no questions to review! 🎉</div>`;
+  } else {
+    reviewHtml += `<div class="review-heading">📝 Let's review (${wrongList.length})</div>`;
+    reviewHtml += `<div class="review-sub">Penjelasan di bawah ini dalam Bahasa Indonesia supaya lebih mudah dipahami.</div>`;
+    wrongList.forEach(w=>{
+      reviewHtml += `<div class="review-card">
+        <div class="review-tag">${w.mode==='serious'?'🎯':'🌸'} Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Your answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+  }
+  document.getElementById('reviewSection').innerHTML = reviewHtml;
+
+  if(translationText){
+    document.getElementById('reviewSection').innerHTML += `
+      <div class="review-heading">📖 Translation Challenge</div>
+      <div class="story-box" style="border-color:var(--yellow);">
+        <div class="story-title">✏️ Your translation</div>${translationText}
+      </div>
+      <div class="review-sub">This part isn't auto-scored — your teacher will read it and give feedback.</div>`;
+  }
+
+  document.getElementById('resultsScreen').classList.remove('hidden');
+
+  // Save to Firebase
+  const payload = {
+    studentName,
+    studentNameLower: studentName.trim().toLowerCase(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    timeTakenSeconds: timeTakenSec,
+    autoSubmitted: !!autoSubmitted,
+    totalCorrect, totalQuestions: totalQ, overallPercent: pct,
+    sectionResults,
+    wrongAnswers: wrongList,
+    translationText,
+    translationScore: null,
+    translationFeedback: '',
+    practiceRoundsToMaster: practiceAttempts,
+    practiceInitialWrongCount,
+    rawAnswers: userAnswers
+  };
+  db.collection('quizAttempts').add(payload).catch(err=>{
+    console.error('Could not save results:', err);
+  });
+}
+
+/* ---------------- TEACHER LOGIN ---------------- */
+function openTeacherModal(){ document.getElementById('teacherModal').classList.remove('hidden'); }
+function closeTeacherModal(){ document.getElementById('teacherModal').classList.add('hidden'); document.getElementById('teacherErr').classList.add('hidden'); }
+function checkTeacherLogin(){
+  const u = document.getElementById('teacherUser').value.trim();
+  const p = document.getElementById('teacherPass').value.trim();
+  if(u === 'gpw' && p === '030030'){
+    closeTeacherModal();
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('teacherDash').classList.remove('hidden');
+    loadAttempts();
+  } else {
+    document.getElementById('teacherErr').classList.remove('hidden');
+  }
+}
+
+/* ---------------- STUDENT SCORE LOOKUP ---------------- */
+function openScoreLookup(){ document.getElementById('scoreLookupModal').classList.remove('hidden'); }
+function closeScoreLookup(){
+  document.getElementById('scoreLookupModal').classList.add('hidden');
+  document.getElementById('lookupErr').classList.add('hidden');
+}
+
+function doScoreLookup(){
+  const name = document.getElementById('lookupName').value.trim();
+  const errEl = document.getElementById('lookupErr');
+  if(!name){
+    errEl.textContent = 'Please type your name first.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+  db.collection('quizAttempts').where('studentNameLower', '==', name.toLowerCase()).get().then(snap=>{
+    if(snap.empty){
+      errEl.textContent = "We couldn't find any past quizzes under that name.";
+      errEl.classList.remove('hidden');
+      return;
+    }
+    const docs = snap.docs.slice().sort((a,b)=>{
+      const ta = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+      const tb = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+      return tb - ta;
+    });
+    closeScoreLookup();
+    renderMyScores(name, docs);
+  }).catch(err=>{
+    errEl.textContent = 'Could not look up scores: ' + err.message;
+    errEl.classList.remove('hidden');
+  });
+}
+
+function renderMyScores(name, docs){
+  document.getElementById('startScreen').classList.add('hidden');
+  let html = `<div class="card"><h1 style="color:var(--pink-deeper);font-size:22px;">🌸 ${name}'s previous scores</h1>`;
+  docs.forEach(doc=>{
+    const d = doc.data();
+    const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+    const transDone = (d.translationScore !== undefined && d.translationScore !== null);
+    html += `<div class="review-card">
+      <div class="review-line"><b>${date}</b></div>
+      <div class="review-line">Quiz score: <span class="review-correct">${d.overallPercent}%</span> (${d.totalCorrect}/${d.totalQuestions})</div>
+      <div class="review-line">Translation score: ${transDone ? `<span class="review-correct">${d.translationScore}/10</span>` : '<span style="color:var(--plum-soft);">Not graded yet</span>'}</div>
+      ${transDone && d.translationFeedback ? `<div class="review-expl"><b>Teacher feedback:</b> ${d.translationFeedback}</div>` : ''}
+    </div>`;
+  });
+  html += `<div class="btn-row" style="justify-content:center;margin-top:14px;"><button class="btn secondary" onclick="location.reload()">← Back</button></div></div>`;
+  document.getElementById('myScoresScreen').innerHTML = html;
+  document.getElementById('myScoresScreen').classList.remove('hidden');
+}
+
+function loadAttempts(){
+  const list = document.getElementById('attemptsList');
+  list.innerHTML = '<p style="font-weight:600;color:var(--plum-soft);">Loading results... 🌸</p>';
+  db.collection('quizAttempts').orderBy('timestamp','desc').get().then(snap=>{
+    if(snap.empty){
+      list.innerHTML = '<p style="font-weight:600;color:var(--plum-soft);">No attempts yet.</p>';
+      return;
+    }
+    let html = `<table><thead><tr><th>Student</th><th>Date</th><th>Score</th><th>Time used</th><th>vs A2</th><th>A&amp;B mastery</th><th>Translation</th></tr></thead><tbody>`;
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+      const mins = Math.floor((d.timeTakenSeconds||0)/60), secs=(d.timeTakenSeconds||0)%60;
+      let pillClass = 'pill-low', pillText='Below A2';
+      if(d.overallPercent>=80){pillClass='pill-good';pillText='Above A2';}
+      else if(d.overallPercent>=65){pillClass='pill-good';pillText='Meets A2';}
+      else if(d.overallPercent>=50){pillClass='pill-mid';pillText='Near A2';}
+      const transStatus = (d.translationScore!==undefined && d.translationScore!==null)
+        ? `<span class="pill-small pill-good">${d.translationScore}/10</span>`
+        : (d.translationText ? `<span class="pill-small pill-mid">Ungraded</span>` : `<span class="pill-small pill-low">—</span>`);
+      html += `<tr class="attempt-row" onclick="showAttemptDetail('${doc.id}')">
+        <td>${d.studentName}</td><td>${date}</td><td>${d.overallPercent}% (${d.totalCorrect}/${d.totalQuestions})</td>
+        <td>${mins}m ${secs}s</td><td><span class="pill-small ${pillClass}">${pillText}</span></td>
+        <td>${d.practiceInitialWrongCount||0} missed → ${d.practiceRoundsToMaster||1} round${(d.practiceRoundsToMaster||1)>1?'s':''}</td>
+        <td>${transStatus}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    list.innerHTML = html;
+    window._attemptsSnap = snap;
+  }).catch(err=>{
+    list.innerHTML = `<p style="font-weight:700;color:#E03131;">Could not load results. Make sure Firestore rules allow read access. (${err.message})</p>`;
+  });
+}
+
+function showAttemptDetail(id){
+  const doc = window._attemptsSnap.docs.find(d=>d.id===id);
+  if(!doc) return;
+  const d = doc.data();
+  let html = `<div class="card" style="margin-top:16px;"><h3 style="color:var(--pink-deeper);">${d.studentName}'s breakdown</h3>`;
+  Object.values(d.sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    html += `<div class="section-score-row">
+      <span>${r.mode==='serious'?'🎯':'🌸'} ${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  html += `<p style="font-weight:600;font-size:13px;color:var(--plum-soft);margin-top:12px;">🎯 sections (A, B, C4, D) test memory recall of rules — low scores there suggest the concept isn't internalized yet, not just a vocabulary gap. 🌸 sections are vocabulary application and are more forgiving of a slip-up.</p>`;
+  html += `</div>`;
+
+  if(d.wrongAnswers && d.wrongAnswers.length){
+    html += `<div class="card" style="margin-top:14px;"><div class="review-heading" style="margin-top:0;">📝 Missed questions (${d.wrongAnswers.length})</div>`;
+    d.wrongAnswers.forEach(w=>{
+      html += `<div class="review-card">
+        <div class="review-tag">${w.mode==='serious'?'🎯':'🌸'} Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Student's answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(d.translationText){
+    const scoreVal = (d.translationScore!==undefined && d.translationScore!==null) ? d.translationScore : '';
+    html += `<div class="card" style="margin-top:14px;"><div class="review-heading" style="margin-top:0;">📖 Translation</div>
+      <div class="story-box" style="border-color:var(--yellow);">${d.translationText}</div>
+      <div class="review-heading" style="font-size:15px;margin-top:16px;">✏️ Grade this translation</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0;">
+        <label style="font-weight:700;font-size:13px;">Score (out of 10):</label>
+        <input type="number" id="transScoreInput" min="0" max="10" step="0.5" value="${scoreVal}" placeholder="e.g. 8" style="width:80px;padding:8px;border-radius:10px;border:2px solid var(--pink-mid);font-weight:700;font-family:'Quicksand';">
+      </div>
+      <textarea id="transFeedbackInput" placeholder="Optional feedback for the student..." style="width:100%;min-height:80px;border-radius:12px;border:2px solid var(--pink-mid);padding:10px;font-family:'Quicksand';font-weight:600;">${d.translationFeedback||''}</textarea>
+      <div class="btn-row" style="justify-content:flex-end;margin-top:10px;">
+        <button class="btn small" onclick="saveTranslationGrade('${id}')">💾 Save grade</button>
+      </div>
+      ${d.translationGradedAt && d.translationGradedAt.toDate ? `<div class="review-sub">Last graded: ${d.translationGradedAt.toDate().toLocaleString()}</div>` : ''}
+    </div>`;
+  }
+
+  document.getElementById('attemptDetail').innerHTML = html;
+}
+
+function saveTranslationGrade(id){
+  const scoreEl = document.getElementById('transScoreInput');
+  const feedbackEl = document.getElementById('transFeedbackInput');
+  const score = parseFloat(scoreEl.value);
+  if(isNaN(score) || score < 0 || score > 10){
+    alert('Please enter a score between 0 and 10.');
+    return;
+  }
+  const feedback = feedbackEl.value.trim();
+  db.collection('quizAttempts').doc(id).update({
+    translationScore: score,
+    translationFeedback: feedback,
+    translationGradedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    alert('Translation grade saved! The student will see it if they check their previous scores.');
+    loadAttempts();
+    document.getElementById('attemptDetail').innerHTML = '';
+  }).catch(err=>{
+    alert('Could not save the grade: ' + err.message);
+  });
+}
+</script>
+</body>
+</html>
