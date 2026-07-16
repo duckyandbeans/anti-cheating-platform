@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Practice Notebook — Have: Yes/No Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --paper:#FFFDF6;
+    --line:#F0E1CE;
+    --margin-line:#F0904D;
+    --ink:#332A1E;
+    --ink-soft:#7A5F41;
+    --accent:#E8720C;
+    --accent-soft:#FBE0C0;
+    --accent-deep:#B85A00;
+    --success:#4F7A50;
+    --success-bg:#E4EFDF;
+    --error:#B4453B;
+    --error-bg:#FBE6E2;
+    --highlight:#FBD98A;
+    --white:#FFFFFF;
+    --shadow: 0 4px 16px rgba(140,80,10,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-size:19px;
+    line-height:1.7;
+    color:var(--ink);
+    background:#F1E9D8;
+    min-height:100vh;
+    padding:22px;
+  }
+  .wrap{max-width:800px;margin:0 auto;}
+  h1,h2,h3{font-family:'Patrick Hand', cursive; margin:0; font-weight:400;}
+  .app-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:20px;flex-wrap:wrap;gap:10px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-emoji{font-size:38px;}
+  .brand-title{font-family:'Patrick Hand';font-size:28px;color:var(--accent-deep);}
+  .brand-sub{font-size:15px;color:var(--ink-soft);}
+
+  .card{
+    background:var(--paper);
+    background-image: repeating-linear-gradient(var(--paper) 0px, var(--paper) 37px, var(--line) 38px);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:30px 32px 30px 56px;
+    margin-bottom:22px;
+    position:relative;
+    border:1px solid #E7DCC5;
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:0; bottom:0; left:38px; width:2px;
+    background:var(--margin-line); opacity:.55;
+  }
+  .card.serious{ border-left:6px solid var(--accent); padding-left:50px; }
+  .card.serious::before{ left:32px; }
+
+  .section-tag{
+    display:inline-block; font-family:'Patrick Hand'; font-size:18px;
+    background:var(--accent-soft); color:var(--accent-deep);
+    padding:5px 16px; border-radius:8px; margin-bottom:14px;
+  }
+
+  .trail{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    margin-bottom:22px; padding:14px 16px; background:var(--white);
+    border-radius:14px; box-shadow:var(--shadow); gap:6px;
+  }
+  .stamp{
+    width:38px;height:38px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px; font-family:'Patrick Hand'; background:var(--paper); border:2px solid var(--line);
+    color:var(--ink-soft); transition:all .3s;
+  }
+  .stamp.done{ background:var(--success-bg); border-color:var(--success); color:var(--success); }
+  .stamp.current{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  .trail-line{flex:1;min-width:12px;height:3px;background:var(--line);border-radius:2px;}
+
+  .section-title{font-size:28px;color:var(--accent-deep);margin-bottom:6px;}
+  .section-sub{font-size:16px;color:var(--ink-soft);margin-bottom:18px;}
+
+  .wordbank{ margin-bottom:22px; }
+  .wb-label{ font-size:16px; font-weight:700; color:var(--accent-deep); display:block; margin-bottom:10px; }
+  .wb-chips{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    display:inline-block; background:var(--white); border:2px solid var(--accent);
+    color:var(--accent-deep); font-weight:700; font-size:17px;
+    padding:9px 18px; border-radius:10px; cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{ background:var(--accent-soft); }
+  .chip-selected{ background:var(--highlight); border-color:#C9A227; transform:scale(1.06); box-shadow:var(--shadow); }
+  .chip-used{ opacity:.35; text-decoration:line-through; cursor:default; pointer-events:none; }
+
+  .q-block{margin-bottom:26px; padding-bottom:22px; border-bottom:1.5px dashed #DCCFAF;}
+  .q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .q-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;
+    font-family:'Patrick Hand';font-size:16px;margin-right:10px;flex-shrink:0;
+  }
+  .q-text{font-weight:700;font-size:19px;line-height:1.8;display:flex;align-items:flex-start;}
+  .q-text-inner{flex:1;}
+
+  .blank-empty{
+    display:inline-block; min-width:110px; text-align:center;
+    border:2px dashed var(--accent); border-radius:8px; padding:5px 12px;
+    color:var(--accent-deep); font-weight:700; cursor:pointer; margin:0 3px;
+  }
+  .blank-empty:hover{ background:var(--accent-soft); }
+  .blank-filled{
+    display:inline-block; border:2px solid var(--success); background:var(--success-bg);
+    border-radius:8px; padding:5px 12px; color:var(--success); font-weight:700; cursor:pointer; margin:0 3px;
+  }
+
+  .fill-input{
+    border:2px solid var(--accent); border-radius:10px; background:var(--white);
+    font-family:'Atkinson Hyperlegible'; font-weight:700; font-size:18px; color:var(--ink);
+    padding:10px 14px; width:100%; max-width:420px; outline:none; margin-top:8px;
+  }
+  .fill-input:focus{ background:var(--accent-soft); }
+
+  .options{margin-top:12px;display:flex;flex-direction:column;gap:10px;padding-left:40px;}
+  .opt{
+    display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:10px;
+    border:2px solid var(--line);cursor:pointer;font-weight:700;font-size:18px;transition:all .15s;
+    background:var(--white);
+  }
+  .opt:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .opt.selected{border-color:var(--accent);background:var(--highlight);}
+
+  .btn{
+    font-family:'Patrick Hand';font-weight:400;font-size:20px;border:none;border-radius:10px;
+    padding:14px 30px;cursor:pointer;transition:transform .15s;
+    background:var(--accent); color:#fff; box-shadow:var(--shadow);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.secondary{ background:var(--white); color:var(--accent-deep); border:2.5px solid var(--accent); box-shadow:none; }
+  .btn.small{padding:9px 20px;font-size:17px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+  .btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;}
+  .btn-row.between{justify-content:space-between;}
+
+  .start-hero{text-align:center;padding:10px 6px;}
+  .start-hero .big-emoji{font-size:56px;}
+  .start-hero h1{font-size:32px;color:var(--accent-deep);margin:12px 0 8px;}
+  .start-hero p{color:var(--ink-soft);font-size:18px;max-width:560px;margin:0 auto 20px;line-height:1.7;}
+  .info-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+  .chip-info{
+    background:var(--accent-soft);border-radius:10px;padding:9px 18px;font-size:15px;
+    font-weight:700;color:var(--accent-deep);
+  }
+  input.name-input{
+    width:100%;max-width:360px;padding:15px 20px;border-radius:10px;
+    border:2.5px solid var(--accent);font-family:'Atkinson Hyperlegible';font-weight:700;
+    font-size:18px;text-align:center;outline:none;margin-bottom:18px;color:var(--ink);
+  }
+
+  .teacher-link{
+    display:block;text-align:center;margin-top:12px;font-size:16px;
+    color:var(--accent-deep);font-weight:700;text-decoration:underline;cursor:pointer;
+  }
+
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(51,48,41,.5);display:flex;
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal{background:var(--paper);border-radius:16px;padding:30px;max-width:400px;width:100%;box-shadow:var(--shadow);}
+  .modal h3{color:var(--accent-deep);margin-bottom:16px;font-size:24px;}
+  .modal input{
+    width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--accent);
+    font-family:'Atkinson Hyperlegible';font-weight:700;margin-bottom:12px;outline:none;font-size:17px;
+  }
+  .modal .err{color:var(--error);font-size:15px;font-weight:700;margin-bottom:10px;}
+
+  .results-hero{text-align:center;}
+  .results-hero .score-circle{
+    width:160px;height:160px;border-radius:50%;margin:12px auto 20px;
+    background:conic-gradient(var(--accent) var(--pct,0%), var(--line) 0);
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .results-hero .score-circle::before{ content:"";position:absolute;inset:14px;border-radius:50%;background:var(--paper); }
+  .results-hero .score-num{position:relative;font-family:'Patrick Hand';font-size:34px;color:var(--accent-deep);}
+  .badge{
+    display:inline-block;background:var(--highlight);color:var(--accent-deep);font-family:'Patrick Hand';
+    font-size:18px;padding:6px 18px;border-radius:10px;margin-bottom:8px;
+  }
+  .section-score-row{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 0;
+    border-bottom:1px dashed #DCCFAF;font-weight:700;font-size:17px;
+  }
+  .section-score-row:last-child{border-bottom:none;}
+  .bar-bg{flex:1;height:12px;background:var(--line);border-radius:6px;margin:0 14px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--accent);border-radius:6px;}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);}
+  th{color:var(--accent-deep);font-family:'Patrick Hand';font-size:16px;}
+  .attempt-row{cursor:pointer;}
+  .attempt-row:hover{background:var(--accent-soft);}
+  .pill-small{display:inline-block;padding:3px 12px;border-radius:8px;font-size:13px;font-weight:700;}
+  .pill-good{background:var(--success-bg);color:var(--success);}
+  .pill-mid{background:var(--highlight);color:var(--accent-deep);}
+  .pill-low{background:var(--error-bg);color:var(--error);}
+
+  .review-heading{font-family:'Patrick Hand';font-size:22px;color:var(--accent-deep);margin:26px 0 6px;}
+  .review-sub{font-size:15px;color:var(--ink-soft);font-weight:700;margin-bottom:16px;}
+  .review-card{
+    background:var(--white); border:2px dashed var(--accent); border-radius:12px;
+    padding:16px 18px; margin-bottom:14px;
+  }
+  .review-tag{
+    display:inline-block; font-family:'Patrick Hand'; font-size:14px;
+    background:var(--accent); color:#fff; padding:4px 12px; border-radius:8px; margin-bottom:10px;
+  }
+  .review-q{font-weight:700;font-size:17px;margin-bottom:8px;line-height:1.6;}
+  .review-your{color:var(--error);font-weight:700;font-size:16px;text-decoration:line-through;}
+  .review-correct{color:var(--success);font-weight:700;font-size:16px;}
+  .review-line{font-size:16px;margin-bottom:5px;}
+  .review-expl{
+    font-size:15px; color:var(--ink-soft); font-weight:700; background:var(--accent-soft);
+    border-radius:10px; padding:10px 12px; margin-top:8px; line-height:1.6;
+  }
+  .review-expl b{color:var(--accent-deep);}
+  .perfect-msg{
+    text-align:center;font-weight:700;font-size:18px;color:var(--success);padding:16px;
+    background:var(--success-bg);border-radius:14px;
+  }
+
+  .quote-banner{
+    background:var(--accent); color:#fff; border-radius:12px; padding:16px 22px; margin-bottom:20px;
+    font-family:'Patrick Hand'; font-size:20px; text-align:center; box-shadow:var(--shadow);
+  }
+  .quote-banner .quote-label{display:block;font-size:12px;opacity:.85;letter-spacing:.08em;margin-bottom:5px;font-family:'Atkinson Hyperlegible';}
+
+  .flashcard{
+    background:var(--white); border:2px solid var(--accent); border-radius:16px;
+    padding:30px; text-align:center; margin:18px 0; min-height:180px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .flash-label{ font-family:'Patrick Hand'; font-size:15px; color:var(--ink-soft); margin-bottom:12px; letter-spacing:.06em; }
+  .flash-front-text{ font-weight:700; font-size:22px; color:var(--accent-deep); }
+  .flash-back-text{ font-weight:700; font-size:18px; color:var(--ink); line-height:1.7; }
+  .flash-counter{ text-align:center; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+
+  .submit-lock{
+    background:var(--accent-soft); border:2px dashed var(--accent); border-radius:12px;
+    padding:12px 18px; margin-top:16px; font-weight:700; font-size:16px; color:var(--accent-deep);
+    text-align:center;
+  }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; font-family:'Patrick Hand'; font-size:17px;
+    padding:13px 24px; border-radius:12px; box-shadow:var(--shadow); opacity:0;
+    transition:opacity .4s, transform .4s; z-index:100; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .skip-highlight{ animation:skipPulse 1.6s ease; border-radius:12px; }
+  @keyframes skipPulse{
+    0%{box-shadow:0 0 0 4px var(--highlight); background:var(--highlight);}
+    100%{box-shadow:0 0 0 0 rgba(0,0,0,0); background:transparent;}
+  }
+
+  footer{text-align:center;font-size:14px;color:var(--ink-soft);opacity:.8;margin-top:22px;}
+  .hidden{display:none !important;}
+  @media(max-width:520px){
+    .options{padding-left:0;}
+    .card{padding:24px 20px 24px 40px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="app-header">
+    <div class="brand">
+      <div class="brand-emoji">📔</div>
+      <div>
+        <div class="brand-title">English Practice Notebook</div>
+        <div class="brand-sub">Grammar Bank 3B — have + yes/no questions</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="card">
+    <div class="start-hero">
+      <div class="big-emoji">📖✏️</div>
+      <h1>Welcome back to your notebook</h1>
+      <p>This exercise practices "have" in the present simple — positive, negative, questions, and short answers, for I / you / we / they. First, a short set of flashcards explains the rule. Then 50 questions: multiple choice, click-and-answer, fill in the blanks, and translation.</p>
+      <div class="info-chips">
+        <div class="chip-info">🗂️ study flashcards first</div>
+        <div class="chip-info">📝 50 questions</div>
+        <div class="chip-info">⏳ 35 minutes</div>
+      </div>
+      <input id="studentName" class="name-input" placeholder="Type your name here" />
+      <div>
+        <button class="btn" onclick="startFlow()">Begin</button>
+      </div>
+      <div class="teacher-link" onclick="openTeacherModal()">I'm the teacher / parent →</div>
+      <div class="teacher-link" onclick="openScoreLookup()">📄 Check my previous scores →</div>
+    </div>
+  </div>
+
+  <!-- FLASHCARD STUDY DECK -->
+  <div id="flashcardScreen" class="hidden card">
+    <div class="section-tag">Study flashcards</div>
+    <div class="section-title">have — present simple (I / you / we / they)</div>
+    <div class="section-sub">Tap the card to flip it. Go through all the cards, then start the quiz whenever you're ready — there's no rush.</div>
+    <div class="flash-counter" id="flashCounter"></div>
+    <div class="flashcard" id="flashcardEl" onclick="flipStudyCard()">
+      <div id="flashStudyFront">
+        <div class="flash-label">RULE</div>
+        <div class="flash-front-text" id="flashFrontText"></div>
+        <div style="margin-top:14px;font-size:14px;color:var(--ink-soft);">tap to see examples</div>
+      </div>
+      <div id="flashStudyBack" class="hidden">
+        <div class="flash-label">EXAMPLES</div>
+        <div class="flash-back-text" id="flashBackText"></div>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center;gap:14px;">
+      <button class="btn secondary small" onclick="prevStudyCard()">Prev</button>
+      <button class="btn secondary small" onclick="nextStudyCard()">Next</button>
+    </div>
+    <div class="btn-row" style="justify-content:center;margin-top:14px;">
+      <button class="btn" onclick="beginTimedExam()">I'm ready — start the quiz</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="trail" id="trail"></div>
+    <div id="sectionContainer"></div>
+  </div>
+
+  <!-- FINAL REVIEW CHECKLIST -->
+  <div id="finalReviewScreen" class="hidden"></div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="hidden card">
+    <div class="results-hero">
+      <div class="badge">All done!</div>
+      <h1 id="resultsName" style="color:var(--accent-deep);font-size:26px;"></h1>
+      <div class="score-circle" id="scoreCircle"><div class="score-num" id="scoreNum">0%</div></div>
+      <p id="benchmarkNote" style="font-weight:700;color:var(--ink-soft);max-width:460px;margin:0 auto 20px;"></p>
+    </div>
+    <div id="sectionScores"></div>
+    <div id="reviewSection"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:20px;">
+      <button class="btn secondary" onclick="location.reload()">Take it again</button>
+    </div>
+  </div>
+
+  <!-- TEACHER LOGIN MODAL -->
+  <div id="teacherModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>Teacher / Parent Login</h3>
+      <input id="teacherUser" placeholder="Username" />
+      <input id="teacherPass" type="password" placeholder="Password" />
+      <div id="teacherErr" class="err hidden">Incorrect username or password.</div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeTeacherModal()">Cancel</button>
+        <button class="btn small" onclick="checkTeacherLogin()">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT SCORE LOOKUP MODAL -->
+  <div id="scoreLookupModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>Check my previous scores</h3>
+      <input id="lookupName" placeholder="Type your name exactly as before" />
+      <div id="lookupErr" class="err hidden"></div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeScoreLookup()">Cancel</button>
+        <button class="btn small" onclick="doScoreLookup()">Look up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT MY-SCORES SCREEN -->
+  <div id="myScoresScreen" class="hidden"></div>
+
+  <!-- TEACHER DASHBOARD -->
+  <div id="teacherDash" class="hidden card">
+    <h2 style="color:var(--accent-deep);font-size:26px;">Results Dashboard</h2>
+    <p style="font-weight:700;color:var(--ink-soft);font-size:16px;">Benchmark: A1. Grammar Bank 3B — have + yes/no questions.</p>
+    <div id="attemptsList"></div>
+    <div id="attemptDetail"></div>
+    <div class="btn-row" style="justify-content:flex-start;"><button class="btn secondary small" onclick="location.reload()">Log out</button></div>
+  </div>
+
+  <footer>Keep going — every question is one step further.</footer>
+</div>
+
+<script>
+/* ---------------- FIREBASE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+  authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+  projectId: "anti-cheating-remedial-quiz",
+  storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+  messagingSenderId: "979294386230",
+  appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+  measurementId: "G-84YB5CYGM8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = 'haveYesNoAttempts'; // separate from the vocabulary quiz's collection
+
+/* ---------------- STUDY FLASHCARDS (explanation deck) ---------------- */
+/* ---------------- TOPIC COLOR PALETTE (all orange family, one hue per topic) ---------------- */
+const TOPIC_COLORS = {
+  positive:  {main:'#E8720C', deep:'#B85A00', soft:'#FBE0C0'}, // vibrant orange
+  negative:  {main:'#D9480F', deep:'#A83908', soft:'#F8D9C4'}, // burnt red-orange
+  questions: {main:'#F2994A', deep:'#C97B24', soft:'#FDEBD3'}, // light amber-orange
+  short:     {main:'#C17817', deep:'#8F5A0F', soft:'#F5E3C0'}  // golden/mustard orange
+};
+
+const studyCards = [
+  {topic:'positive', front:'POSITIVE SENTENCES', back:"In positive sentences, when we use \"have\", we can pair it with 3 types of sentence formula:\n\n1. a / an + singular noun\n2. a number + noun\n3. some + plural noun\n\nTap Next to see each one with examples."},
+  {topic:'positive', front:'Positive — Formula 1 of 3\na / an + singular noun', back:'They have a daughter.\nYou have an email from Nicola.'},
+  {topic:'positive', front:'Positive — Formula 2 of 3\na number + noun', back:'I have one brother and three sisters.'},
+  {topic:'positive', front:'Positive — Formula 3 of 3\nsome + plural noun', back:'I have some keys.\nWe have some friends in Rome.'},
+  {topic:'negative', front:'NEGATIVE SENTENCES', back:"In negative sentences, when we use \"don't have\", we can pair it with 2 types of sentence formula:\n\n1. a / an + singular noun\n2. any + plural noun\n\nTap Next to see each one with examples."},
+  {topic:'negative', front:"Negative — Formula 1 of 2\na / an + singular noun", back:"I don't have a car.\nWe don't have an office."},
+  {topic:'negative', front:"Negative — Formula 2 of 2\nany + plural noun", back:"They don't have any brothers.\n(= no brothers)"},
+  {topic:'questions', front:'YES/NO QUESTIONS', back:"To ask a yes/no question with \"have\", we use 1 sentence formula:\n\nDo + subject + have + object?\n\nTap Next to see examples."},
+  {topic:'questions', front:'Questions — Formula\nDo + subject + have...?', back:'Do you have a car?\nDo they have any British friends?'},
+  {topic:'short', front:'SHORT ANSWERS', back:"We answer yes/no questions with a short form using \"do\" or \"don't\" — we don't repeat the word \"have\".\n\nTap Next to see examples."},
+  {topic:'short', front:'Short answers', back:"Yes, I do.  /  No, we don't.\n\n⚠️ NOT \"No, they don't have.\""}
+];
+let studyIdx = 0;
+let studyFlipped = false;
+
+/* ---------------- QUIZ DATA ---------------- */
+const quizData = [
+{id:'M', label:'M', title:'Multiple choice', mode:'serious', type:'mcq', color:TOPIC_COLORS.positive,
+ intro:'Recall practice — choose the best answer.',
+ questions:[
+  {q:'Which sentence is correct?', options:['I have a new bike.','I haves a new bike.','I am have a new bike.','I do have a new bike.'], answer:0,
+   expl:'Untuk I/you/we/they, bentuk positif "have" tetap "have", tanpa tambahan -s.'},
+  {q:'Which sentence is correct?', options:['They have a daughter.','They have an daughter.','They has a daughter.','They having a daughter.'], answer:0,
+   expl:'"Daughter" dimulai konsonan, jadi pakai "a". Subjek "they" pakai "have", bukan "has".'},
+  {q:'You have ___ email from Nicola.', options:['a','an','some','any'], answer:1,
+   expl:'"Email" dimulai bunyi vokal, jadi pakai "an".'},
+  {q:'I have ___ keys.', options:['a','an','some','any'], answer:2,
+   expl:'"Keys" kata benda jamak dalam kalimat positif, jadi pakai "some".'},
+  {q:'Which is the correct negative form?', options:["I don't have a car.","I not have a car.","I doesn't have a car.","I have not a car."], answer:0,
+   expl:'Bentuk negatif untuk I/you/we/they: "don\'t have".'},
+  {q:"We don't have ___ brothers.", options:['a','an','some','any'], answer:3,
+   expl:'Kalimat negatif + kata benda jamak → pakai "any".'},
+  {q:'Which is the correct question?', options:['Do you have a car?','You have a car?','Have you a car?','Do you having a car?'], answer:0,
+   expl:'Pertanyaan dibentuk dengan "Do" + subjek + "have" + objek.'},
+  {q:'Which is the correct question?', options:['Do they have any friends?','Do they has any friends?','Have they any friends?','Do they have some friends?'], answer:0,
+   expl:'Dalam pertanyaan biasanya pakai "any", bukan "some". Tetap "have", bukan "has".'},
+  {q:"What is the correct short answer to 'Do you have a car?' if the answer is no?", options:["No, I don't.","No, I don't have.","No, I not have.","No, I haven't got."], answer:0,
+   expl:'Jawaban singkat cukup "No, I don\'t." — tidak mengulang kata "have".'},
+  {q:"What is the correct short answer to 'Do they have any children?' if the answer is yes?", options:['Yes, they do.','Yes, they have.','Yes, they does.','Yes, they having.'], answer:0,
+   expl:'Jawaban singkat memakai "do", bukan mengulang "have".'},
+  {q:'Which sentence uses "have" correctly with a number and a noun?', options:['I have one brother and three sisters.','I have a one brother.','I have three sister.','I have some one brother.'], answer:0,
+   expl:'Setelah angka (one, three, dst), kita tidak pakai a/an atau some.'},
+  {q:'Which sentence is negative and correct?', options:["We don't have an office.","We don't have office.","We not have an office.","We haven't an office."], answer:0,
+   expl:'Kata benda tunggal tetap pakai a/an setelah "don\'t have".'},
+  {q:'Which word order is correct for a question?', options:['Do you have a car?','You do have a car?','Do have you a car?','Have do you a car?'], answer:0,
+   expl:'Urutan yang benar: Do + subjek + have + objek + ?'},
+  {q:'Do you have ___ bike?', options:['a','an','some','any'], answer:0,
+   expl:'"Bike" kata benda tunggal dimulai konsonan, jadi pakai "a".'},
+  {q:'Do they have ___ British friends?', options:['a','an','some','any'], answer:3,
+   expl:'Pertanyaan + kata benda jamak → pakai "any".'}
+ ]},
+{id:'K', label:'K', title:'Click and answer', mode:'fun', type:'clickfill', color:TOPIC_COLORS.negative,
+ wordbank:['a','any','an','an','some'],
+ questions:[
+  {q:'I have ___ Italian father.', answer:'an',
+   expl:'"Italian" dimulai bunyi vokal, jadi pakai "an".'},
+  {q:'We have ___ friends in Rome.', answer:'some',
+   expl:'"Friends" kata benda jamak positif, jadi pakai "some".'},
+  {q:'Do you have ___ pet at home?', answer:'a',
+   expl:'"Pet" kata benda tunggal dimulai konsonan, jadi pakai "a".'},
+  {q:"They don't have ___ photos.", answer:'any',
+   expl:'Kalimat negatif + kata benda jamak → pakai "any".'},
+  {q:'I have ___ old phone.', answer:'an',
+   expl:'"Old" dimulai bunyi vokal, jadi pakai "an" (perhatikan kata pertama setelah a/an, bukan kata bendanya).'}
+ ]},
+{id:'F', label:'F', title:'Fill in the blanks', mode:'serious', type:'fill', color:TOPIC_COLORS.questions,
+ intro:'Recall practice — type your answer in the box. Capital letters don\u2019t matter.',
+ questions:[
+  {q:'Put the words in order: a / you / bike? / Do / have', answer:'Do you have a bike?',
+   expl:'Urutan pertanyaan: Do + subjek + have + objek?'},
+  {q:'Put the words in order: children? / Pat and Viv / Do / have / any', answer:'Do Pat and Viv have any children?',
+   expl:'"Pat and Viv" = they, tetap pakai "do" + "have".'},
+  {q:'Put the words in order: at / you / Nasir, / desk / a / do / have / home?', answer:'Nasir, do you have a desk at home?',
+   expl:'"Nasir," sebagai sapaan di awal, lalu Do + you + have + a desk + at home?'},
+  {q:'Put the words in order: cups? / we / any / do / have', answer:'Do we have any cups?',
+   expl:'Pola pertanyaan: Do + we + have + any cups?'},
+  {q:'Put the words in order: have / Craig? / any / you / Do / sisters,', answer:'Craig, do you have any sisters?',
+   expl:'"Craig," sebagai sapaan di awal, lalu Do + you + have + any sisters?'},
+  {q:'Put the words in order: Davies, / have / any / Mrs / do / books? / the students', answer:'Mrs Davies, do the students have any books?',
+   expl:'"Mrs Davies," sebagai sapaan, subjek pertanyaan "the students" (=they) + do + have + any books?'},
+  {q:"Give a short answer (No) to: 'Do you have a car?'", answer:"No, I don't.",
+   expl:'Jawaban singkat negatif: No, + subjek + don\'t.'},
+  {q:"Give a short answer (Yes) to: 'Do they have any children?'", answer:'Yes, they do.',
+   expl:'Jawaban singkat positif: Yes, + subjek + do.'},
+  {q:"Give a short answer (No) to: 'Do we have any milk?'", answer:"No, we don't.",
+   expl:'Jawaban singkat negatif untuk "we": No, we don\'t.'},
+  {q:"Give a short answer (Yes) to: 'Do you have a phone?'", answer:'Yes, I do.',
+   expl:'Jawaban singkat positif untuk "you": Yes, I do.'},
+  {q:"Give a short answer (Yes) to: 'Do they have a house in Bali?'", answer:'Yes, they do.',
+   expl:'Jawaban singkat positif: Yes, they do.'},
+  {q:"Give a short answer (No) to: 'Do we have class today?'", answer:"No, we don't.",
+   expl:'Jawaban singkat negatif: No, we don\'t.'},
+  {q:'I ___ a new phone. (positive)', answer:'have',
+   expl:'Bentuk positif untuk "I" adalah "have".'},
+  {q:"We ___ have any classes today. (negative)", answer:"don't", aliases:['dont'],
+   expl:'Bentuk negatif: subjek + don\'t + have.'},
+  {q:'___ you have a car? (question)', answer:'Do',
+   expl:'Pertanyaan dimulai dengan "Do" untuk subjek you/we/they/I.'},
+  {q:'They ___ have two children. (positive)', answer:'have',
+   expl:'Bentuk positif untuk "they" adalah "have".'},
+  {q:'Find and correct the mistake: "Do you have any laptop at home?" — type only the corrected word.', answer:'a',
+   expl:'"Laptop" kata benda tunggal, seharusnya "a", bukan "any".'},
+  {q:'Find and correct the mistake: "Do you have some children?" — type only the corrected word.', answer:'any',
+   expl:'Dalam pertanyaan, seharusnya "any", bukan "some".'},
+  {q:'Find and correct the mistake: "No, I do, but I have a tablet." — type only the corrected word.', answer:"don't", aliases:['dont'],
+   expl:'Jawabannya seharusnya negatif "No, I don\'t" karena kalimat berikutnya menunjukkan tidak punya laptop.'},
+  {q:'Find and correct the mistake: "And do you a phone?" — type only the corrected word.', answer:'have',
+   expl:'Pertanyaan ini kehilangan kata kerja utama; seharusnya "do you have a phone?".'}
+ ]},
+{id:'T', label:'T', title:'Translation (Indonesian → English)', mode:'serious', type:'translate_items', color:TOPIC_COLORS.short,
+ intro:'Translate each sentence into English. This part is graded by your teacher, not automatically.',
+ questions:[
+  {q:'Saya punya sepeda baru.', answer:'I have a new bike.'},
+  {q:'Kami punya dua anak.', answer:'We have two children.'},
+  {q:'Mereka tidak punya mobil.', answer:"They don't have a car."},
+  {q:'Apakah kamu punya adik laki-laki?', answer:'Do you have a brother?'},
+  {q:'Saya tidak punya pekerjaan.', answer:"I don't have a job."},
+  {q:'Kami punya beberapa teman di Roma.', answer:'We have some friends in Rome.'},
+  {q:'Apakah mereka punya anjing?', answer:'Do they have a dog?'},
+  {q:'Kamu punya email dari Nicola.', answer:'You have an email from Nicola.'},
+  {q:'Kami tidak punya kelas hari ini.', answer:"We don't have a class today."},
+  {q:'Apakah kamu punya HP baru?', answer:'Do you have a new phone?'}
+ ]}
+];
+
+/* ---------------- STATE ---------------- */
+let studentName = '';
+let currentSectionIdx = 0;
+let userAnswers = {};
+let startTime = null;
+const AUTO_SUBMIT_SECONDS = 35*60;
+const FIRST_TIMED_SECTION_IDX = 0;
+let submitted = false;
+let autoSubmitTimer = null;
+let warningTimers = [];
+let reviewChecks = {};
+
+let selectedChipId = null;      // chip id currently selected, e.g. "K_wb_2"
+let chipUsedBy = {};            // chipId -> blank key it's placed in
+let blankChipId = {};           // blank key -> chipId currently filling it
+
+/* ---------------- HELPERS ---------------- */
+function norm(s){
+  return (s||'').toString().trim().toLowerCase().replace(/['\u2019]/g,"'").replace(/[.!?]/g,'').replace(/\s+/g,' ');
+}
+function isCorrectFill(q, val){
+  const n = norm(val);
+  if(!n) return false;
+  if(n === norm(q.answer)) return true;
+  if(q.aliases && q.aliases.some(a=>norm(a)===n)) return true;
+  return false;
+}
+
+/* ---------------- START & STUDY FLASHCARDS ---------------- */
+function startFlow(){
+  const name = document.getElementById('studentName').value.trim();
+  if(!name){ document.getElementById('studentName').style.borderColor = '#B4453B'; document.getElementById('studentName').placeholder='Please type your name'; return; }
+  studentName = name;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('flashcardScreen').classList.remove('hidden');
+  studyIdx = 0; studyFlipped = false;
+  renderStudyCard();
+}
+function renderStudyCard(){
+  const c = studyCards[studyIdx];
+  const col = TOPIC_COLORS[c.topic];
+  document.getElementById('flashCounter').textContent = `Card ${studyIdx+1} of ${studyCards.length}`;
+  document.getElementById('flashcardEl').style.setProperty('--accent', col.main);
+  document.getElementById('flashcardEl').style.setProperty('--accent-deep', col.deep);
+  document.getElementById('flashcardEl').style.setProperty('--accent-soft', col.soft);
+  document.getElementById('flashcardEl').style.borderColor = col.main;
+  document.getElementById('flashFrontText').innerHTML = c.front.replace(/\n/g,'<br>');
+  document.getElementById('flashBackText').innerHTML = c.back.replace(/\n/g,'<br>');
+  document.getElementById('flashStudyFront').classList.toggle('hidden', studyFlipped);
+  document.getElementById('flashStudyBack').classList.toggle('hidden', !studyFlipped);
+}
+function flipStudyCard(){ studyFlipped = !studyFlipped; renderStudyCard(); }
+function nextStudyCard(){ studyIdx = (studyIdx+1) % studyCards.length; studyFlipped=false; renderStudyCard(); }
+function prevStudyCard(){ studyIdx = (studyIdx-1+studyCards.length) % studyCards.length; studyFlipped=false; renderStudyCard(); }
+
+function beginTimedExam(){
+  document.getElementById('flashcardScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  startTime = Date.now();
+  autoSubmitTimer = setTimeout(()=>{ if(!submitted) finishQuiz(true); }, AUTO_SUBMIT_SECONDS*1000);
+  warningTimers.push(setTimeout(()=> showToast("5 minutes left — take your time wrapping up."), (AUTO_SUBMIT_SECONDS-300)*1000));
+  warningTimers.push(setTimeout(()=> showToast("1 minute left."), (AUTO_SUBMIT_SECONDS-60)*1000));
+  renderTrail();
+  renderSection(FIRST_TIMED_SECTION_IDX);
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.classList.add('show'); }, 10);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4500);
+}
+
+/* ---------------- TRAIL ---------------- */
+function renderTrail(){
+  const trail = document.getElementById('trail');
+  trail.innerHTML = '';
+  quizData.forEach((sec, i)=>{
+    const stamp = document.createElement('div');
+    stamp.className = 'stamp' + (i < currentSectionIdx ? ' done' : '') + (i===currentSectionIdx ? ' current':'');
+    stamp.textContent = i < currentSectionIdx ? '✓' : sec.label;
+    stamp.title = sec.title;
+    if(i === currentSectionIdx){
+      stamp.style.borderColor = sec.color.main;
+      stamp.style.color = sec.color.deep;
+      stamp.style.boxShadow = `0 0 0 3px ${sec.color.soft}`;
+    }
+    trail.appendChild(stamp);
+    if(i < quizData.length-1){
+      const line = document.createElement('div');
+      line.className = 'trail-line';
+      trail.appendChild(line);
+    }
+  });
+}
+
+/* ---------------- RENDER SECTION ---------------- */
+function renderSection(idx, preserveScroll){
+  currentSectionIdx = idx;
+  if(!preserveScroll){ selectedChipId = null; }
+  renderTrail();
+  const sec = quizData[idx];
+  const container = document.getElementById('sectionContainer');
+  const isSerious = sec.mode === 'serious';
+  const scrollY = preserveScroll ? window.scrollY : 0;
+
+  let html = `<div class="card ${isSerious?'serious':''}" style="--accent:${sec.color.main}; --accent-deep:${sec.color.deep}; --accent-soft:${sec.color.soft};">`;
+  html += `<div class="section-tag">${isSerious?'Recall practice':'Practice'} — Section ${sec.label}</div>`;
+  html += `<div class="section-title">${sec.title}</div>`;
+  if(sec.intro) html += `<div class="section-sub">${sec.intro}</div>`;
+
+  if(sec.type === 'clickfill'){
+    html += `<div class="wordbank"><span class="wb-label">Word bank — tap a word, then tap the blank in the sentence:</span><div class="wb-chips">`;
+    sec.wordbank.forEach((w, wi)=>{
+      const chipId = sec.id+'_wb_'+wi;
+      const used = !!chipUsedBy[chipId];
+      const isSelected = selectedChipId === chipId;
+      const wEsc = w.replace(/'/g, "\\'");
+      html += `<span class="chip ${used?'chip-used':''} ${isSelected?'chip-selected':''}" ${used?'':`onclick="selectChip('${chipId}','${wEsc}')"`}>${w}</span>`;
+    });
+    html += `</div></div>`;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const filled = userAnswers[key];
+      const parts = q.q.split('___');
+      const blankHtml = filled
+        ? `<span class="blank-filled" onclick="clearBlank('${key}')">${filled} ✕</span>`
+        : `<span class="blank-empty" onclick="assignBlank('${key}')">tap here</span>`;
+      html += `<div class="q-block" id="q_${key}"><div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${parts[0]}${blankHtml}${parts[1]||''}</span></div></div>`;
+    });
+  } else if(sec.type === 'fill'){
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key] || '';
+      html += `<div class="q-block" id="q_${key}">
+        <div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${q.q}</span></div>
+        <input class="fill-input" data-key="${key}" oninput="saveFill(this)" value="${val.replace(/"/g,'&quot;')}" placeholder="type your answer">
+      </div>`;
+    });
+  } else if(sec.type === 'translate_items'){
+    html += `<div class="quote-banner"><span class="quote-label">QUOTE OF THE DAY</span>"Take your time, do not rush."</div>`;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key] || '';
+      html += `<div class="q-block" id="q_${key}">
+        <div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner"><b>${q.q}</b></span></div>
+        <input class="fill-input" style="max-width:100%;" data-key="${key}" oninput="saveFill(this)" value="${val.replace(/"/g,'&quot;')}" placeholder="Write the English translation here...">
+      </div>`;
+    });
+  } else {
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      html += `<div class="q-block" id="q_${key}">`;
+      html += `<div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${q.q}</span></div>`;
+      html += `<div class="options">`;
+      q.options.forEach((opt, oi)=>{
+        const selected = userAnswers[key] === oi;
+        html += `<label class="opt ${selected?'selected':''}" onclick="selectMcq('${key}', ${oi}, this)"><span>${String.fromCharCode(97+oi)}) ${opt}</span></label>`;
+      });
+      html += `</div></div>`;
+    });
+  }
+
+  html += `<div class="btn-row between">`;
+  html += idx > FIRST_TIMED_SECTION_IDX ? `<button class="btn secondary" onclick="renderSection(${idx-1})">Back</button>` : `<span></span>`;
+  html += idx < quizData.length-1
+    ? `<button class="btn" onclick="attemptNext(${idx})">Next section</button>`
+    : `<button class="btn" onclick="attemptGoFinalReview()">Go to final review</button>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  container.innerHTML = html;
+  if(preserveScroll){ window.scrollTo(0, scrollY); } else { window.scrollTo({top:0, behavior:'smooth'}); }
+}
+
+function selectMcq(key, oi, el){
+  userAnswers[key] = oi;
+  const parent = el.parentElement;
+  [...parent.children].forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function saveFill(el){
+  userAnswers[el.dataset.key] = el.value;
+}
+
+/* ---- click-to-fill (word bank, duplicate-safe) ---- */
+function selectChip(chipId, word){
+  selectedChipId = (selectedChipId === chipId) ? null : chipId;
+  renderSection(currentSectionIdx, true);
+}
+function assignBlank(key){
+  if(!selectedChipId){
+    showToast('Tap a word from the box above first');
+    return;
+  }
+  const sec = quizData[currentSectionIdx];
+  const wIdx = parseInt(selectedChipId.split('_wb_')[1]);
+  const word = sec.wordbank[wIdx];
+  if(blankChipId[key]){ delete chipUsedBy[blankChipId[key]]; }
+  userAnswers[key] = word;
+  chipUsedBy[selectedChipId] = key;
+  blankChipId[key] = selectedChipId;
+  selectedChipId = null;
+  renderSection(currentSectionIdx, true);
+}
+function clearBlank(key){
+  const chipId = blankChipId[key];
+  if(chipId) delete chipUsedBy[chipId];
+  delete blankChipId[key];
+  delete userAnswers[key];
+  renderSection(currentSectionIdx, true);
+}
+
+/* ---- skip-to-question ---- */
+function findFirstUnanswered(sec){
+  for(let qi=0; qi<sec.questions.length; qi++){
+    const key = sec.id+'_'+qi;
+    if(sec.type === 'mcq'){ if(userAnswers[key] === undefined) return key; }
+    else { const v = userAnswers[key]; if(!v || !v.toString().trim()) return key; }
+  }
+  return null;
+}
+function scrollToQuestion(key){
+  const el = document.getElementById('q_'+key);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.classList.add('skip-highlight');
+  setTimeout(()=> el.classList.remove('skip-highlight'), 1600);
+}
+function attemptNext(idx){
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  renderSection(idx+1);
+}
+function attemptGoFinalReview(){
+  const missingKey = findFirstUnanswered(quizData[quizData.length-1]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  goToFinalReview();
+}
+
+/* ---- FINAL REVIEW CHECKLIST ---- */
+function goToFinalReview(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.remove('hidden');
+  renderFinalReview();
+}
+function renderFinalReview(){
+  let html = `<div class="card serious">`;
+  html += `<div class="section-tag">Final review — one more pass before you submit</div>`;
+  html += `<div class="section-title">Check each part before you submit</div>`;
+  html += `<div class="section-sub">"Take your time, do not rush." Go back into any section to double-check your answers, then tick its box once you're happy with it.</div>`;
+
+  quizData.forEach((sec, idx)=>{
+    let answered = 0, total = sec.questions.length;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      if(sec.type === 'mcq'){ if(userAnswers[key] !== undefined) answered++; }
+      else { const v = userAnswers[key]; if(v && v.toString().trim()) answered++; }
+    });
+    const checked = !!reviewChecks[sec.id];
+    html += `<div class="review-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div class="review-tag">Section ${sec.label} — ${sec.title}</div>
+        <div class="review-line">${answered}/${total} answered</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn secondary small" onclick="goEditSection(${idx})">Check this part</button>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;cursor:pointer;">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleReviewCheck('${sec.id}', this.checked)" style="width:22px;height:22px;accent-color:var(--accent);">
+          Reviewed
+        </label>
+      </div>
+    </div>`;
+  });
+
+  const allChecked = quizData.every(sec => reviewChecks[sec.id]);
+  html += `<div class="btn-row" style="justify-content:center;margin-top:18px;">
+    <button class="btn" onclick="confirmFinalSubmit()" ${allChecked?'':'disabled'}>Submit quiz</button>
+  </div>`;
+  if(!allChecked){
+    html += `<div class="submit-lock">Tick every "Reviewed" box above to unlock submitting.</div>`;
+  }
+  html += `</div>`;
+  document.getElementById('finalReviewScreen').innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function toggleReviewCheck(sectionId, isChecked){
+  reviewChecks[sectionId] = isChecked;
+  renderFinalReview();
+}
+function goEditSection(idx){
+  reviewChecks[quizData[idx].id] = false;
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderSection(idx);
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ setTimeout(()=>scrollToQuestion(missingKey), 60); }
+}
+function confirmFinalSubmit(){
+  if(confirm("Ready to submit your quiz? You can't change answers after this.")){
+    finishQuiz(false);
+  }
+}
+
+/* ---------------- SCORING & FINISH ---------------- */
+function finishQuiz(autoSubmitted){
+  if(submitted) return;
+  submitted = true;
+  clearTimeout(autoSubmitTimer);
+  warningTimers.forEach(t=>clearTimeout(t));
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+
+  const sectionResults = {};
+  const wrongList = [];
+  const translationItems = [];
+  let totalCorrect = 0, totalQ = 0;
+
+  quizData.forEach(sec=>{
+    if(sec.type === 'translate_items'){
+      sec.questions.forEach((q, qi)=>{
+        translationItems.push({ indo: q.q, modelAnswer: q.answer, studentAnswer: (userAnswers[sec.id+'_'+qi]||'').trim() });
+      });
+      return;
+    }
+    let correct = 0;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key];
+      let isRight = false;
+      if(sec.type === 'mcq'){ isRight = (val === q.answer); }
+      else { isRight = isCorrectFill(q, val); }
+      if(isRight){
+        correct++;
+      } else {
+        let questionText, yourAnswerText, correctAnswerText;
+        if(sec.type === 'mcq'){
+          questionText = q.q;
+          yourAnswerText = (val === undefined || val === null) ? '(no answer)' : q.options[val];
+          correctAnswerText = q.options[q.answer];
+        } else {
+          questionText = q.q.replace('___','_____');
+          yourAnswerText = (val && val.toString().trim()) ? val : '(no answer)';
+          correctAnswerText = q.answer;
+        }
+        wrongList.push({ section: sec.title, mode: sec.mode, questionText, yourAnswerText, correctAnswerText, expl: q.expl || '' });
+      }
+    });
+    sectionResults[sec.id] = {title:sec.title, correct, total:sec.questions.length, mode:sec.mode};
+    totalCorrect += correct;
+    totalQ += sec.questions.length;
+  });
+
+  const pct = Math.round((totalCorrect/totalQ)*100);
+  const timeTakenSec = Math.round((Date.now()-startTime)/1000);
+
+  let benchmarkNote = '';
+  if(pct >= 80) benchmarkNote = "Excellent! This is well above the A1 benchmark — she's showing strong, confident understanding.";
+  else if(pct >= 65) benchmarkNote = "Great job! This meets the A1 benchmark. A little more practice on the lower-scoring sections will help her move toward A2.";
+  else if(pct >= 50) benchmarkNote = "Good effort — this is close to the A1 benchmark. Focus on the sections below to help her get there.";
+  else benchmarkNote = "This is below the A1 benchmark right now. That's okay — use the section breakdown to target review.";
+
+  document.getElementById('resultsName').textContent = `Well done, ${studentName}!`;
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct+'%');
+  document.getElementById('scoreNum').textContent = pct+'%';
+  document.getElementById('benchmarkNote').textContent = (autoSubmitted ? "Time was up at 35 minutes, so this includes only what was answered. " : "") + benchmarkNote + " (This score covers Sections M, K & F — the 10 translation sentences are graded separately by your teacher.)";
+
+  let rowsHtml = '';
+  Object.values(sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    rowsHtml += `<div class="section-score-row">
+      <span>${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  document.getElementById('sectionScores').innerHTML = rowsHtml;
+
+  let reviewHtml = '';
+  if(wrongList.length === 0){
+    reviewHtml = `<div class="review-heading">Review</div><div class="perfect-msg">Perfect score — no questions to review!</div>`;
+  } else {
+    reviewHtml += `<div class="review-heading">Let's review (${wrongList.length})</div>`;
+    reviewHtml += `<div class="review-sub">Penjelasan di bawah ini dalam Bahasa Indonesia supaya lebih mudah dipahami.</div>`;
+    wrongList.forEach(w=>{
+      reviewHtml += `<div class="review-card">
+        <div class="review-tag">Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Your answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+  }
+  reviewHtml += `<div class="review-heading">Translation (${translationItems.length})</div>`;
+  reviewHtml += `<div class="review-sub">This part isn't auto-scored — your teacher will read it and give feedback.</div>`;
+  translationItems.forEach((t,i)=>{
+    reviewHtml += `<div class="review-card">
+      <div class="review-line"><b>${i+1}. ${t.indo}</b></div>
+      <div class="review-line">Your translation: ${t.studentAnswer || '<i>(no answer)</i>'}</div>
+    </div>`;
+  });
+  document.getElementById('reviewSection').innerHTML = reviewHtml;
+  document.getElementById('resultsScreen').classList.remove('hidden');
+
+  const payload = {
+    studentName,
+    studentNameLower: studentName.trim().toLowerCase(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    timeTakenSeconds: timeTakenSec,
+    autoSubmitted: !!autoSubmitted,
+    totalCorrect, totalQuestions: totalQ, overallPercent: pct,
+    sectionResults,
+    wrongAnswers: wrongList,
+    translationItems,
+    translationScore: null,
+    translationFeedback: '',
+    rawAnswers: userAnswers
+  };
+  db.collection(COLLECTION).add(payload).catch(err=>{
+    console.error('Could not save results:', err);
+  });
+}
+
+/* ---------------- TEACHER LOGIN ---------------- */
+function openTeacherModal(){ document.getElementById('teacherModal').classList.remove('hidden'); }
+function closeTeacherModal(){ document.getElementById('teacherModal').classList.add('hidden'); document.getElementById('teacherErr').classList.add('hidden'); }
+function checkTeacherLogin(){
+  const u = document.getElementById('teacherUser').value.trim();
+  const p = document.getElementById('teacherPass').value.trim();
+  if(u === 'gpw' && p === '030030'){
+    closeTeacherModal();
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('teacherDash').classList.remove('hidden');
+    loadAttempts();
+  } else {
+    document.getElementById('teacherErr').classList.remove('hidden');
+  }
+}
+
+/* ---------------- STUDENT SCORE LOOKUP ---------------- */
+function openScoreLookup(){ document.getElementById('scoreLookupModal').classList.remove('hidden'); }
+function closeScoreLookup(){
+  document.getElementById('scoreLookupModal').classList.add('hidden');
+  document.getElementById('lookupErr').classList.add('hidden');
+}
+function doScoreLookup(){
+  const name = document.getElementById('lookupName').value.trim();
+  const errEl = document.getElementById('lookupErr');
+  if(!name){
+    errEl.textContent = 'Please type your name first.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  errEl.classList.add('hidden');
+  db.collection(COLLECTION).where('studentNameLower', '==', name.toLowerCase()).get().then(snap=>{
+    if(snap.empty){
+      errEl.textContent = "We couldn't find any past quizzes under that name.";
+      errEl.classList.remove('hidden');
+      return;
+    }
+    const docs = snap.docs.slice().sort((a,b)=>{
+      const ta = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+      const tb = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+      return tb - ta;
+    });
+    closeScoreLookup();
+    renderMyScores(name, docs);
+  }).catch(err=>{
+    errEl.textContent = 'Could not look up scores: ' + err.message;
+    errEl.classList.remove('hidden');
+  });
+}
+function renderMyScores(name, docs){
+  document.getElementById('startScreen').classList.add('hidden');
+  let html = `<div class="card"><h1 style="color:var(--accent-deep);font-size:26px;">${name}'s previous scores</h1>`;
+  docs.forEach(doc=>{
+    const d = doc.data();
+    const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+    const transDone = (d.translationScore !== undefined && d.translationScore !== null);
+    html += `<div class="review-card">
+      <div class="review-line"><b>${date}</b></div>
+      <div class="review-line">Quiz score: <span class="review-correct">${d.overallPercent}%</span> (${d.totalCorrect}/${d.totalQuestions})</div>
+      <div class="review-line">Translation score: ${transDone ? `<span class="review-correct">${d.translationScore}/10</span>` : '<span style="color:var(--ink-soft);">Not graded yet</span>'}</div>
+      ${transDone && d.translationFeedback ? `<div class="review-expl"><b>Teacher feedback:</b> ${d.translationFeedback}</div>` : ''}
+    </div>`;
+  });
+  html += `<div class="btn-row" style="justify-content:center;margin-top:16px;"><button class="btn secondary" onclick="location.reload()">Back</button></div></div>`;
+  document.getElementById('myScoresScreen').innerHTML = html;
+  document.getElementById('myScoresScreen').classList.remove('hidden');
+}
+
+function loadAttempts(){
+  const list = document.getElementById('attemptsList');
+  list.innerHTML = '<p style="font-weight:700;color:var(--ink-soft);">Loading results...</p>';
+  db.collection(COLLECTION).orderBy('timestamp','desc').get().then(snap=>{
+    if(snap.empty){
+      list.innerHTML = '<p style="font-weight:700;color:var(--ink-soft);">No attempts yet.</p>';
+      return;
+    }
+    let html = `<table><thead><tr><th>Student</th><th>Date</th><th>Score</th><th>Time used</th><th>vs A1</th><th>Translation</th></tr></thead><tbody>`;
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+      const mins = Math.floor((d.timeTakenSeconds||0)/60), secs=(d.timeTakenSeconds||0)%60;
+      let pillClass = 'pill-low', pillText='Below A1';
+      if(d.overallPercent>=80){pillClass='pill-good';pillText='Above A1';}
+      else if(d.overallPercent>=65){pillClass='pill-good';pillText='Meets A1';}
+      else if(d.overallPercent>=50){pillClass='pill-mid';pillText='Near A1';}
+      const transStatus = (d.translationScore!==undefined && d.translationScore!==null)
+        ? `<span class="pill-small pill-good">${d.translationScore}/10</span>`
+        : (d.translationItems && d.translationItems.length ? `<span class="pill-small pill-mid">Ungraded</span>` : `<span class="pill-small pill-low">—</span>`);
+      html += `<tr class="attempt-row" onclick="showAttemptDetail('${doc.id}')">
+        <td>${d.studentName}</td><td>${date}</td><td>${d.overallPercent}% (${d.totalCorrect}/${d.totalQuestions})</td>
+        <td>${mins}m ${secs}s</td><td><span class="pill-small ${pillClass}">${pillText}</span></td>
+        <td>${transStatus}</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    list.innerHTML = html;
+    window._attemptsSnap = snap;
+  }).catch(err=>{
+    list.innerHTML = `<p style="font-weight:700;color:var(--error);">Could not load results. Make sure Firestore rules allow read access. (${err.message})</p>`;
+  });
+}
+
+function showAttemptDetail(id){
+  const doc = window._attemptsSnap.docs.find(d=>d.id===id);
+  if(!doc) return;
+  const d = doc.data();
+  let html = `<div class="card" style="margin-top:18px;"><h3 style="color:var(--accent-deep);font-size:22px;">${d.studentName}'s breakdown</h3>`;
+  Object.values(d.sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    html += `<div class="section-score-row">
+      <span>${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  if(d.wrongAnswers && d.wrongAnswers.length){
+    html += `<div class="card" style="margin-top:16px;"><div class="review-heading" style="margin-top:0;">Missed questions (${d.wrongAnswers.length})</div>`;
+    d.wrongAnswers.forEach(w=>{
+      html += `<div class="review-card">
+        <div class="review-tag">Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Student's answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(d.translationItems && d.translationItems.length){
+    const scoreVal = (d.translationScore!==undefined && d.translationScore!==null) ? d.translationScore : '';
+    html += `<div class="card" style="margin-top:16px;"><div class="review-heading" style="margin-top:0;">Translation (${d.translationItems.length} sentences)</div>`;
+    d.translationItems.forEach((t,i)=>{
+      html += `<div class="review-card">
+        <div class="review-line"><b>${i+1}. ${t.indo}</b></div>
+        <div class="review-line">Student: ${t.studentAnswer || '<i>(no answer)</i>'}</div>
+        <div class="review-line" style="color:var(--ink-soft);">Model answer: ${t.modelAnswer}</div>
+      </div>`;
+    });
+    html += `<div class="review-heading" style="font-size:19px;margin-top:8px;">Grade the translation section</div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0;">
+        <label style="font-weight:700;font-size:16px;">Score (out of 10):</label>
+        <input type="number" id="transScoreInput" min="0" max="10" step="0.5" value="${scoreVal}" placeholder="e.g. 8" style="width:90px;padding:10px;border-radius:10px;border:2px solid var(--accent);font-weight:700;font-family:'Atkinson Hyperlegible';font-size:16px;">
+      </div>
+      <textarea id="transFeedbackInput" placeholder="Optional feedback for the student..." style="width:100%;min-height:90px;border-radius:10px;border:2px solid var(--accent);padding:12px;font-family:'Atkinson Hyperlegible';font-weight:700;font-size:16px;">${d.translationFeedback||''}</textarea>
+      <div class="btn-row" style="justify-content:flex-end;margin-top:12px;">
+        <button class="btn small" onclick="saveTranslationGrade('${id}')">Save grade</button>
+      </div>
+      ${d.translationGradedAt && d.translationGradedAt.toDate ? `<div class="review-sub">Last graded: ${d.translationGradedAt.toDate().toLocaleString()}</div>` : ''}
+    </div>`;
+  }
+
+  document.getElementById('attemptDetail').innerHTML = html;
+}
+
+function saveTranslationGrade(id){
+  const scoreEl = document.getElementById('transScoreInput');
+  const feedbackEl = document.getElementById('transFeedbackInput');
+  const score = parseFloat(scoreEl.value);
+  if(isNaN(score) || score < 0 || score > 10){
+    alert('Please enter a score between 0 and 10.');
+    return;
+  }
+  const feedback = feedbackEl.value.trim();
+  db.collection(COLLECTION).doc(id).update({
+    translationScore: score,
+    translationFeedback: feedback,
+    translationGradedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(()=>{
+    alert('Translation grade saved! The student will see it if they check their previous scores.');
+    loadAttempts();
+    document.getElementById('attemptDetail').innerHTML = '';
+  }).catch(err=>{
+    alert('Could not save the grade: ' + err.message);
+  });
+}
+</script>
+</body>
+</html>
