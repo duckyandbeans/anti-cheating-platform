@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modal Verbs — A Grammar Workshop for Mrs Fenny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#152C29;
+    --ink-soft:#1F3B36;
+    --paper:#F3ECD8;
+    --paper-dim:#E7DFC7;
+    --line:#c9bd9c;
+    --teal:#3F8A82;
+    --dustyblue:#5B7C99;
+    --sage:#7C9473;
+    --mustard:#D9A441;
+    --burgundy:#A63446;
+    --plum:#7B5C82;
+    --deepteal:#2F6F68;
+    --wine:#8C3B4A;
+    --steel:#4A6C8C;
+    --ochre:#B8860B;
+    --good:#3F8A57;
+    --bad:#B23A3A;
+    --display: 'Fraunces', serif;
+    --body: 'Work Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--body);
+    line-height:1.5;
+  }
+
+  a{color:inherit;}
+
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    padding:64px 0 40px;
+    position:relative;
+    border-bottom:1px solid rgba(243,236,216,0.15);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--mustard);
+    margin-bottom:18px;
+  }
+  h1.title{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(44px,8vw,92px);
+    line-height:0.95;
+    margin:0 0 20px;
+    letter-spacing:-0.01em;
+  }
+  .title em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--mustard);
+  }
+  .hero-sub{
+    font-size:18px;
+    max-width:560px;
+    color:rgba(243,236,216,0.8);
+    margin-bottom:32px;
+  }
+  .hero-sub strong{color:var(--paper);}
+
+  .drawer-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:8px;
+  }
+  .tab{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:0.05em;
+    border:1px solid rgba(243,236,216,0.3);
+    padding:7px 12px;
+    border-radius:3px 3px 0 0;
+    color:rgba(243,236,216,0.75);
+    background:rgba(243,236,216,0.03);
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{
+    padding:64px 0;
+    border-bottom:1px solid rgba(243,236,216,0.15);
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    margin-bottom:36px;
+    flex-wrap:wrap;
+  }
+  .section-num{
+    font-family:var(--mono);
+    color:var(--mustard);
+    font-size:13px;
+    letter-spacing:0.1em;
+  }
+  h2.section-title{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(30px,4vw,44px);
+    margin:6px 0 0;
+  }
+  .section-note{
+    font-size:14.5px;
+    color:rgba(243,236,216,0.65);
+    max-width:360px;
+  }
+
+  /* ---------- FLASHCARDS ---------- */
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:22px;
+  }
+  .flashcard{
+    perspective:1400px;
+    height:320px;
+    cursor:pointer;
+  }
+  .flashcard-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transition:transform 0.55s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner{
+    transform:rotateY(180deg);
+  }
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:6px;
+    background:var(--paper);
+    color:var(--ink);
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 10px 24px rgba(0,0,0,0.28);
+    border-top:6px solid var(--card-color, var(--teal));
+  }
+  .face.back{
+    transform:rotateY(180deg);
+    background:var(--paper-dim);
+    overflow-y:auto;
+  }
+  .card-tag{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--card-color, var(--teal));
+    font-weight:600;
+  }
+  .card-word{
+    font-family:var(--display);
+    font-size:44px;
+    font-weight:700;
+    margin:14px 0 6px;
+    line-height:1;
+  }
+  .card-hint{
+    margin-top:auto;
+    font-size:12px;
+    color:#6b6252;
+    font-family:var(--mono);
+  }
+  .meter{
+    display:flex;
+    gap:5px;
+    margin-top:14px;
+  }
+  .meter-dot{
+    width:9px;height:9px;border-radius:50%;
+    background:#d8cdac;
+  }
+  .meter-dot.filled{background:var(--card-color, var(--teal));}
+  .meter-label{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#8a8064;
+    margin-top:6px;
+  }
+  .back-word{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:20px;
+    color:var(--card-color, var(--teal));
+    margin-bottom:10px;
+  }
+  .back h4{
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:#6b6252;
+    margin:12px 0 6px;
+  }
+  .back ul{
+    margin:0 0 4px;
+    padding-left:18px;
+    font-size:13px;
+  }
+  .back li{margin-bottom:3px;}
+  .back .examples li{font-style:italic;}
+  .back .tip{
+    font-size:12px;
+    background:rgba(63,138,130,0.12);
+    border-left:3px solid var(--card-color, var(--teal));
+    padding:8px 10px;
+    margin-top:10px;
+  }
+
+  /* ---------- QUIZ ---------- */
+  #score-banner{
+    font-family:var(--mono);
+    font-size:14px;
+    background:rgba(217,164,65,0.12);
+    border:1px dashed var(--mustard);
+    color:var(--mustard);
+    padding:14px 18px;
+    border-radius:4px;
+    margin-bottom:28px;
+    display:none;
+  }
+  #score-banner.show{display:block;}
+
+  .quiz-item{
+    background:var(--ink-soft);
+    border:1px solid rgba(243,236,216,0.12);
+    border-radius:6px;
+    padding:20px 22px;
+    margin-bottom:14px;
+  }
+  .quiz-item.correct{border-color:var(--good);}
+  .quiz-item.incorrect{border-color:var(--bad);}
+  .q-head{
+    display:flex;
+    gap:12px;
+    align-items:baseline;
+    margin-bottom:12px;
+  }
+  .q-num{
+    font-family:var(--mono);
+    color:var(--mustard);
+    font-size:13px;
+    flex-shrink:0;
+  }
+  .q-text{font-size:15.5px;}
+  .q-options{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:8px;
+    margin-left:34px;
+  }
+  .q-option{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    padding:8px 10px;
+    border:1px solid rgba(243,236,216,0.15);
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .q-option:hover{border-color:var(--mustard);}
+  .q-option input{accent-color:var(--mustard);}
+  .q-option.right-answer{border-color:var(--good);background:rgba(63,138,87,0.15);}
+  .q-option.wrong-answer{border-color:var(--bad);background:rgba(178,58,58,0.15);}
+  .explain{
+    margin:12px 0 0 34px;
+    font-size:13px;
+    color:rgba(243,236,216,0.75);
+    display:none;
+    border-left:2px solid var(--mustard);
+    padding-left:10px;
+  }
+  .explain.show{display:block;}
+
+  .quiz-actions{
+    display:flex;
+    gap:14px;
+    margin-top:24px;
+    flex-wrap:wrap;
+  }
+  button.btn{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    background:var(--mustard);
+    color:var(--ink);
+    border:none;
+    padding:13px 22px;
+    border-radius:4px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button.btn.secondary{
+    background:transparent;
+    color:var(--paper);
+    border:1px solid rgba(243,236,216,0.4);
+  }
+  button.btn:hover{opacity:0.88;}
+
+  /* ---------- SPEAKING ---------- */
+  .speak-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width:760px){.speak-grid{grid-template-columns:1fr;}}
+  .speak-card{
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:6px;
+    padding:26px;
+  }
+  .speak-card h3{
+    font-family:var(--display);
+    font-size:22px;
+    margin:0 0 4px;
+  }
+  .speak-card .role-note{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#6b6252;
+    margin-bottom:16px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  .speak-card ol{
+    padding-left:20px;
+    margin:0;
+  }
+  .speak-card li{
+    margin-bottom:12px;
+    font-size:14.5px;
+  }
+  .speak-card.teacher{border-top:6px solid var(--burgundy);}
+  .speak-card.student{border-top:6px solid var(--deepteal);}
+
+  .howto{
+    background:rgba(243,236,216,0.06);
+    border:1px dashed rgba(243,236,216,0.3);
+    border-radius:6px;
+    padding:20px 22px;
+    margin-bottom:26px;
+    font-size:14px;
+  }
+  .howto h4{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--mustard);
+    margin:0 0 10px;
+  }
+  .howto ul{margin:0;padding-left:18px;}
+  .howto li{margin-bottom:6px;}
+
+  footer{
+    padding:36px 0 60px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:rgba(243,236,216,0.4);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Grammar Workshop · Card Catalog No. 07</div>
+    <h1 class="title">Modal<br><em>Verbs.</em></h1>
+    <p class="hero-sub">A one-lesson deep dive for <strong>Mrs Fenny</strong> — ten modals, what each one does, how sure or how strict it sounds, thirty practice questions, and a speaking round to finish.</p>
+    <div class="drawer-tabs">
+      <span class="tab">ABILITY</span>
+      <span class="tab">PERMISSION</span>
+      <span class="tab">POSSIBILITY</span>
+      <span class="tab">OBLIGATION</span>
+      <span class="tab">ADVICE</span>
+      <span class="tab">FUTURE</span>
+      <span class="tab">HYPOTHETICAL</span>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="flashcards">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">01 — The Card Catalog</div>
+        <h2 class="section-title">Ten modals, flipped.</h2>
+      </div>
+      <p class="section-note">Tap a card to flip it. The dots under each word are the <strong>Force Meter</strong> — how strong, certain, or obligatory that modal sounds. More dots, more force.</p>
+    </div>
+    <div class="card-grid" id="flashcard-grid"></div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">02 — Practice Drawer</div>
+        <h2 class="section-title">30 questions.</h2>
+      </div>
+      <p class="section-note">Choose one answer per question, then press <strong>Check My Answers</strong>. Right answers turn green, wrong ones turn red, and each question gets a short note underneath.</p>
+    </div>
+    <div id="score-banner"></div>
+    <div id="quiz-list"></div>
+    <div class="quiz-actions">
+      <button class="btn" id="check-btn">Check My Answers</button>
+      <button class="btn secondary" id="reset-btn">Reset Quiz</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="speaking" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-num">03 — Speaking Round</div>
+        <h2 class="section-title">Say it out loud.</h2>
+      </div>
+      <p class="section-note">Ten minutes of speaking to finish the lesson — the teacher leads, Mrs Fenny answers in full sentences using the modal each prompt is built around.</p>
+    </div>
+
+    <div class="howto">
+      <h4>How to run this</h4>
+      <ul>
+        <li>Go through the Teacher Prompts one at a time — read the prompt aloud, don't show it.</li>
+        <li>Mrs Fenny answers in 2–3 full sentences, naturally, without writing anything down first.</li>
+        <li>Note any modal mix-ups quietly and circle back to them at the very end, after all ten prompts.</li>
+        <li>If there's time left, swap: Mrs Fenny reads a Student Prompt and free-talks for 30–60 seconds.</li>
+      </ul>
+    </div>
+
+    <div class="speak-grid">
+      <div class="speak-card teacher">
+        <h3>Teacher Prompts</h3>
+        <div class="role-note">Read aloud, one at a time</div>
+        <ol id="teacher-prompts"></ol>
+      </div>
+      <div class="speak-card student">
+        <h3>Student Prompts</h3>
+        <div class="role-note">Mrs Fenny picks one, talks for 30–60 seconds</div>
+        <ol id="student-prompts"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Modal Verbs Workshop — built for a one-on-one lesson with Mrs Fenny.</div>
+</footer>
+
+<script>
+/* ---------------- FLASHCARD DATA ---------------- */
+const modals = [
+  {word:"Can", color:"var(--teal)", tag:"Ability · Informal Permission", force:3,
+    uses:["General ability (present)","Informal permission","Possibility, mostly in questions and negatives"],
+    examples:["Fish can breathe underwater.","Can I sit here?","It can get very cold in the mountains."],
+    tip:"Use \u201ccan\u2019t\u201d for something you\u2019re sure is impossible: \u201cThat can\u2019t be right.\u201d"},
+  {word:"Could", color:"var(--dustyblue)", tag:"Past Ability · Polite Request", force:2,
+    uses:["Ability in the past","Polite requests","Present or future possibility, softer than can"],
+    examples:["I could swim before I could walk.","Could you open the door, please?","We could go to the beach this weekend."],
+    tip:"\u201cCould\u201d softens a request \u2014 it sounds more polite than \u201ccan.\u201d"},
+  {word:"May", color:"var(--sage)", tag:"Formal Permission · Possibility", force:3,
+    uses:["Formal permission","Possibility, slightly more formal than might"],
+    examples:["May I leave the room?","The train may be delayed.","You may begin the exam now."],
+    tip:"\u201cMay\u201d is the more formal choice for asking permission, compared with \u201ccan.\u201d"},
+  {word:"Might", color:"var(--mustard)", tag:"Weak Possibility", force:1,
+    uses:["Possibility, less certain than may","Tentative, cautious suggestions"],
+    examples:["It might snow tonight.","She might join us later.","We might have made a mistake."],
+    tip:"\u201cMight\u201d is the most cautious, least confident modal of possibility."},
+  {word:"Must", color:"var(--burgundy)", tag:"Obligation · Strong Deduction", force:5,
+    uses:["Strong obligation or necessity","A confident logical conclusion"],
+    examples:["You must wear a seatbelt.","He must be tired after that trip.","Employees must wash their hands."],
+    tip:"\u201cMustn\u2019t\u201d means forbidden; \u201cdon\u2019t have to\u201d means no obligation \u2014 they are not the same!"},
+  {word:"Should", color:"var(--plum)", tag:"Advice · Expectation", force:3,
+    uses:["Giving advice or a recommendation","Expecting something is likely"],
+    examples:["You should drink more water.","The bus should arrive any minute.","You shouldn\u2019t skip breakfast."],
+    tip:"\u201cShould have + past participle\u201d talks about a past regret: \u201cI should have called her.\u201d"},
+  {word:"Ought to", color:"var(--deepteal)", tag:"Formal Advice", force:3,
+    uses:["Advice, similar to should but more formal","Common in writing or formal speech"],
+    examples:["We ought to leave now to catch the train.","You ought to apologize to her.","Students ought to respect their teachers."],
+    tip:"\u201cOught to\u201d is rare in casual conversation \u2014 \u201cshould\u201d is used far more often day to day."},
+  {word:"Will", color:"var(--wine)", tag:"Future · Willingness · Promise", force:4,
+    uses:["Future predictions and facts","Willingness or a spontaneous decision","Promises"],
+    examples:["I will call you tomorrow.","I\u2019ll help you carry that bag.","The sun will rise at 6 a.m."],
+    tip:"\u201cWill\u201d often signals a decision made right at the moment of speaking."},
+  {word:"Would", color:"var(--steel)", tag:"Hypothetical · Polite Request · Past Habit", force:2,
+    uses:["Hypothetical or imagined situations","Polite requests and offers","Repeated actions in the past"],
+    examples:["If I won the lottery, I would travel the world.","Would you like some tea?","When I was young, I would read every night."],
+    tip:"\u201cWould\u201d is the past-tense partner of \u201cwill\u201d in reported speech: \u201cShe said she would come.\u201d"},
+  {word:"Shall", color:"var(--ochre)", tag:"Formal Future · Suggestions", force:4,
+    uses:["Formal future, especially with I/we (British English)","Suggestions and offers","Legal or formal obligation"],
+    examples:["I shall return by noon.","Shall we dance?","The contractor shall complete the work by June."],
+    tip:"\u201cShall we\u2026?\u201d is a classic, polite way to suggest doing something together."}
+];
+
+const grid = document.getElementById("flashcard-grid");
+modals.forEach(m=>{
+  const card = document.createElement("div");
+  card.className = "flashcard";
+  card.style.setProperty("--card-color", m.color);
+  card.innerHTML = `
+    <div class="flashcard-inner">
+      <div class="face front">
+        <div class="card-tag">${m.tag}</div>
+        <div class="card-word">${m.word}</div>
+        <div class="meter">${Array.from({length:5},(_,i)=>`<span class="meter-dot ${i<m.force?'filled':''}"></span>`).join("")}</div>
+        <div class="meter-label">Force ${m.force}/5</div>
+        <div class="card-hint">tap to flip \u2192</div>
+      </div>
+      <div class="face back">
+        <div class="back-word">${m.word}</div>
+        <h4>Used for</h4>
+        <ul>${m.uses.map(u=>`<li>${u}</li>`).join("")}</ul>
+        <h4>Examples</h4>
+        <ul class="examples">${m.examples.map(e=>`<li>${e}</li>`).join("")}</ul>
+        <div class="tip">${m.tip}</div>
+      </div>
+    </div>`;
+  card.addEventListener("click", ()=> card.classList.toggle("flipped"));
+  grid.appendChild(card);
+});
+
+/* ---------------- QUIZ DATA ---------------- */
+const quiz = [
+  {q:"My grandmother ___ still touch her toes at eighty.", options:["must","should","can","might"], correct:2, explain:"\u201cCan\u201d expresses a present ability."},
+  {q:"As a teenager, he ___ hold his breath for two minutes.", options:["can","must","will","could"], correct:3, explain:"\u201cCould\u201d expresses ability in the past."},
+  {q:"\u201c___ I use your telephone, sir?\u201d", options:["Must","May","Will","Should"], correct:1, explain:"\u201cMay\u201d is the formal choice for asking permission."},
+  {q:"\u201c___ I borrow your pen for a second?\u201d", options:["Can","Must","Shall","Ought to"], correct:0, explain:"\u201cCan\u201d is the everyday, informal way to ask permission."},
+  {q:"It ___ rain later, but the sky looks fairly clear.", options:["must","should","might","will"], correct:2, explain:"\u201cMight\u201d shows a weak, uncertain possibility."},
+  {q:"She ___ be at the meeting; I\u2019m not sure of her schedule.", options:["must","should","will","may"], correct:3, explain:"\u201cMay\u201d expresses possibility, similar to \u201cmight\u201d but a little more formal."},
+  {q:"All passengers ___ fasten their seatbelts before takeoff.", options:["might","must","could","would"], correct:1, explain:"\u201cMust\u201d shows a strong obligation or rule."},
+  {q:"The lights are off and the car is gone; they ___ have left already.", options:["must","can","might","should"], correct:0, explain:"\u201cMust have\u201d expresses a confident deduction about the past."},
+  {q:"You ___ smoke inside the hospital; it\u2019s strictly forbidden.", options:["don\u2019t have to","might not","mustn\u2019t","couldn\u2019t"], correct:2, explain:"\u201cMustn\u2019t\u201d expresses prohibition \u2014 it\u2019s not allowed."},
+  {q:"You ___ finish the whole report today; tomorrow is fine too.", options:["mustn\u2019t","shouldn\u2019t","can\u2019t","don\u2019t have to"], correct:3, explain:"\u201cDon\u2019t have to\u201d means there is no obligation."},
+  {q:"You ___ see a dentist about that toothache.", options:["must","should","will","can"], correct:1, explain:"\u201cShould\u201d gives advice or a recommendation."},
+  {q:"As citizens, we ___ obey the law.", options:["ought to","can","might","could"], correct:0, explain:"\u201cOught to\u201d is a more formal way of giving advice, similar to \u201cshould.\u201d"},
+  {q:"The package ___ arrive by Friday, according to the tracking website.", options:["must","can","should","might"], correct:2, explain:"\u201cShould\u201d expresses an expectation that something is likely."},
+  {q:"I think it ___ be sunny tomorrow.", options:["can","must","could","will"], correct:3, explain:"\u201cWill\u201d is used for future predictions."},
+  {q:"I ___ help you move next weekend, I promise.", options:["must","will","should","might"], correct:1, explain:"\u201cWill\u201d expresses a promise or willingness."},
+  {q:"\u201c___ you mind closing the window?\u201d", options:["Would","Will","Can","Must"], correct:0, explain:"\u201cWould you mind\u2026?\u201d is a very polite request."},
+  {q:"If I had more time, I ___ travel the world.", options:["will","can","would","must"], correct:2, explain:"\u201cWould\u201d is used in the result clause of a hypothetical (2nd conditional)."},
+  {q:"Every summer, we ___ visit our grandparents\u2019 farm.", options:["will","must","should","would"], correct:3, explain:"\u201cWould\u201d describes a repeated action in the past \u2014 a past habit."},
+  {q:"\u201c___ you pass the salt, please?\u201d", options:["Must","Could","Shall","Ought"], correct:1, explain:"\u201cCould\u201d makes a polite request."},
+  {q:"The traffic is bad; we ___ be late.", options:["could","must","should","will"], correct:0, explain:"\u201cCould\u201d expresses a real possibility."},
+  {q:"\u201c___ we begin the meeting now?\u201d", options:["Will","Must","Shall","Might"], correct:2, explain:"\u201cShall we\u2026?\u201d is a formal way to suggest doing something together."},
+  {q:"The tenant ___ pay rent by the fifth of each month.", options:["might","could","would","shall"], correct:3, explain:"\u201cShall\u201d is used in formal or legal writing to state an obligation."},
+  {q:"\u201cThat ___ be true; I just saw her an hour ago!\u201d", options:["mustn\u2019t","can\u2019t","shouldn\u2019t","wouldn\u2019t"], correct:1, explain:"\u201cCan\u2019t\u201d expresses a confident belief that something is impossible."},
+  {q:"You ___ be exhausted after that long flight.", options:["must","can","might","should"], correct:0, explain:"\u201cMust\u201d shows a strong, logical deduction."},
+  {q:"I\u2019m not sure, but I ___ left my keys at the office.", options:["must have","should have","might have","would have"], correct:2, explain:"\u201cMight have\u201d shows uncertainty about a past action."},
+  {q:"You ___ told me earlier; now we\u2019re going to be late.", options:["must have","would have","could have","should have"], correct:3, explain:"\u201cShould have\u201d expresses regret about a past action."},
+  {q:"He ___ won the race, but he tripped near the finish line.", options:["should have","could have","must have","would have"], correct:1, explain:"\u201cCould have\u201d describes a missed possibility or ability in the past."},
+  {q:"Children ___ play near the swimming pool without an adult.", options:["mustn\u2019t","don\u2019t have to","might not","would not"], correct:0, explain:"\u201cMustn\u2019t\u201d shows a rule or prohibition."},
+  {q:"According to the report, prices ___ rise sharply next quarter.", options:["must","can","may","shall"], correct:2, explain:"\u201cMay\u201d expresses a formal possibility, common in written reports."},
+  {q:"Metal ___ conduct electricity.", options:["must","should","will","can"], correct:3, explain:"\u201cCan\u201d states a general ability or fact."}
+];
+
+const list = document.getElementById("quiz-list");
+const letters = ["A","B","C","D"];
+quiz.forEach((item, qi)=>{
+  const div = document.createElement("div");
+  div.className = "quiz-item";
+  div.id = "quiz-item-"+qi;
+  div.innerHTML = `
+    <div class="q-head">
+      <span class="q-num">Q${String(qi+1).padStart(2,"0")}</span>
+      <span class="q-text">${item.q}</span>
+    </div>
+    <div class="q-options">
+      ${item.options.map((opt,oi)=>`
+        <label class="q-option" id="opt-${qi}-${oi}">
+          <input type="radio" name="q${qi}" value="${oi}">
+          <span>${letters[oi]}) ${opt}</span>
+        </label>`).join("")}
+    </div>
+    <div class="explain" id="explain-${qi}">${item.explain}</div>
+  `;
+  list.appendChild(div);
+});
+
+document.getElementById("check-btn").addEventListener("click", ()=>{
+  let score = 0;
+  quiz.forEach((item, qi)=>{
+    const selected = document.querySelector(`input[name="q${qi}"]:checked`);
+    const container = document.getElementById("quiz-item-"+qi);
+    const rightOpt = document.getElementById(`opt-${qi}-${item.correct}`);
+    rightOpt.classList.add("right-answer");
+    if(selected){
+      const chosenIdx = Number(selected.value);
+      if(chosenIdx === item.correct){
+        score++;
+        container.classList.add("correct");
+      } else {
+        container.classList.add("incorrect");
+        document.getElementById(`opt-${qi}-${chosenIdx}`).classList.add("wrong-answer");
+      }
+    } else {
+      container.classList.add("incorrect");
+    }
+    document.getElementById("explain-"+qi).classList.add("show");
+  });
+  const banner = document.getElementById("score-banner");
+  banner.textContent = `Score: ${score} / ${quiz.length} \u2014 ${score>=24?"Excellent work.":score>=18?"Solid, review the misses.":"Worth a second pass through the flashcards."}`;
+  banner.classList.add("show");
+  banner.scrollIntoView({behavior:"smooth", block:"center"});
+});
+
+document.getElementById("reset-btn").addEventListener("click", ()=>{
+  quiz.forEach((item, qi)=>{
+    const container = document.getElementById("quiz-item-"+qi);
+    container.classList.remove("correct","incorrect");
+    item.options.forEach((_,oi)=>{
+      const opt = document.getElementById(`opt-${qi}-${oi}`);
+      opt.classList.remove("right-answer","wrong-answer");
+      const input = opt.querySelector("input");
+      input.checked = false;
+    });
+    document.getElementById("explain-"+qi).classList.remove("show");
+  });
+  document.getElementById("score-banner").classList.remove("show");
+  window.scrollTo({top: document.getElementById("quiz").offsetTop - 20, behavior:"smooth"});
+});
+
+/* ---------------- SPEAKING PROMPTS ---------------- */
+const teacherPrompts = [
+  "Tell me three things you can do well in English now that you couldn\u2019t do a year ago.",
+  "If you won the lottery tomorrow, what would you do first?",
+  "What should a new employee do on their first day at a job?",
+  "Ask me for permission to leave the room, using three different modals.",
+  "You look tired today \u2014 what might have happened last night? Guess out loud.",
+  "Give me a rule from your home country that everyone must follow.",
+  "Politely ask me to open the window, using \u2018would\u2019 and then \u2018could.\u2019",
+  "Describe something you used to do every weekend as a child, using \u2018would.\u2019",
+  "What ought a good teacher to do for their students?",
+  "Make a promise to me about something you will do this week."
+];
+const studentPrompts = [
+  "Talk for 30 seconds about a skill you can do that surprises people.",
+  "Describe a rule at your workplace that employees must follow.",
+  "Give a friend advice about a problem, using \u2018should\u2019 and \u2018ought to.\u2019",
+  "Make three polite requests using \u2018could,\u2019 \u2018would,\u2019 and \u2018can.\u2019",
+  "Imagine you had a superpower \u2014 explain what you would do with it.",
+  "Guess what your teacher might be doing right now, away from class.",
+  "Talk about something you would always do on weekends as a child.",
+  "Ask permission to do three different things using \u2018can,\u2019 \u2018could,\u2019 and \u2018may.\u2019",
+  "Make one promise about tomorrow using \u2018will.\u2019",
+  "Talk about a decision you regret, using \u2018should have\u2019 or \u2018could have.\u2019"
+];
+document.getElementById("teacher-prompts").innerHTML = teacherPrompts.map(p=>`<li>${p}</li>`).join("");
+document.getElementById("student-prompts").innerHTML = studentPrompts.map(p=>`<li>${p}</li>`).join("");
+</script>
+</body>
+</html>
