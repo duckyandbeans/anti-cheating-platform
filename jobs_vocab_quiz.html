@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Practice Notebook — Work &amp; Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --paper:#FFFDF6;
+    --line:#F0E1CE;
+    --margin-line:#F0904D;
+    --ink:#332A1E;
+    --ink-soft:#7A5F41;
+    --accent:#E8720C;
+    --accent-soft:#FBE0C0;
+    --accent-deep:#B85A00;
+    --success:#4F7A50;
+    --success-bg:#E4EFDF;
+    --error:#B4453B;
+    --error-bg:#FBE6E2;
+    --highlight:#FBD98A;
+    --white:#FFFFFF;
+    --shadow: 0 4px 16px rgba(140,80,10,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Atkinson Hyperlegible', sans-serif; font-size:19px; line-height:1.7;
+    color:var(--ink); background:#F1E9D8; min-height:100vh; padding:22px;
+  }
+  .wrap{max-width:800px;margin:0 auto;}
+  h1,h2,h3{font-family:'Patrick Hand', cursive; margin:0; font-weight:400;}
+  .app-header{ display:flex;align-items:center;justify-content:space-between; margin-bottom:20px;flex-wrap:wrap;gap:10px; }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-emoji{font-size:38px;}
+  .brand-title{font-family:'Patrick Hand';font-size:28px;color:var(--accent-deep);}
+  .brand-sub{font-size:15px;color:var(--ink-soft);}
+
+  .card{
+    background:var(--paper);
+    background-image: repeating-linear-gradient(var(--paper) 0px, var(--paper) 37px, var(--line) 38px);
+    border-radius:16px; box-shadow:var(--shadow); padding:30px 32px 30px 56px;
+    margin-bottom:22px; position:relative; border:1px solid #E7DCC5;
+  }
+  .card::before{ content:""; position:absolute; top:0; bottom:0; left:38px; width:2px; background:var(--margin-line); opacity:.55; }
+  .card.serious{ border-left:6px solid var(--accent); padding-left:50px; }
+  .card.serious::before{ left:32px; }
+
+  .section-tag{
+    display:inline-block; font-family:'Patrick Hand'; font-size:18px;
+    background:var(--accent-soft); color:var(--accent-deep); padding:5px 16px; border-radius:8px; margin-bottom:14px;
+  }
+  .trail{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+    margin-bottom:22px; padding:14px 16px; background:var(--white); border-radius:14px; box-shadow:var(--shadow); gap:6px;
+  }
+  .stamp{
+    width:36px;height:36px;border-radius:8px; display:flex;align-items:center;justify-content:center;
+    font-size:14px; font-family:'Patrick Hand'; background:var(--paper); border:2px solid var(--line);
+    color:var(--ink-soft); transition:all .3s;
+  }
+  .stamp.done{ background:var(--success-bg); border-color:var(--success); color:var(--success); }
+  .stamp.current{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  .trail-line{flex:1;min-width:8px;height:3px;background:var(--line);border-radius:2px;}
+
+  .section-title{font-size:28px;color:var(--accent-deep);margin-bottom:6px;}
+  .section-sub{font-size:16px;color:var(--ink-soft);margin-bottom:18px;}
+
+  .wordbank{ margin-bottom:22px; }
+  .wb-label{ font-size:16px; font-weight:700; color:var(--accent-deep); display:block; margin-bottom:10px; }
+  .wb-chips{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    display:inline-block; background:var(--white); border:2px solid var(--accent);
+    color:var(--accent-deep); font-weight:700; font-size:17px; padding:9px 18px; border-radius:10px; cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{ background:var(--accent-soft); }
+  .chip-selected{ background:var(--highlight); border-color:#C9A227; transform:scale(1.06); box-shadow:var(--shadow); }
+  .chip-used{ opacity:.35; text-decoration:line-through; cursor:default; pointer-events:none; }
+
+  .q-block{margin-bottom:26px; padding-bottom:22px; border-bottom:1.5px dashed #DCCFAF;}
+  .q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+  .q-num{
+    display:inline-flex;align-items:center;justify-content:center; width:30px;height:30px;border-radius:8px;
+    background:var(--accent);color:#fff; font-family:'Patrick Hand';font-size:16px;margin-right:10px;flex-shrink:0;
+  }
+  .q-text{font-weight:700;font-size:19px;line-height:1.8;display:flex;align-items:flex-start;}
+  .q-text-inner{flex:1;}
+
+  .blank-empty{
+    display:inline-block; min-width:110px; text-align:center; border:2px dashed var(--accent); border-radius:8px;
+    padding:5px 12px; color:var(--accent-deep); font-weight:700; cursor:pointer; margin:0 3px;
+  }
+  .blank-empty:hover{ background:var(--accent-soft); }
+  .blank-filled{
+    display:inline-block; border:2px solid var(--success); background:var(--success-bg);
+    border-radius:8px; padding:5px 12px; color:var(--success); font-weight:700; cursor:pointer; margin:0 3px;
+  }
+
+  .fill-input{
+    border:2px solid var(--accent); border-radius:10px; background:var(--white);
+    font-family:'Atkinson Hyperlegible'; font-weight:700; font-size:18px; color:var(--ink);
+    padding:10px 14px; width:100%; max-width:460px; outline:none; margin-top:8px;
+  }
+  .fill-input:focus{ background:var(--accent-soft); }
+
+  .options{margin-top:12px;display:flex;flex-direction:column;gap:10px;padding-left:40px;}
+  .opt{
+    display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:10px; border:2px solid var(--line);
+    cursor:pointer;font-weight:700;font-size:18px;transition:all .15s; background:var(--white);
+  }
+  .opt:hover{border-color:var(--accent);background:var(--accent-soft);}
+  .opt.selected{border-color:var(--accent);background:var(--highlight);}
+
+  .btn{
+    font-family:'Patrick Hand';font-weight:400;font-size:20px;border:none;border-radius:10px;
+    padding:14px 30px;cursor:pointer;transition:transform .15s; background:var(--accent); color:#fff; box-shadow:var(--shadow);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.secondary{ background:var(--white); color:var(--accent-deep); border:2.5px solid var(--accent); box-shadow:none; }
+  .btn.small{padding:9px 20px;font-size:17px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+  .btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:10px;}
+  .btn-row.between{justify-content:space-between;}
+
+  .start-hero{text-align:center;padding:10px 6px;}
+  .start-hero .big-emoji{font-size:56px;}
+  .start-hero h1{font-size:32px;color:var(--accent-deep);margin:12px 0 8px;}
+  .start-hero p{color:var(--ink-soft);font-size:18px;max-width:560px;margin:0 auto 20px;line-height:1.7;}
+  .info-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+  .chip-info{ background:var(--accent-soft);border-radius:10px;padding:9px 18px;font-size:15px; font-weight:700;color:var(--accent-deep); }
+  input.name-input{
+    width:100%;max-width:360px;padding:15px 20px;border-radius:10px; border:2.5px solid var(--accent);
+    font-family:'Atkinson Hyperlegible';font-weight:700; font-size:18px;text-align:center;outline:none;margin-bottom:18px;color:var(--ink);
+  }
+  .teacher-link{ display:block;text-align:center;margin-top:12px;font-size:16px; color:var(--accent-deep);font-weight:700;text-decoration:underline;cursor:pointer; }
+
+  .modal-bg{ position:fixed;inset:0;background:rgba(51,48,41,.5);display:flex; align-items:center;justify-content:center;z-index:50;padding:20px; }
+  .modal{background:var(--paper);border-radius:16px;padding:30px;max-width:400px;width:100%;box-shadow:var(--shadow);}
+  .modal h3{color:var(--accent-deep);margin-bottom:16px;font-size:24px;}
+  .modal input{
+    width:100%;padding:13px 16px;border-radius:10px;border:2px solid var(--accent);
+    font-family:'Atkinson Hyperlegible';font-weight:700;margin-bottom:12px;outline:none;font-size:17px;
+  }
+  .modal .err{color:var(--error);font-size:15px;font-weight:700;margin-bottom:10px;}
+
+  .results-hero{text-align:center;}
+  .results-hero .score-circle{
+    width:160px;height:160px;border-radius:50%;margin:12px auto 20px;
+    background:conic-gradient(var(--accent) var(--pct,0%), var(--line) 0);
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .results-hero .score-circle::before{ content:"";position:absolute;inset:14px;border-radius:50%;background:var(--paper); }
+  .results-hero .score-num{position:relative;font-family:'Patrick Hand';font-size:34px;color:var(--accent-deep);}
+  .badge{ display:inline-block;background:var(--highlight);color:var(--accent-deep);font-family:'Patrick Hand'; font-size:18px;padding:6px 18px;border-radius:10px;margin-bottom:8px; }
+  .section-score-row{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 0; border-bottom:1px dashed #DCCFAF;font-weight:700;font-size:16px;
+  }
+  .section-score-row:last-child{border-bottom:none;}
+  .bar-bg{flex:1;height:12px;background:var(--line);border-radius:6px;margin:0 14px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--accent);border-radius:6px;}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);}
+  th{color:var(--accent-deep);font-family:'Patrick Hand';font-size:16px;}
+  .attempt-row{cursor:pointer;}
+  .attempt-row:hover{background:var(--accent-soft);}
+  .pill-small{display:inline-block;padding:3px 12px;border-radius:8px;font-size:13px;font-weight:700;}
+  .pill-good{background:var(--success-bg);color:var(--success);}
+  .pill-mid{background:var(--highlight);color:var(--accent-deep);}
+  .pill-low{background:var(--error-bg);color:var(--error);}
+
+  .review-heading{font-family:'Patrick Hand';font-size:22px;color:var(--accent-deep);margin:26px 0 6px;}
+  .review-sub{font-size:15px;color:var(--ink-soft);font-weight:700;margin-bottom:16px;}
+  .review-card{ background:var(--white); border:2px dashed var(--accent); border-radius:12px; padding:16px 18px; margin-bottom:14px; }
+  .review-tag{ display:inline-block; font-family:'Patrick Hand'; font-size:14px; background:var(--accent); color:#fff; padding:4px 12px; border-radius:8px; margin-bottom:10px; }
+  .review-q{font-weight:700;font-size:17px;margin-bottom:8px;line-height:1.6;}
+  .review-your{color:var(--error);font-weight:700;font-size:16px;text-decoration:line-through;}
+  .review-correct{color:var(--success);font-weight:700;font-size:16px;}
+  .review-line{font-size:16px;margin-bottom:5px;}
+  .review-expl{ font-size:15px; color:var(--ink-soft); font-weight:700; background:var(--accent-soft); border-radius:10px; padding:10px 12px; margin-top:8px; line-height:1.6; }
+  .review-expl b{color:var(--accent-deep);}
+  .perfect-msg{ text-align:center;font-weight:700;font-size:18px;color:var(--success);padding:16px; background:var(--success-bg);border-radius:14px; }
+
+  .flashcard{
+    background:var(--white); border:2px solid var(--accent); border-radius:16px; padding:28px; text-align:left;
+    margin:18px 0; min-height:160px; cursor:pointer;
+  }
+  .flash-label{ font-family:'Patrick Hand'; font-size:15px; color:var(--ink-soft); margin-bottom:12px; letter-spacing:.06em; text-align:center; }
+  .flash-front-text{ font-weight:700; font-size:26px; color:var(--accent-deep); text-align:center; }
+  .flash-back-text{ font-weight:700; font-size:17px; color:var(--ink); line-height:1.8; }
+  .flash-counter{ text-align:center; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+  .flash-tap-hint{ text-align:center; margin-top:14px;font-size:14px;color:var(--ink-soft); }
+
+  .submit-lock{
+    background:var(--accent-soft); border:2px dashed var(--accent); border-radius:12px; padding:12px 18px; margin-top:16px;
+    font-weight:700; font-size:16px; color:var(--accent-deep); text-align:center;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; font-family:'Patrick Hand'; font-size:17px; padding:13px 24px; border-radius:12px;
+    box-shadow:var(--shadow); opacity:0; transition:opacity .4s, transform .4s; z-index:100; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .skip-highlight{ animation:skipPulse 1.6s ease; border-radius:12px; }
+  @keyframes skipPulse{ 0%{box-shadow:0 0 0 4px var(--highlight); background:var(--highlight);} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0); background:transparent;} }
+
+  footer{text-align:center;font-size:14px;color:var(--ink-soft);opacity:.8;margin-top:22px;}
+  .hidden{display:none !important;}
+  @media(max-width:520px){ .options{padding-left:0;} .card{padding:24px 20px 24px 40px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="app-header">
+    <div class="brand">
+      <div class="brand-emoji">📔</div>
+      <div>
+        <div class="brand-title">English Practice Notebook</div>
+        <div class="brand-sub">Weekly Vocabulary Practice — Work &amp; Jobs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="card">
+    <div class="start-hero">
+      <div class="big-emoji">📖✏️</div>
+      <h1>Welcome back to your notebook</h1>
+      <p>This week's topic is Work &amp; Jobs — words like career, boss, factory, and phrases like "earn a living" and "make money." First, a study reference shows you all the words. Then a full practice set with 68 questions, taken directly from your workbook pages.</p>
+      <div class="info-chips">
+        <div class="chip-info">🗂️ study reference first</div>
+        <div class="chip-info">📝 68 questions</div>
+        <div class="chip-info">⏳ 35 minutes</div>
+      </div>
+      <input id="studentName" class="name-input" placeholder="Type your name here" />
+      <div>
+        <button class="btn" onclick="startFlow()">Begin</button>
+      </div>
+      <div class="teacher-link" onclick="openTeacherModal()">I'm the teacher / parent →</div>
+      <div class="teacher-link" onclick="openScoreLookup()">📄 Check my previous scores →</div>
+    </div>
+  </div>
+
+  <!-- REFERENCE FLASHCARD DECK -->
+  <div id="flashcardScreen" class="hidden card">
+    <div class="section-tag">Study reference</div>
+    <div class="section-title">Work &amp; Jobs — vocabulary</div>
+    <div class="section-sub">Tap the card to flip it and read the word list. Go through all the cards, then start the practice whenever you're ready.</div>
+    <div class="flash-counter" id="flashCounter"></div>
+    <div class="flashcard" id="flashcardEl" onclick="flipStudyCard()">
+      <div id="flashStudyFront">
+        <div class="flash-label">CATEGORY</div>
+        <div class="flash-front-text" id="flashFrontText"></div>
+        <div class="flash-tap-hint">tap to see the words</div>
+      </div>
+      <div id="flashStudyBack" class="hidden">
+        <div class="flash-label" style="text-align:left;">WORDS</div>
+        <div class="flash-back-text" id="flashBackText"></div>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:center;gap:14px;">
+      <button class="btn secondary small" onclick="prevStudyCard()">Prev</button>
+      <button class="btn secondary small" onclick="nextStudyCard()">Next</button>
+    </div>
+    <div class="btn-row" style="justify-content:center;margin-top:14px;">
+      <button class="btn" onclick="beginTimedExam()">I'm ready — start the practice</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="trail" id="trail"></div>
+    <div id="sectionContainer"></div>
+  </div>
+
+  <!-- FINAL REVIEW CHECKLIST -->
+  <div id="finalReviewScreen" class="hidden"></div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="hidden card">
+    <div class="results-hero">
+      <div class="badge">All done!</div>
+      <h1 id="resultsName" style="color:var(--accent-deep);font-size:26px;"></h1>
+      <div class="score-circle" id="scoreCircle"><div class="score-num" id="scoreNum">0%</div></div>
+      <p id="benchmarkNote" style="font-weight:700;color:var(--ink-soft);max-width:460px;margin:0 auto 20px;"></p>
+    </div>
+    <div id="sectionScores"></div>
+    <div id="reviewSection"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:20px;">
+      <button class="btn secondary" onclick="location.reload()">Take it again</button>
+    </div>
+  </div>
+
+  <!-- TEACHER LOGIN MODAL -->
+  <div id="teacherModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>Teacher / Parent Login</h3>
+      <input id="teacherUser" placeholder="Username" />
+      <input id="teacherPass" type="password" placeholder="Password" />
+      <div id="teacherErr" class="err hidden">Incorrect username or password.</div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeTeacherModal()">Cancel</button>
+        <button class="btn small" onclick="checkTeacherLogin()">Log in</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT SCORE LOOKUP MODAL -->
+  <div id="scoreLookupModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>Check my previous scores</h3>
+      <input id="lookupName" placeholder="Type your name exactly as before" />
+      <div id="lookupErr" class="err hidden"></div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeScoreLookup()">Cancel</button>
+        <button class="btn small" onclick="doScoreLookup()">Look up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT MY-SCORES SCREEN -->
+  <div id="myScoresScreen" class="hidden"></div>
+
+  <!-- TEACHER DASHBOARD -->
+  <div id="teacherDash" class="hidden card">
+    <h2 style="color:var(--accent-deep);font-size:26px;">Results Dashboard</h2>
+    <p style="font-weight:700;color:var(--ink-soft);font-size:16px;">Topic: Work &amp; Jobs vocabulary.</p>
+    <div id="attemptsList"></div>
+    <div id="attemptDetail"></div>
+    <div class="btn-row" style="justify-content:flex-start;"><button class="btn secondary small" onclick="location.reload()">Log out</button></div>
+  </div>
+
+  <footer>Keep going — every question is one step further.</footer>
+</div>
+
+<script>
+/* ---------------- FIREBASE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAB_on0WAobEXccxHvcwtS9ShxQpfATH-A",
+  authDomain: "anti-cheating-remedial-quiz.firebaseapp.com",
+  projectId: "anti-cheating-remedial-quiz",
+  storageBucket: "anti-cheating-remedial-quiz.firebasestorage.app",
+  messagingSenderId: "979294386230",
+  appId: "1:979294386230:web:7f9ff3e377d4da20cd4097",
+  measurementId: "G-84YB5CYGM8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const COLLECTION = 'jobsVocabAttempts';
+
+/* ---------------- STUDY REFERENCE CARDS ---------------- */
+const studyCards = [
+  {front:'NOUNS', back:"boss, career, chance, company, difficulty, driving licence, effort, engineer, factory, job, journalist, manager, mechanic, meeting, money, newspaper, occupation, office, police officer, staff, type, work"},
+  {front:'VERBS', back:"accept, build, call, carry, complete, create, drive, earn, finish, lift, manage, please, speak, start, train, try"},
+  {front:'PHRASAL VERBS', back:"get back, get up, tidy up, wake up"},
+  {front:'PHRASES', back:"at work, be able to do (something), by myself / yourself / etc, decide on (something), earn a living, earn money, make a living, make money, on business, on time"},
+  {front:'ADJECTIVES & ADVERBS', back:"Adjectives: bored, boring, busy, daily, difficult, necessary, wonderful\n\nAdverbs: alone, certainly, daily, hard"},
+  {front:'WORD FORMATION', back:"ability \u2192 able / unable\narrangement \u2192 arrange\nchoice \u2192 choose\nday \u2192 daily\ndecision \u2192 decide\ndifficulty \u2192 difficult\nengine \u2192 engineer \u2192 engineering\nmanager \u2192 manage \u2192 management\nmusic \u2192 musical \u2192 musician\nsuit \u2192 suitable / unsuitable\ncertain \u2192 certainly"}
+];
+let studyIdx = 0;
+let studyFlipped = false;
+
+/* ---------------- QUIZ DATA ---------------- */
+const quizData = [
+{id:'A', label:'A', title:'Choose the correct word', mode:'serious', type:'mcq',
+ intro:'Circle (tap) the correct word to complete each sentence.',
+ questions:[
+  {q:'Kelly is going to make more ___ to pass her university exams.', options:['effort','chance'], answer:0, expl:'"Effort" berarti usaha, cocok dengan "make effort" (berusaha).'},
+  {q:"When I leave university, I'll be a great ___. I'll design robots to build cars.", options:['engineer','police officer'], answer:0, expl:'"Engineer" (insinyur) merancang dan membangun mesin/robot.'},
+  {q:'The ___ wants to have a staff meeting at the company office tomorrow.', options:['manager','occupation'], answer:0, expl:'"Manager" adalah orang yang mengadakan rapat staf; "occupation" berarti profesi, bukan orangnya.'},
+  {q:'Would you like a ___ in a factory?', options:['work','job'], answer:1, expl:'"Job" dipakai dengan artikel "a" (a job); "work" biasanya tidak dihitung.'},
+  {q:'Maria is a ___. She repairs cars.', options:['mechanic','police officer'], answer:0, expl:'"Mechanic" (montir) memperbaiki mobil.'},
+  {q:'What ___ would you choose when you grow up?', options:['difficulty','occupation'], answer:1, expl:'"Occupation" berarti pekerjaan/profesi.'}
+ ]},
+{id:'B', label:'B', title:'Fill in the gaps (word bank)', mode:'fun', type:'clickfill',
+ wordbank:['office','journalist','type','driving licence','career','boss','company','factory'],
+ questions:[
+  {q:'Paul is a well-known ___. He writes interesting articles in newspapers and magazines.', answer:'journalist', expl:'"Journalist" = wartawan.'},
+  {q:'Before you buy a car, you must get your ___.', answer:'driving licence', expl:'"Driving licence" = SIM.'},
+  {q:"Larry's going to ask his ___ at work for a day off.", answer:'boss', expl:'"Boss" = atasan.'},
+  {q:'Our school visited the Lamborghini ___ and we saw how they make cars.', answer:'factory', expl:'"Factory" = pabrik.'},
+  {q:'Dave wants to have the ___ of career where he can be creative.', answer:'type', expl:'"Type" = jenis.'},
+  {q:"I'd like to have a teaching ___ because working with children is more important than money.", answer:'career', expl:'"Career" = karier.'},
+  {q:"I've got a lot of emails to send, so I won't leave the ___ until late this evening.", answer:'office', expl:'"Office" = kantor.'},
+  {q:'Our ___ is international and has offices in many big cities around the world.', answer:'company', expl:'"Company" = perusahaan.'}
+ ]},
+{id:'C', label:'C', title:'Verbs — choose the correct answer', mode:'serious', type:'mcq',
+ intro:'Tap the correct verb.',
+ questions:[
+  {q:'Are you going to ___ the job offer or not?', options:['complete','earn','accept'], answer:2, expl:'"Accept" = menerima.'},
+  {q:'The manager of the company can ___ a lot of money.', options:['earn','create','try'], answer:0, expl:'"Earn" = menghasilkan uang.'},
+  {q:'Let me ___ those heavy boxes for you.', options:['drive','carry','call'], answer:1, expl:'"Carry" = membawa (barang berat).'},
+  {q:'When they ___ a new factory here, my mum might find a job.', options:['build','create','complete'], answer:0, expl:'"Build" = membangun.'},
+  {q:'What type of car does Derek ___ for the company?', options:['drive','lift','try'], answer:0, expl:'"Drive" = mengemudikan.'},
+  {q:'My boss is always complaining. Nothing ___ him!', options:['manages','pleases','trains'], answer:1, expl:'"Please" = menyenangkan seseorang.'},
+  {q:'May I ___ to the manager, please?', options:['start','call','speak'], answer:2, expl:'"Speak to someone" = berbicara dengan seseorang.'}
+ ]},
+{id:'D', label:'D', title:'Match the question with the answer', mode:'fun', type:'clickfill',
+ wordbank:['Of course! Where do you want to move it to?','When I finish my studies here.',"I'm trying to finish it, but I've got so much to do.","Yes, it's very hard work.","I'm going to be late; we're very busy right now.",'Of course, what time do you want it to arrive?'],
+ questions:[
+  {q:'What time are you going to finish work today?', answer:"I'm going to be late; we're very busy right now.", expl:'Balasan yang cocok menjelaskan keterlambatan karena sibuk.'},
+  {q:'Would you call a taxi for me, please?', answer:'Of course, what time do you want it to arrive?', expl:'Balasan logis untuk permintaan memanggil taksi adalah menanyakan waktu kedatangan.'},
+  {q:'Can you complete the project this week?', answer:"I'm trying to finish it, but I've got so much to do.", expl:'Jawaban menunjukkan usaha menyelesaikan meski masih banyak pekerjaan.'},
+  {q:'When do you hope to train as a nurse?', answer:'When I finish my studies here.', expl:'Waktu berlatih menjadi perawat berkaitan dengan selesainya studi.'},
+  {q:'Is it difficult to manage a big company?', answer:"Yes, it's very hard work.", expl:'Jawaban "yes" dengan penjelasan bahwa itu pekerjaan berat.'},
+  {q:'Can you help me lift the table?', answer:'Of course! Where do you want to move it to?', expl:'Balasan logis untuk bantuan mengangkat meja adalah menanyakan tujuan pemindahan.'}
+ ]},
+{id:'E', label:'E', title:'Crossword clues (adjectives & adverbs)', mode:'fun', type:'clickfill',
+ intro:'Originally a crossword — here the same clues are a simple list. Tap the word that fits each clue.',
+ wordbank:['alone','difficult','busy','hard','wonderful','bored','certainly','daily','boring','necessary','hard'],
+ questions:[
+  {q:'(Across 6) Dinara was ___ in the room. There was nobody else there.', answer:'alone', expl:'"Alone" = sendirian.'},
+  {q:'(Across 7) The maths problem was very ___ but Nick found the answer by himself!', answer:'difficult', expl:'"Difficult" = sulit.'},
+  {q:"(Across 8) We're going to be very ___ at the office all week. We must finish a project before the weekend.", answer:'busy', expl:'"Busy" = sibuk.'},
+  {q:'(Across 10) You must practise your English ___ to get better!', answer:'hard', expl:'"Hard" (adverb) = dengan giat.'},
+  {q:"(Across 11) I'm sure the school trip will be ___!", answer:'wonderful', expl:'"Wonderful" = luar biasa.'},
+  {q:"(Down 1) Marat was feeling ___ and didn't know how to spend his time.", answer:'bored', expl:'"Bored" = merasa bosan.'},
+  {q:"(Down 2) Yes, I'll ___ come to your party, I promise I won't miss it!", answer:'certainly', expl:'"Certainly" = pasti.'},
+  {q:'(Down 3) Professional athletes have a very tiring ___ programme.', answer:'daily', expl:'"Daily" = harian.'},
+  {q:'(Down 4) The film was really ___ and we left in the middle.', answer:'boring', expl:'"Boring" = membosankan.'},
+  {q:"(Down 5) Next year my family and I are going to move to Australia, so it's ___ for me to learn English.", answer:'necessary', expl:'"Necessary" = perlu.'},
+  {q:'(Down 9) Farmers work very ___ every day.', answer:'hard', expl:'"Hard" (adverb) = dengan giat.'}
+ ]},
+{id:'F', label:'F', title:'Fill in the missing word (phrasal verbs)', mode:'fun', type:'clickfill',
+ wordbank:['up','back','by','up','on','on','living','earn'],
+ questions:[
+  {q:"I'm going to bed now because tomorrow I have to wake ___ very early.", answer:'up', expl:'"Wake up" = bangun tidur.'},
+  {q:'What time are you going to get ___ from the gym?', answer:'back', expl:'"Get back" = kembali.'},
+  {q:"Would you like some cake? I've made it ___ myself!", answer:'by', expl:'"By myself" = sendiri.'},
+  {q:"I'm going to tidy ___ my room this weekend, I promise!", answer:'up', expl:'"Tidy up" = merapikan.'},
+  {q:"Your boss is going to be very angry if you aren't ___ time in the morning.", answer:'on', expl:'"On time" = tepat waktu.'},
+  {q:'They\u2019re having a meeting to decide ___ the future of the company.', answer:'on', expl:'"Decide on" = memutuskan tentang sesuatu.'},
+  {q:'Dina is an artist. She makes a ___ by selling her paintings.', answer:'living', expl:'"Make a living" = mencari nafkah.'},
+  {q:'How much money do managers ___ in a year?', answer:'earn', expl:'"Earn" = menghasilkan (uang).'}
+ ]},
+{id:'G', label:'G', title:'Fill in the gaps (phrases)', mode:'fun', type:'clickfill',
+ intro:'From a short text about choosing a career.',
+ wordbank:['make money','be able to','get up','at work','on business','earn a living'],
+ questions:[
+  {q:"When you're a teenager, you start thinking about your future and how to ___.", answer:'make money', expl:'"Make money" = menghasilkan uang.'},
+  {q:'The best way to decide is to think about what you might ___ do well.', answer:'be able to', expl:'"Be able to" = mampu melakukan sesuatu.'},
+  {q:'Another thing to think about is whether you want to ___ early or late in the morning.', answer:'get up', expl:'"Get up" = bangun tidur.'},
+  {q:"For some jobs it's necessary to be ___ early in the morning.", answer:'at work', expl:'"At work" = berada di tempat kerja.'},
+  {q:'For some jobs you must travel a lot ___.', answer:'on business', expl:'"On business" = untuk urusan pekerjaan.'},
+  {q:'...and for others you must study for many years before you can start to ___.', answer:'earn a living', expl:'"Earn a living" = mencari nafkah.'}
+ ]},
+{id:'H', label:'H', title:'Word formation — sentences', mode:'serious', type:'fill',
+ intro:'Type the correct form of the word shown in brackets. Capital letters don\u2019t matter.',
+ questions:[
+  {q:"Marisa was ___ (able) to come to the meeting and the boss wasn't happy.", answer:'unable', expl:'Butuh bentuk negatif dari "able" \u2192 "unable".'},
+  {q:'Can you play any ___ (music) instruments, like the guitar?', answer:'musical', expl:'Butuh bentuk adjective dari "music" \u2192 "musical".'},
+  {q:'I have great ___ (difficult) understanding this grammar rule.', answer:'difficulty', expl:'Butuh bentuk noun dari "difficult" \u2192 "difficulty".'},
+  {q:"Peter's got a ___ (choose) to go to university or not.", answer:'choice', expl:'Butuh bentuk noun dari "choose" \u2192 "choice".'},
+  {q:"We've made all the ___ (arrange) ourselves. I hope everything is ok.", answer:'arrangements', aliases:['arrangement'], expl:'Butuh bentuk noun jamak dari "arrange" \u2192 "arrangements".'},
+  {q:"Nina would like to study ___ (engine) at university, like her father.", answer:'engineering', expl:'Butuh bentuk noun (bidang studi) dari "engine" \u2192 "engineering".'},
+  {q:"United will ___ (certain) win the match \u2013 they're much better!", answer:'certainly', expl:'Butuh bentuk adverb dari "certain" \u2192 "certainly".'},
+  {q:'When you go to a business meeting, you must wear ___ (suit) clothes.', answer:'suitable', expl:'Butuh bentuk adjective dari "suit" \u2192 "suitable".'}
+ ]},
+{id:'I', label:'I', title:'Word formation — a short text', mode:'serious', type:'fill',
+ intro:'The story: a fourteen-year-old talks about wanting to become a musician, but their parents disagree. Type the correct form of the word shown in brackets.',
+ questions:[
+  {q:'My ___ programme is very hard. (DAY)', answer:'daily', expl:'Butuh bentuk adjective dari "day" \u2192 "daily".'},
+  {q:"I've made the ___ to study music when I leave school. (DECIDE)", answer:'decision', expl:'Butuh bentuk noun dari "decide" \u2192 "decision".'},
+  {q:"All my family are very talented, but I'll be the first professional ___ in the family! (MUSIC)", answer:'musician', expl:'Butuh bentuk noun (orang) dari "music" \u2192 "musician".'},
+  {q:'But my parents think this job is ___ for me. (SUIT)', answer:'unsuitable', expl:'Orang tua tidak setuju, jadi butuh bentuk negatif \u2192 "unsuitable".'},
+  {q:'My dad wants me to become an ___ like him. (ENGINE)', answer:'engineer', expl:'Butuh bentuk noun (orang) dari "engine" \u2192 "engineer".'},
+  {q:'My mum wants me to study business ___ and find a job in a big company. (MANAGE)', answer:'management', expl:'Butuh bentuk noun dari "manage" \u2192 "management".'},
+  {q:'I know I have the ___ to become a great piano player. (ABLE)', answer:'ability', expl:'Butuh bentuk noun dari "able" \u2192 "ability".'},
+  {q:"I really don't think I can be a good ___ in a company. (MANAGE)", answer:'manager', expl:'Butuh bentuk noun (orang) dari "manage" \u2192 "manager".'}
+ ]}
+];
+
+/* ---------------- STATE ---------------- */
+let studentName = '';
+let currentSectionIdx = 0;
+let userAnswers = {};
+let startTime = null;
+const AUTO_SUBMIT_SECONDS = 35*60;
+const FIRST_TIMED_SECTION_IDX = 0;
+let submitted = false;
+let autoSubmitTimer = null;
+let warningTimers = [];
+let reviewChecks = {};
+
+let selectedChipId = null;
+let chipUsedBy = {};
+let blankChipId = {};
+
+/* ---------------- HELPERS ---------------- */
+function norm(s){
+  return (s||'').toString().trim().toLowerCase().replace(/['\u2019]/g,"'").replace(/[.!?]/g,'').replace(/\s+/g,' ');
+}
+function isCorrectFill(q, val){
+  const n = norm(val);
+  if(!n) return false;
+  if(n === norm(q.answer)) return true;
+  if(q.aliases && q.aliases.some(a=>norm(a)===n)) return true;
+  return false;
+}
+
+/* ---------------- START & STUDY REFERENCE ---------------- */
+function startFlow(){
+  const name = document.getElementById('studentName').value.trim();
+  if(!name){ document.getElementById('studentName').style.borderColor = '#B4453B'; document.getElementById('studentName').placeholder='Please type your name'; return; }
+  studentName = name;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('flashcardScreen').classList.remove('hidden');
+  studyIdx = 0; studyFlipped = false;
+  renderStudyCard();
+}
+function renderStudyCard(){
+  const c = studyCards[studyIdx];
+  document.getElementById('flashCounter').textContent = `Card ${studyIdx+1} of ${studyCards.length}`;
+  document.getElementById('flashFrontText').innerHTML = c.front.replace(/\n/g,'<br>');
+  document.getElementById('flashBackText').innerHTML = c.back.replace(/\n/g,'<br>');
+  document.getElementById('flashStudyFront').classList.toggle('hidden', studyFlipped);
+  document.getElementById('flashStudyBack').classList.toggle('hidden', !studyFlipped);
+}
+function flipStudyCard(){ studyFlipped = !studyFlipped; renderStudyCard(); }
+function nextStudyCard(){ studyIdx = (studyIdx+1) % studyCards.length; studyFlipped=false; renderStudyCard(); }
+function prevStudyCard(){ studyIdx = (studyIdx-1+studyCards.length) % studyCards.length; studyFlipped=false; renderStudyCard(); }
+
+function beginTimedExam(){
+  document.getElementById('flashcardScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  startTime = Date.now();
+  autoSubmitTimer = setTimeout(()=>{ if(!submitted) finishQuiz(true); }, AUTO_SUBMIT_SECONDS*1000);
+  warningTimers.push(setTimeout(()=> showToast("5 minutes left — take your time wrapping up."), (AUTO_SUBMIT_SECONDS-300)*1000));
+  warningTimers.push(setTimeout(()=> showToast("1 minute left."), (AUTO_SUBMIT_SECONDS-60)*1000));
+  renderTrail();
+  renderSection(FIRST_TIMED_SECTION_IDX);
+}
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(()=>{ t.classList.add('show'); }, 10);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(), 400); }, 4500);
+}
+
+/* ---------------- TRAIL ---------------- */
+function renderTrail(){
+  const trail = document.getElementById('trail');
+  trail.innerHTML = '';
+  quizData.forEach((sec, i)=>{
+    const stamp = document.createElement('div');
+    stamp.className = 'stamp' + (i < currentSectionIdx ? ' done' : '') + (i===currentSectionIdx ? ' current':'');
+    stamp.textContent = i < currentSectionIdx ? '✓' : sec.label;
+    stamp.title = sec.title;
+    trail.appendChild(stamp);
+    if(i < quizData.length-1){
+      const line = document.createElement('div');
+      line.className = 'trail-line';
+      trail.appendChild(line);
+    }
+  });
+}
+
+/* ---------------- RENDER SECTION ---------------- */
+function renderSection(idx, preserveScroll){
+  currentSectionIdx = idx;
+  if(!preserveScroll){ selectedChipId = null; }
+  renderTrail();
+  const sec = quizData[idx];
+  const container = document.getElementById('sectionContainer');
+  const isSerious = sec.mode === 'serious';
+  const scrollY = preserveScroll ? window.scrollY : 0;
+
+  let html = `<div class="card ${isSerious?'serious':''}">`;
+  html += `<div class="section-tag">${isSerious?'Recall practice':'Practice'} — Section ${sec.label}</div>`;
+  html += `<div class="section-title">${sec.title}</div>`;
+  if(sec.intro) html += `<div class="section-sub">${sec.intro}</div>`;
+
+  if(sec.type === 'clickfill'){
+    html += `<div class="wordbank"><span class="wb-label">Word bank — tap a word, then tap the blank in the sentence:</span><div class="wb-chips">`;
+    sec.wordbank.forEach((w, wi)=>{
+      const chipId = sec.id+'_wb_'+wi;
+      const used = !!chipUsedBy[chipId];
+      const isSelected = selectedChipId === chipId;
+      const wEsc = w.replace(/'/g, "\\'");
+      html += `<span class="chip ${used?'chip-used':''} ${isSelected?'chip-selected':''}" ${used?'':`onclick="selectChip('${chipId}','${wEsc}')"`}>${w}</span>`;
+    });
+    html += `</div></div>`;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const filled = userAnswers[key];
+      const parts = q.q.split('___');
+      const blankHtml = filled
+        ? `<span class="blank-filled" onclick="clearBlank('${key}')">${filled} ✕</span>`
+        : `<span class="blank-empty" onclick="assignBlank('${key}')">tap here</span>`;
+      html += `<div class="q-block" id="q_${key}"><div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${parts[0]}${blankHtml}${parts[1]||''}</span></div></div>`;
+    });
+  } else if(sec.type === 'fill'){
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key] || '';
+      html += `<div class="q-block" id="q_${key}">
+        <div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${q.q}</span></div>
+        <input class="fill-input" data-key="${key}" oninput="saveFill(this)" value="${val.replace(/"/g,'&quot;')}" placeholder="type your answer">
+      </div>`;
+    });
+  } else {
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      html += `<div class="q-block" id="q_${key}">`;
+      html += `<div class="q-text"><span class="q-num">${qi+1}</span><span class="q-text-inner">${q.q}</span></div>`;
+      html += `<div class="options">`;
+      q.options.forEach((opt, oi)=>{
+        const selected = userAnswers[key] === oi;
+        html += `<label class="opt ${selected?'selected':''}" onclick="selectMcq('${key}', ${oi}, this)"><span>${String.fromCharCode(97+oi)}) ${opt}</span></label>`;
+      });
+      html += `</div></div>`;
+    });
+  }
+
+  html += `<div class="btn-row between">`;
+  html += idx > FIRST_TIMED_SECTION_IDX ? `<button class="btn secondary" onclick="renderSection(${idx-1})">Back</button>` : `<span></span>`;
+  html += idx < quizData.length-1
+    ? `<button class="btn" onclick="attemptNext(${idx})">Next section</button>`
+    : `<button class="btn" onclick="attemptGoFinalReview()">Go to final review</button>`;
+  html += `</div>`;
+  html += `</div>`;
+
+  container.innerHTML = html;
+  if(preserveScroll){ window.scrollTo(0, scrollY); } else { window.scrollTo({top:0, behavior:'smooth'}); }
+}
+
+function selectMcq(key, oi, el){
+  userAnswers[key] = oi;
+  const parent = el.parentElement;
+  [...parent.children].forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function saveFill(el){ userAnswers[el.dataset.key] = el.value; }
+
+/* ---- click-to-fill (word bank, duplicate-safe) ---- */
+function selectChip(chipId, word){
+  selectedChipId = (selectedChipId === chipId) ? null : chipId;
+  renderSection(currentSectionIdx, true);
+}
+function assignBlank(key){
+  if(!selectedChipId){ showToast('Tap a word from the box above first'); return; }
+  const sec = quizData[currentSectionIdx];
+  const wIdx = parseInt(selectedChipId.split('_wb_')[1]);
+  const word = sec.wordbank[wIdx];
+  if(blankChipId[key]){ delete chipUsedBy[blankChipId[key]]; }
+  userAnswers[key] = word;
+  chipUsedBy[selectedChipId] = key;
+  blankChipId[key] = selectedChipId;
+  selectedChipId = null;
+  renderSection(currentSectionIdx, true);
+}
+function clearBlank(key){
+  const chipId = blankChipId[key];
+  if(chipId) delete chipUsedBy[chipId];
+  delete blankChipId[key];
+  delete userAnswers[key];
+  renderSection(currentSectionIdx, true);
+}
+
+/* ---- skip-to-question ---- */
+function findFirstUnanswered(sec){
+  for(let qi=0; qi<sec.questions.length; qi++){
+    const key = sec.id+'_'+qi;
+    if(sec.type === 'mcq'){ if(userAnswers[key] === undefined) return key; }
+    else { const v = userAnswers[key]; if(!v || !v.toString().trim()) return key; }
+  }
+  return null;
+}
+function scrollToQuestion(key){
+  const el = document.getElementById('q_'+key);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+  el.classList.add('skip-highlight');
+  setTimeout(()=> el.classList.remove('skip-highlight'), 1600);
+}
+function attemptNext(idx){
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  renderSection(idx+1);
+}
+function attemptGoFinalReview(){
+  const missingKey = findFirstUnanswered(quizData[quizData.length-1]);
+  if(missingKey){ scrollToQuestion(missingKey); return; }
+  goToFinalReview();
+}
+
+/* ---- FINAL REVIEW CHECKLIST ---- */
+function goToFinalReview(){
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.remove('hidden');
+  renderFinalReview();
+}
+function renderFinalReview(){
+  let html = `<div class="card serious">`;
+  html += `<div class="section-tag">Final review — one more pass before you submit</div>`;
+  html += `<div class="section-title">Check each part before you submit</div>`;
+  html += `<div class="section-sub">"Take your time, do not rush." Go back into any section to double-check your answers, then tick its box once you're happy with it.</div>`;
+
+  quizData.forEach((sec, idx)=>{
+    let answered = 0, total = sec.questions.length;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      if(sec.type === 'mcq'){ if(userAnswers[key] !== undefined) answered++; }
+      else { const v = userAnswers[key]; if(v && v.toString().trim()) answered++; }
+    });
+    const checked = !!reviewChecks[sec.id];
+    html += `<div class="review-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div class="review-tag">Section ${sec.label} — ${sec.title}</div>
+        <div class="review-line">${answered}/${total} answered</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn secondary small" onclick="goEditSection(${idx})">Check this part</button>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;cursor:pointer;">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleReviewCheck('${sec.id}', this.checked)" style="width:22px;height:22px;accent-color:var(--accent);">
+          Reviewed
+        </label>
+      </div>
+    </div>`;
+  });
+
+  const allChecked = quizData.every(sec => reviewChecks[sec.id]);
+  html += `<div class="btn-row" style="justify-content:center;margin-top:18px;">
+    <button class="btn" onclick="confirmFinalSubmit()" ${allChecked?'':'disabled'}>Submit</button>
+  </div>`;
+  if(!allChecked){ html += `<div class="submit-lock">Tick every "Reviewed" box above to unlock submitting.</div>`; }
+  html += `</div>`;
+  document.getElementById('finalReviewScreen').innerHTML = html;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function toggleReviewCheck(sectionId, isChecked){ reviewChecks[sectionId] = isChecked; renderFinalReview(); }
+function goEditSection(idx){
+  reviewChecks[quizData[idx].id] = false;
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  renderSection(idx);
+  const missingKey = findFirstUnanswered(quizData[idx]);
+  if(missingKey){ setTimeout(()=>scrollToQuestion(missingKey), 60); }
+}
+function confirmFinalSubmit(){
+  if(confirm("Ready to submit? You can't change answers after this.")){ finishQuiz(false); }
+}
+
+/* ---------------- SCORING & FINISH ---------------- */
+function finishQuiz(autoSubmitted){
+  if(submitted) return;
+  submitted = true;
+  clearTimeout(autoSubmitTimer);
+  warningTimers.forEach(t=>clearTimeout(t));
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('finalReviewScreen').classList.add('hidden');
+
+  const sectionResults = {};
+  const wrongList = [];
+  let totalCorrect = 0, totalQ = 0;
+
+  quizData.forEach(sec=>{
+    let correct = 0;
+    sec.questions.forEach((q, qi)=>{
+      const key = sec.id+'_'+qi;
+      const val = userAnswers[key];
+      let isRight = false;
+      if(sec.type === 'mcq'){ isRight = (val === q.answer); }
+      else { isRight = isCorrectFill(q, val); }
+      if(isRight){
+        correct++;
+      } else {
+        let questionText, yourAnswerText, correctAnswerText;
+        if(sec.type === 'mcq'){
+          questionText = q.q;
+          yourAnswerText = (val === undefined || val === null) ? '(no answer)' : q.options[val];
+          correctAnswerText = q.options[q.answer];
+        } else {
+          questionText = q.q.replace('___','_____');
+          yourAnswerText = (val && val.toString().trim()) ? val : '(no answer)';
+          correctAnswerText = q.answer;
+        }
+        wrongList.push({ section: sec.title, mode: sec.mode, questionText, yourAnswerText, correctAnswerText, expl: q.expl || '' });
+      }
+    });
+    sectionResults[sec.id] = {title:sec.title, correct, total:sec.questions.length, mode:sec.mode};
+    totalCorrect += correct;
+    totalQ += sec.questions.length;
+  });
+
+  const pct = Math.round((totalCorrect/totalQ)*100);
+  const timeTakenSec = Math.round((Date.now()-startTime)/1000);
+
+  let benchmarkNote = '';
+  if(pct >= 80) benchmarkNote = "Excellent! Strong, confident vocabulary understanding.";
+  else if(pct >= 65) benchmarkNote = "Great job! This meets the benchmark. A little more practice on the lower-scoring sections will help.";
+  else if(pct >= 50) benchmarkNote = "Good effort — close to the benchmark. Focus on the sections below to help improve.";
+  else benchmarkNote = "Below the benchmark right now. That's okay — use the section breakdown to target review.";
+
+  document.getElementById('resultsName').textContent = `Well done, ${studentName}!`;
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct+'%');
+  document.getElementById('scoreNum').textContent = pct+'%';
+  document.getElementById('benchmarkNote').textContent = (autoSubmitted ? "Time was up at 35 minutes, so this includes only what was answered. " : "") + benchmarkNote;
+
+  let rowsHtml = '';
+  Object.values(sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    rowsHtml += `<div class="section-score-row">
+      <span>${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  document.getElementById('sectionScores').innerHTML = rowsHtml;
+
+  let reviewHtml = '';
+  if(wrongList.length === 0){
+    reviewHtml = `<div class="review-heading">Review</div><div class="perfect-msg">Perfect score — no questions to review!</div>`;
+  } else {
+    reviewHtml += `<div class="review-heading">Let's review (${wrongList.length})</div>`;
+    reviewHtml += `<div class="review-sub">Penjelasan di bawah ini dalam Bahasa Indonesia supaya lebih mudah dipahami.</div>`;
+    wrongList.forEach(w=>{
+      reviewHtml += `<div class="review-card">
+        <div class="review-tag">Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Your answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+  }
+  document.getElementById('reviewSection').innerHTML = reviewHtml;
+  document.getElementById('resultsScreen').classList.remove('hidden');
+
+  const payload = {
+    studentName,
+    studentNameLower: studentName.trim().toLowerCase(),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    timeTakenSeconds: timeTakenSec,
+    autoSubmitted: !!autoSubmitted,
+    totalCorrect, totalQuestions: totalQ, overallPercent: pct,
+    sectionResults,
+    wrongAnswers: wrongList,
+    rawAnswers: userAnswers
+  };
+  db.collection(COLLECTION).add(payload).catch(err=>{ console.error('Could not save results:', err); });
+}
+
+/* ---------------- TEACHER LOGIN ---------------- */
+function openTeacherModal(){ document.getElementById('teacherModal').classList.remove('hidden'); }
+function closeTeacherModal(){ document.getElementById('teacherModal').classList.add('hidden'); document.getElementById('teacherErr').classList.add('hidden'); }
+function checkTeacherLogin(){
+  const u = document.getElementById('teacherUser').value.trim();
+  const p = document.getElementById('teacherPass').value.trim();
+  if(u === 'gpw' && p === '030030'){
+    closeTeacherModal();
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('teacherDash').classList.remove('hidden');
+    loadAttempts();
+  } else {
+    document.getElementById('teacherErr').classList.remove('hidden');
+  }
+}
+
+/* ---------------- STUDENT SCORE LOOKUP ---------------- */
+function openScoreLookup(){ document.getElementById('scoreLookupModal').classList.remove('hidden'); }
+function closeScoreLookup(){
+  document.getElementById('scoreLookupModal').classList.add('hidden');
+  document.getElementById('lookupErr').classList.add('hidden');
+}
+function doScoreLookup(){
+  const name = document.getElementById('lookupName').value.trim();
+  const errEl = document.getElementById('lookupErr');
+  if(!name){ errEl.textContent = 'Please type your name first.'; errEl.classList.remove('hidden'); return; }
+  errEl.classList.add('hidden');
+  db.collection(COLLECTION).where('studentNameLower', '==', name.toLowerCase()).get().then(snap=>{
+    if(snap.empty){ errEl.textContent = "We couldn't find any past quizzes under that name."; errEl.classList.remove('hidden'); return; }
+    const docs = snap.docs.slice().sort((a,b)=>{
+      const ta = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+      const tb = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+      return tb - ta;
+    });
+    closeScoreLookup();
+    renderMyScores(name, docs);
+  }).catch(err=>{
+    errEl.textContent = 'Could not look up scores: ' + err.message;
+    errEl.classList.remove('hidden');
+  });
+}
+function renderMyScores(name, docs){
+  document.getElementById('startScreen').classList.add('hidden');
+  let html = `<div class="card"><h1 style="color:var(--accent-deep);font-size:26px;">${name}'s previous scores</h1>`;
+  docs.forEach(doc=>{
+    const d = doc.data();
+    const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+    html += `<div class="review-card">
+      <div class="review-line"><b>${date}</b></div>
+      <div class="review-line">Score: <span class="review-correct">${d.overallPercent}%</span> (${d.totalCorrect}/${d.totalQuestions})</div>
+    </div>`;
+  });
+  html += `<div class="btn-row" style="justify-content:center;margin-top:16px;"><button class="btn secondary" onclick="location.reload()">Back</button></div></div>`;
+  document.getElementById('myScoresScreen').innerHTML = html;
+  document.getElementById('myScoresScreen').classList.remove('hidden');
+}
+
+function loadAttempts(){
+  const list = document.getElementById('attemptsList');
+  list.innerHTML = '<p style="font-weight:700;color:var(--ink-soft);">Loading results...</p>';
+  db.collection(COLLECTION).orderBy('timestamp','desc').get().then(snap=>{
+    if(snap.empty){ list.innerHTML = '<p style="font-weight:700;color:var(--ink-soft);">No attempts yet.</p>'; return; }
+    let html = `<table><thead><tr><th>Student</th><th>Date</th><th>Score</th><th>Time used</th><th>Level</th></tr></thead><tbody>`;
+    snap.forEach(doc=>{
+      const d = doc.data();
+      const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : '—';
+      const mins = Math.floor((d.timeTakenSeconds||0)/60), secs=(d.timeTakenSeconds||0)%60;
+      let pillClass = 'pill-low', pillText='Below benchmark';
+      if(d.overallPercent>=80){pillClass='pill-good';pillText='Above benchmark';}
+      else if(d.overallPercent>=65){pillClass='pill-good';pillText='Meets benchmark';}
+      else if(d.overallPercent>=50){pillClass='pill-mid';pillText='Near benchmark';}
+      html += `<tr class="attempt-row" onclick="showAttemptDetail('${doc.id}')">
+        <td>${d.studentName}</td><td>${date}</td><td>${d.overallPercent}% (${d.totalCorrect}/${d.totalQuestions})</td>
+        <td>${mins}m ${secs}s</td><td><span class="pill-small ${pillClass}">${pillText}</span></td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+    list.innerHTML = html;
+    window._attemptsSnap = snap;
+  }).catch(err=>{
+    list.innerHTML = `<p style="font-weight:700;color:var(--error);">Could not load results. Make sure Firestore rules allow read access. (${err.message})</p>`;
+  });
+}
+
+function showAttemptDetail(id){
+  const doc = window._attemptsSnap.docs.find(d=>d.id===id);
+  if(!doc) return;
+  const d = doc.data();
+  let html = `<div class="card" style="margin-top:18px;"><h3 style="color:var(--accent-deep);font-size:22px;">${d.studentName}'s breakdown</h3>`;
+  Object.values(d.sectionResults).forEach(r=>{
+    const p = Math.round((r.correct/r.total)*100);
+    html += `<div class="section-score-row">
+      <span>${r.title}</span>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%"></div></div>
+      <span>${r.correct}/${r.total}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  if(d.wrongAnswers && d.wrongAnswers.length){
+    html += `<div class="card" style="margin-top:16px;"><div class="review-heading" style="margin-top:0;">Missed questions (${d.wrongAnswers.length})</div>`;
+    d.wrongAnswers.forEach(w=>{
+      html += `<div class="review-card">
+        <div class="review-tag">Section ${w.section}</div>
+        <div class="review-q">${w.questionText}</div>
+        <div class="review-line">Student's answer: <span class="review-your">${w.yourAnswerText}</span></div>
+        <div class="review-line">Correct answer: <span class="review-correct">${w.correctAnswerText}</span></div>
+        ${w.expl ? `<div class="review-expl"><b>Kenapa:</b> ${w.expl}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  document.getElementById('attemptDetail').innerHTML = html;
+}
+</script>
+</body>
+</html>
