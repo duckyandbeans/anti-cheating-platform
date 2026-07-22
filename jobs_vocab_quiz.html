@@ -234,14 +234,29 @@
       <div class="info-chips">
         <div class="chip-info">🗂️ study reference first</div>
         <div class="chip-info">📝 68 questions</div>
-        <div class="chip-info">⏳ 35 minutes</div>
+        <div class="chip-info">👆 tap to answer, no typing needed</div>
       </div>
       <input id="studentName" class="name-input" placeholder="Type your name here" />
       <div>
         <button class="btn" onclick="startFlow()">Begin</button>
       </div>
-      <div class="teacher-link" onclick="openTeacherModal()">I'm the teacher / parent →</div>
+      <div class="teacher-link" onclick="openTeacherModal()">👩‍🏫 Teacher / parent dashboard →</div>
       <div class="teacher-link" onclick="openScoreLookup()">📄 Check my previous scores →</div>
+      <div class="teacher-link" onclick="openAnswerKey()">✅ View answer key →</div>
+    </div>
+  </div>
+
+  <!-- TEACHER LOGIN MODAL -->
+  <div id="teacherModal" class="modal-bg hidden">
+    <div class="modal">
+      <h3>Teacher / Parent Login</h3>
+      <input id="teacherUser" placeholder="Username" />
+      <input id="teacherPass" type="password" placeholder="Password" />
+      <div id="teacherErr" class="err hidden">Incorrect username or password.</div>
+      <div class="btn-row between">
+        <button class="btn secondary small" onclick="closeTeacherModal()">Cancel</button>
+        <button class="btn small" onclick="checkTeacherLogin()">Log in</button>
+      </div>
     </div>
   </div>
 
@@ -295,19 +310,8 @@
     </div>
   </div>
 
-  <!-- TEACHER LOGIN MODAL -->
-  <div id="teacherModal" class="modal-bg hidden">
-    <div class="modal">
-      <h3>Teacher / Parent Login</h3>
-      <input id="teacherUser" placeholder="Username" />
-      <input id="teacherPass" type="password" placeholder="Password" />
-      <div id="teacherErr" class="err hidden">Incorrect username or password.</div>
-      <div class="btn-row between">
-        <button class="btn secondary small" onclick="closeTeacherModal()">Cancel</button>
-        <button class="btn small" onclick="checkTeacherLogin()">Log in</button>
-      </div>
-    </div>
-  </div>
+  <!-- ANSWER KEY SCREEN (no login needed) -->
+  <div id="answerKeyScreen" class="hidden"></div>
 
   <!-- STUDENT SCORE LOOKUP MODAL -->
   <div id="scoreLookupModal" class="modal-bg hidden">
@@ -479,11 +483,8 @@ let studentName = '';
 let currentSectionIdx = 0;
 let userAnswers = {};
 let startTime = null;
-const AUTO_SUBMIT_SECONDS = 35*60;
 const FIRST_TIMED_SECTION_IDX = 0;
 let submitted = false;
-let autoSubmitTimer = null;
-let warningTimers = [];
 let reviewChecks = {};
 
 let selectedChipId = null;
@@ -528,9 +529,6 @@ function beginTimedExam(){
   document.getElementById('flashcardScreen').classList.add('hidden');
   document.getElementById('quizScreen').classList.remove('hidden');
   startTime = Date.now();
-  autoSubmitTimer = setTimeout(()=>{ if(!submitted) finishQuiz(true); }, AUTO_SUBMIT_SECONDS*1000);
-  warningTimers.push(setTimeout(()=> showToast("5 minutes left — take your time wrapping up."), (AUTO_SUBMIT_SECONDS-300)*1000));
-  warningTimers.push(setTimeout(()=> showToast("1 minute left."), (AUTO_SUBMIT_SECONDS-60)*1000));
   renderTrail();
   renderSection(FIRST_TIMED_SECTION_IDX);
 }
@@ -742,15 +740,13 @@ function goEditSection(idx){
   if(missingKey){ setTimeout(()=>scrollToQuestion(missingKey), 60); }
 }
 function confirmFinalSubmit(){
-  if(confirm("Ready to submit? You can't change answers after this.")){ finishQuiz(false); }
+  if(confirm("Ready to submit? You can't change answers after this.")){ finishQuiz(); }
 }
 
 /* ---------------- SCORING & FINISH ---------------- */
-function finishQuiz(autoSubmitted){
+function finishQuiz(){
   if(submitted) return;
   submitted = true;
-  clearTimeout(autoSubmitTimer);
-  warningTimers.forEach(t=>clearTimeout(t));
   document.getElementById('quizScreen').classList.add('hidden');
   document.getElementById('finalReviewScreen').classList.add('hidden');
 
@@ -799,7 +795,7 @@ function finishQuiz(autoSubmitted){
   document.getElementById('resultsName').textContent = `Well done, ${studentName}!`;
   document.getElementById('scoreCircle').style.setProperty('--pct', pct+'%');
   document.getElementById('scoreNum').textContent = pct+'%';
-  document.getElementById('benchmarkNote').textContent = (autoSubmitted ? "Time was up at 35 minutes, so this includes only what was answered. " : "") + benchmarkNote;
+  document.getElementById('benchmarkNote').textContent = benchmarkNote;
 
   let rowsHtml = '';
   Object.values(sectionResults).forEach(r=>{
@@ -836,7 +832,6 @@ function finishQuiz(autoSubmitted){
     studentNameLower: studentName.trim().toLowerCase(),
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     timeTakenSeconds: timeTakenSec,
-    autoSubmitted: !!autoSubmitted,
     totalCorrect, totalQuestions: totalQ, overallPercent: pct,
     sectionResults,
     wrongAnswers: wrongList,
@@ -853,12 +848,42 @@ function checkTeacherLogin(){
   const p = document.getElementById('teacherPass').value.trim();
   if(u === 'gpw' && p === '030030'){
     closeTeacherModal();
-    document.getElementById('startScreen').classList.add('hidden');
-    document.getElementById('teacherDash').classList.remove('hidden');
-    loadAttempts();
+    openTeacherDash();
   } else {
     document.getElementById('teacherErr').classList.remove('hidden');
   }
+}
+function openTeacherDash(){
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('teacherDash').classList.remove('hidden');
+  loadAttempts();
+}
+
+/* ---------------- ANSWER KEY (no login needed) ---------------- */
+function openAnswerKey(){
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('answerKeyScreen').classList.remove('hidden');
+  renderAnswerKey();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function renderAnswerKey(){
+  let html = `<div class="card">
+    <h1 style="color:var(--accent-deep);font-size:26px;margin-bottom:6px;">Answer Key</h1>
+    <div class="section-sub">Every question with its correct answer, section by section.</div>`;
+  quizData.forEach(sec=>{
+    html += `<div class="review-heading">Section ${sec.label} — ${sec.title}</div>`;
+    sec.questions.forEach((q, qi)=>{
+      const questionText = q.q.replace('___','_____');
+      const correctAnswerText = sec.type === 'mcq' ? q.options[q.answer] : q.answer;
+      html += `<div class="review-card">
+        <div class="review-q">${qi+1}. ${questionText}</div>
+        <div class="review-line">Correct answer: <span class="review-correct">${correctAnswerText}</span></div>
+        ${q.expl ? `<div class="review-expl"><b>Kenapa:</b> ${q.expl}</div>` : ''}
+      </div>`;
+    });
+  });
+  html += `<div class="btn-row" style="justify-content:center;margin-top:16px;"><button class="btn secondary" onclick="location.reload()">Back</button></div></div>`;
+  document.getElementById('answerKeyScreen').innerHTML = html;
 }
 
 /* ---------------- STUDENT SCORE LOOKUP ---------------- */
